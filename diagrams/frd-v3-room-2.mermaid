@@ -1,0 +1,47 @@
+graph TD
+    %% Define node styles
+    classDef room fill:#f9d77e,stroke:#333,stroke-width:2px
+    classDef choice fill:#f9f9f9,stroke:#333,stroke-width:1px
+    classDef outcome fill:#99ff99,stroke:#333,stroke-width:2px
+    classDef combat fill:#ff9999,stroke:#333,stroke-width:2px
+    classDef death fill:#000000,color:#ffffff,stroke:#ff0000,stroke-width:2px
+    classDef check fill:#99ccff,stroke:#333,stroke-width:2px
+    classDef item fill:#ffcc99,stroke:#333,stroke-width:2px
+    
+    %% Room 2 Entry Point
+    R2[Room 2: Puzzle Room]
+    
+    %% Initial choices
+    R2 --> C1{Choose Action}
+    C1 -->|"Solve Puzzle"| CH1[Intelligence Check]
+    C1 -->|"Break Mechanism"| CH2[Strength Check]
+    
+    %% Solve puzzle path
+    CH1 -->|"Success"| I1[Gain Sword of Dragon Slaying]
+    CH1 -->|"Failure"| CO1[Golem Combat]
+    
+    %% Break mechanism path
+    CH2 -->|"Success"| O1[Mechanism Broken]
+    CH2 -->|"Failure"| CO1
+    
+    %% Combat path
+    CO1 -->|"Victory"| O2[Golem Defeated]
+    CO1 -->|"Defeat"| D1[Death]
+    
+    %% Outcomes lead to movement choices
+    I1 --> M1{Choose Path}
+    O1 --> M1
+    O2 --> M1
+    
+    %% Movement options
+    M1 -->|"Go West"| R1[To Room 1]
+    M1 -->|"Go East"| R4[To Room 4]
+    
+    %% Apply styles
+    class R1,R2,R3,R4 room
+    class C1,M1 choice
+    class O1,O2 outcome
+    class CO1 combat
+    class D1 death
+    class CH1,CH2 check
+    class I1 item

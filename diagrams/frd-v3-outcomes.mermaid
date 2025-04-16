@@ -1,0 +1,22 @@
+graph TD
+    %% Define node styles
+    classDef exit fill:#99ff99,stroke:#333,stroke-width:2px
+    classDef outcome fill:#ccffcc,stroke:#333,stroke-width:2px
+    classDef choice fill:#f9f9f9,stroke:#333,stroke-width:1px
+    
+    %% Exit Entry Point
+    E[Exit Dungeon]
+    
+    %% Determine final outcome based on achievements
+    E --> C1{Final Outcome}
+    
+    %% Different endings based on what was accomplished
+    C1 -->|"Dragon defeated + Treasure obtained"| O1[Victory with Treasure and Dragon Slain]
+    C1 -->|"Dragon defeated + No Treasure"| O2[Victory with Dragon Slain but No Treasure]
+    C1 -->|"Dragon alive + Treasure obtained"| O3[Escape with Treasure]
+    C1 -->|"Dragon alive + No Treasure"| O4[Escape without Treasure]
+    
+    %% Apply styles
+    class E exit
+    class C1 choice
+    class O1,O2,O3,O4 outcome

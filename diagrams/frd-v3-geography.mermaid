@@ -1,0 +1,26 @@
+graph TD
+    classDef room fill:#f9d77e,stroke:#333,stroke-width:2px
+    classDef exit fill:#99ff99,stroke:#333,stroke-width:2px
+    
+    R1[Room 1: Entrance Hall<br>Goblin Guardian]
+    R2[Room 2: Chamber of Riddles<br>Puzzle Room]
+    R3[Room 3: Treasure Vault<br>Trapped Treasure]
+    R4[Room 4: Dragon's Lair<br>Boss Chamber]
+    E[Exit]
+    
+    R1 --->|"East"| R2
+    R1 --->|"South"| R3
+
+    R2 --->|"West"| R1
+    R2 --->|"South"| R3
+    R2 --->|"East"| R4
+
+    R3 --->|"North"| R1
+    R3 --->|"North East"| R4
+
+    R4 --->|"West"| R2
+    R4 --->|"South West"| R3
+    R4 --->|"South"| E
+    
+    class R1,R2,R3,R4 room
+    class E exit

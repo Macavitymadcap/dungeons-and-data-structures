@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <base href="./">
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>Mermaid Viewer</title>
+
+    <!-- Mermaid.js -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+
+    <!-- Load Scripts and Initialise-->
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+          mermaid.initialize({ startOnLoad: false });
+
+          const files = [
+            'frd-v1.mermaid',
+            'frd-v2.mermaid',
+            'frd-v3-overview.mermaid',
+            'frd-v3-geography.mermaid',
+            'frd-v3-room-1.mermaid',
+            'frd-v3-room-2.mermaid',
+            'frd-v3-room-3.mermaid',
+            'frd-v3-room-4.mermaid',
+            'frd-v3-outcomes.mermaid',
+          ];
+
+          const container = document.getElementById('diagrams-container');
+
+          for (const file of files) {
+            const response = await fetch(file);
+            const diagramCode = await response.text();
+
+            const div = document.createElement('div');
+            div.className = 'mermaid';
+            div.textContent = diagramCode;
+
+            const summary = document.createElement('summary');
+            summary.textContent = file.replace('.mermaid', '').split('-').join(' ');
+
+            const details = document.createElement('details');
+            details.appendChild(summary);
+            details.appendChild(div);
+            container.appendChild(details);
+
+            mermaid.init(undefined, div);
+          }
+        });
+    </script>
+  </head>
+
+  <body>
+    <section id="diagrams-container"></section>
+  </body>
+</html>
