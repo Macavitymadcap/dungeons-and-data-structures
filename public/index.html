@@ -68,12 +68,13 @@
         <h1>Dungeons &amp; Data Structures</h1>
     </header>
 
-    <main id="main" hx-get="/introduction.html" hx-trigger="load once"></main>
+    <main id="main" hx-get="./introduction.html" hx-trigger="load once"></main>
+    <!-- Updated hx-get to use a relative path -->
 
     <footer>
         <nav>
             <menu 
-                hx-get="/menu.html"
+                hx-get="./menu.html"
                 hx-trigger="load once"
                 hx-swap="outerHTML"
             >
