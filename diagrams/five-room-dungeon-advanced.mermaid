@@ -1,0 +1,183 @@
+graph TD
+    classDef room fill:#f9d77e,stroke:#333,stroke-width:2px
+    classDef combat fill:#ff9999,stroke:#333,stroke-width:2px
+    classDef skill fill:#99ccff,stroke:#333,stroke-width:2px
+    classDef outcome fill:#99ff99,stroke:#333,stroke-width:2px
+    classDef death fill:#000000,color:#ffffff,stroke:#ff0000,stroke-width:2px
+    
+    %% Room Nodes - Standardized with Room Numbers and Descriptions
+    R1[Room 1: Entrance Hall<br>Goblin Guardian]
+    R2[Room 2: Chamber of Riddles<br>Magical Puzzle]
+    R3[Room 3: Treasure Vault<br>Hidden Trap]
+    R4[Room 4: Dragon's Lair<br>Boss Chamber]
+    
+    %% Encounter Nodes
+    EG[Goblin Encounter]
+    EP[Puzzle Golem Encounter]
+    ED[Dragon Encounter]
+    
+    %% Action Nodes - Using clear action verbs
+    A1[Approach Goblin]
+    A2[Attack Goblin]
+    A3[Attempt to Bribe Goblin]
+    A4[Attempt to Sneak Past Goblin]
+    A5[Solve Riddle]
+    A6[Break Mechanism]
+    A7[Search Treasure Vault]
+    A8[Inspect Treasure Chest]
+    A9[Attempt to Detect Trap]
+    A10[Attempt to Disarm Trap]
+    A11[Take Treasure]
+    A12[Attack Dragon]
+    A13[Flee from Dragon]
+    A14[Return for Treasure]
+    
+    %% Check Nodes - Standardized labels
+    C1[Charisma Check]
+    C2[Stealth Check]
+    C3[Intelligence Check] 
+    C4[Strength Check]
+    C5[Perception Check]
+    C6[Dexterity Check]
+    
+    %% Direction Nodes - Clear geographical labels
+    D1[Choose Direction<br>East or South]
+    D2[Choose Direction<br>West or South]
+    D3[Choose Direction<br>North or West]
+    
+    %% Outcome Nodes - Standardized with clear outcome states
+    O1[Goblin Defeated]
+    O2[Goblin Bribed]
+    O3[Snuck Past Goblin]
+    O4[Riddle Solved]
+    O5[Mechanism Broken]
+    O6[Golem Defeated]
+    O7[Trap Detected]
+    O8[Trap Disarmed]
+    O9[Trap Triggered]
+    O10[Dragon Defeated]
+    O11[Escaped from Dragon]
+    O12[Treasure Acquired]
+    
+    %% Ending Nodes - Clear endings with reasons
+    E1[Ending: Death by Goblin]
+    E2[Ending: Death by Golem]
+    E3[Ending: Death by Trap]
+    E4[Ending: Death by Dragon]
+    E5[Ending: Victory with Treasure and Dragon Slain]
+    E6[Ending: Victory with Dragon Slain but No Treasure]
+    E7[Ending: Escape with Treasure]
+    E8[Ending: Escape without Treasure]
+    
+    %% Geographic Flow - Room 1 (Entrance) connections
+    R1 --> A1
+    A1 --> A2
+    A1 --> A3
+    A1 --> A4
+    
+    A2 --> EG
+    EG --> O1
+    EG --> E1
+    
+    A3 --> C1
+    C1 --> O2
+    C1 --> A2
+    
+    A4 --> C2
+    C2 --> O3
+    C2 --> A2
+    C2 --> A3
+    
+    %% Path from Room 1 outcomes to Direction choice
+    O1 --> D1
+    O2 --> D1
+    O3 --> D1
+    
+    %% Direction choice from Room 1
+    D1 --> R2
+    D1 --> R3
+    
+    %% Room 2 (Puzzle Room) connections
+    R2 --> A5
+    R2 --> A6
+    
+    A5 --> C3
+    C3 --> O4
+    C3 --> EP
+    
+    A6 --> C4
+    C4 --> O5
+    C4 --> EP
+    
+    EP --> O6
+    EP --> E2
+    
+    %% Path from Room 2 outcomes to Direction choice
+    O4 --> D2
+    O5 --> D2
+    O6 --> D2
+    
+    %% Direction choice from Room 2
+    D2 --> R1
+    D2 --> R3
+    
+    %% Room 3 (Treasure Vault) connections
+    R3 --> A7
+    A7 --> A8
+    A8 --> A9
+    A8 --> A11
+    
+    A9 --> C5
+    C5 --> O7
+    C5 --> A11
+    
+    O7 --> A10
+    A10 --> C6
+    C6 --> O8
+    C6 --> O9
+    
+    O9 --> E3
+    O9 --> O12
+    
+    A11 --> O9
+    O8 --> O12
+    
+    %% Direction choice from Room 3
+    O12 --> D3
+    D3 --> R1
+    D3 --> R4
+    
+    %% Room 4 (Dragon's Lair) connections
+    R4 --> ED
+    ED --> A12
+    ED --> A13
+    
+    A12 --> O10
+    A12 --> E4
+    
+    A13 --> O11
+    
+    %% Treasure decision after defeating dragon
+    O10 --> A14
+    A14 --> R3
+    A14 --> E6
+    
+    %% Treasure decision after fleeing dragon
+    O11 --> A14
+    
+    %% Final outcomes
+    O10 --> O12
+    O10 --> E6
+    
+    O12 --> E5
+    O12 --> E7
+    
+    O11 --> E8
+    
+    %% Apply classes
+    class R1,R2,R3,R4 room
+    class EG,EP,ED combat
+    class C1,C2,C3,C4,C5,C6 skill
+    class O1,O2,O3,O4,O5,O6,O7,O8,O9,O10,O11,O12 outcome
+    class E1,E2,E3,E4 death
+    class E5,E6,E7,E8 outcome
