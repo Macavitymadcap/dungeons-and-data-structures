@@ -1,0 +1,25 @@
+graph TD
+    A[1: Entrance: Guardian Goblin]
+    A -->|"Fight"| B
+    A -->|"Sneak past"| B
+    A -->|"Bribe"| B
+
+    B[2: Puzzle Room]
+    B -->|"Solve riddle"| C
+    B -->|"Break mechanism"| E
+
+    C[3: Treasure Room]
+    C -->|"Take treasure"| D
+    C -->|"Leave treasure"| E
+
+    D[4: Trap Room]
+    D -->|"Disarm trap"| E
+    D -->|"Triggered trap"| F
+
+    E[5: Boss Chamber]
+    E -->|"Fight dragon"| G
+    E -->|"Flee dungeon"| H
+
+    F[Ending: Death]
+    G[Ending: Victory]
+    H[Ending: Escape]

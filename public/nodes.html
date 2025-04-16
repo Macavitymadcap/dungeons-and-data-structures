@@ -1,0 +1,239 @@
+<h2>Choose Your Node Adventure</h2>
+
+<p>
+  Adventure gamebooks like the Fighting Fantasy series and Choose Your Own Adventure books implement one of the most
+  recognizable data structures in computer science: the directed graph. Each numbered section or paragraph in these
+  books functions as a node in the graph, with the choices at the end of each section representing directed edges to
+  other nodes.
+</p>
+
+<h3>Graph Theory in Adventure Books</h3>
+
+<p>
+  In computer science terms, a directed graph (or digraph) consists of:
+
+</p>
+
+<ul>
+  <li><strong>Vertices (nodes)</strong>: The individual locations or states in the system</li>
+  <li><strong>Edges (connections)</strong>: The relationships or transitions between nodes</li>
+  <li><strong>Direction</strong>: The permitted flow from one node to another</li>
+</ul>
+
+<p>
+  Adventure gamebooks typically implement a directed acyclic graph (DAG) to prevent infinite loops, though some may
+  include cycles for specific gameplay mechanics. The reader traverses this graph through decision-making, performing
+  what amounts to a depth-first search through the narrative space.
+</p>
+
+<h3>Implementing an Adventure Node System</h3>
+
+<p>
+  Let's implement a simple Choose Your Own Adventure system using TypeScript:
+</p>
+
+<details>
+  <summary>Click to view the code</summary>
+
+<pre><code class="language-typescript">interface AdventureNode {
+  id: number;
+  text: string;
+  choices: Choice[];
+  isEnding: boolean;
+}
+
+interface Choice {
+  text: string;
+  nextNodeId: number;
+}
+
+class AdventureGraph {
+  private nodes: Map&lt;number, AdventureNode&gt; = new Map();
+  private currentNodeId: number;
+  
+  constructor(startingNodeId: number) {
+    this.currentNodeId = startingNodeId;
+  }
+  
+  addNode(node: AdventureNode): void {
+    this.nodes.set(node.id, node);
+  }
+  
+  getCurrentNode(): AdventureNode | undefined {
+    return this.nodes.get(this.currentNodeId);
+  }
+  
+  makeChoice(choiceIndex: number): boolean {
+    const currentNode = this.getCurrentNode();
+    if (!currentNode || choiceIndex &gt;= currentNode.choices.length) {
+      return false;
+    }
+    
+    this.currentNodeId = currentNode.choices[choiceIndex].nextNodeId;
+    return true;
+  }
+  
+  isAtEnding(): boolean {
+    const currentNode = this.getCurrentNode();
+    return currentNode ? currentNode.isEnding : false;
+  }
+  
+  // Validate that all choices lead to valid nodes
+  validateGraph(): boolean {
+    for (const node of this.nodes.values()) {
+      for (const choice of node.choices) {
+        if (!this.nodes.has(choice.nextNodeId)) {
+          console.error(`Node ${node.id} has invalid choice to ${choice.nextNodeId}`);
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+}
+</code></pre>
+</details>
+
+
+<h3>Five Room Dungeon Example</h3>
+
+<p>
+  To illustrate this concept, let's create a simple five-room dungeon adventure using our node system. First, let's
+  visualize the structure using a Mermaid diagram:
+</p>
+
+<div class="mermaid">
+graph TD
+  A[1: Entrance: Guardian Goblin]
+  A -->|"Fight"| B
+  A -->|"Sneak past"| B
+  A -->|"Bribe"| B
+
+  B[2: Puzzle Room]
+  B -->|"Solve riddle"| C
+  B -->|"Break mechanism"| E
+
+  C[3: Treasure Room]
+  C -->|"Take treasure"| D
+  C -->|"Leave treasure"| E
+
+  D[4: Trap Room]
+  D -->|"Disarm trap"| E
+  D -->|"Triggered trap"| F
+
+  E[5: Boss Chamber]
+  E -->|"Fight dragon"| G
+  E -->|"Flee dungeon"| H
+
+  F[Ending: Death]
+  G[Ending: Victory]
+  H[Ending: Escape]
+</div>
+
+<p>
+  Now, let's implement this adventure using our node system:
+</p>
+
+<details>
+  <summary>Click to view the code</summary>
+
+<pre><code class="language-typescript">// Create the adventure
+const dungeon = new AdventureGraph(1);
+
+// Add the nodes
+dungeon.addNode({
+  id: 1,
+  text: &quot;You stand at the entrance of the dungeon. A goblin guards the doorway, eyeing you suspiciously.&quot;,
+  choices: [
+    { text: &quot;Attack the goblin&quot;, nextNodeId: 2 },
+    { text: &quot;Try to sneak past while it's distracted&quot;, nextNodeId: 2 },
+    { text: &quot;Offer gold to pass&quot;, nextNodeId: 2 }
+  ],
+  isEnding: false
+});
+
+dungeon.addNode({
+  id: 2,
+  text: &quot;You enter a chamber with a stone pedestal in the center. There's a riddle inscribed: 'I speak without a mouth and hear without ears. I have no body, but I come alive with wind.'&quot;,
+  choices: [
+    { text: &quot;Answer 'Echo'&quot;, nextNodeId: 3 },
+    { text: &quot;Smash the pedestal&quot;, nextNodeId: 5 }
+  ],
+  isEnding: false
+});
+
+dungeon.addNode({
+  id: 3,
+  text: &quot;The pedestal slides away, revealing a hidden compartment with a glittering treasure chest.&quot;,
+  choices: [
+    { text: &quot;Take the treasure&quot;, nextNodeId: 4 },
+    { text: &quot;Leave it and proceed&quot;, nextNodeId: 5 }
+  ],
+  isEnding: false
+});
+
+dungeon.addNode({
+  id: 4,
+  text: &quot;As you lift the treasure, you hear a click. The floor beneath you begins to crumble, revealing spikes!&quot;,
+  choices: [
+    { text: &quot;Try to disarm the trap&quot;, nextNodeId: 5 },
+    { text: &quot;Jump but fail to escape&quot;, nextNodeId: 6 }
+  ],
+  isEnding: false
+});
+
+dungeon.addNode({
+  id: 5,
+  text: &quot;You enter a massive chamber with ancient columns. A dragon sleeps on a pile of gold in the center.&quot;,
+  choices: [
+    { text: &quot;Fight the dragon&quot;, nextNodeId: 7 },
+    { text: &quot;Flee the dungeon&quot;, nextNodeId: 8 }
+  ],
+  isEnding: false
+});
+
+dungeon.addNode({
+  id: 6,
+  text: &quot;The spikes impale you. Your adventure ends here.&quot;,
+  choices: [],
+  isEnding: true
+});
+
+dungeon.addNode({
+  id: 7,
+  text: &quot;After a fierce battle, you defeat the dragon and claim its hoard. You are victorious!&quot;,
+  choices: [],
+  isEnding: true
+});
+
+dungeon.addNode({
+  id: 8,
+  text: &quot;You escape the dungeon with your life, if not your pride. Perhaps another day you'll return better prepared.&quot;,
+  choices: [],
+  isEnding: true
+});
+
+// Validate the graph
+if (dungeon.validateGraph()) {
+  console.log(&quot;Adventure is ready to play!&quot;);
+}
+</code></pre>
+</details>
+
+<p>
+  This implementation demonstrates how adventure books structure their narratives as traversable graphs. Each choice
+  represents an edge leading to another node, and the reader's decisions determine their path through the story. The
+  same approach is used in digital RPGs, interactive fiction, and even modern narrative-heavy video games.
+</p>
+
+<p>
+  From a computational perspective, this structure offers several advantages:
+</p>
+
+<ul>
+  <li><strong>Modularity</strong>: Each node can be designed independently</li>
+  <li><strong>Reusability</strong>: Multiple paths can lead to the same node</li>
+  <li><strong>Analyzability</strong>: The narrative structure can be validated programmatically</li>
+  <li><strong>Extensibility</strong>: New nodes and paths can be added without disrupting existing ones</li>
+</ul>
+

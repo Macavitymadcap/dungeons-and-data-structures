@@ -1,0 +1,687 @@
+<h2>Character Composition &amp; Inheritance</h2>
+
+<p>
+  While the abstract StatBlock provides a solid foundation, player characters in RPGs have significantly more
+  complexity due to the combinatorial nature of races, classes, backgrounds, and equipment. This complexity is best
+  handled through a combination of inheritance and composition.
+</p>
+
+<h3>Character Class Hierarchy</h3>
+
+<p>
+  In our system, the PlayerCharacter class extends the StatBlock but incorporates additional components:
+</p>
+
+<details>
+  <summary>Click to view the full code</summary>
+
+<pre><code class="language-typescript">interface Race {
+  name: string;
+  size: Size;
+  speed: number;
+  abilityScoreIncreases: Partial&lt;Record&lt;Ability, number&gt;&gt;;
+  traits: Trait[];
+  languages: string[];
+}
+
+interface CharacterClass {
+  name: string;
+  hitDieSize: number;
+  primaryAbility: Ability;
+  savingThrowProficiencies: Ability[];
+  armorProficiencies: string[];
+  weaponProficiencies: string[];
+  skillProficiencyChoices: string[];
+  startingEquipment: Item[];
+  features: Record&lt;number, Feature[]&gt;; // Keyed by level
+}
+
+interface Background {
+  name: string;
+  skillProficiencies: string[];
+  toolProficiencies: string[];
+  languages: number; // Number of languages to choose
+  equipment: Item[];
+  feature: Feature;
+  personalityTraits: string[];
+  ideals: string[];
+  bonds: string[];
+  flaws: string[];
+}
+
+// Player Character class
+class PlayerCharacter extends StatBlock {
+  race: Race;
+  characterClass: CharacterClass;
+  level: number;
+  background: Background;
+  proficiencyBonus: number;
+  experience: number;
+  alignment: string;
+  features: Feature[] = [];
+  inventory: Item[] = [];
+  equippedItems: Record&lt;string, Item&gt; = {};
+  spellbook?: Spellbook;
+  
+  constructor(
+    name: string,
+    race: Race,
+    characterClass: CharacterClass,
+    level: number,
+    background: Background,
+    baseAbilities: Record&lt;Ability, number&gt;,
+    alignment: string
+  ) {
+    // Calculate base stats
+    const raceAbilityBonuses = race.abilityScoreIncreases;
+    const abilities: Record&lt;Ability, number&gt; = { ...baseAbilities };
+    
+    // Apply racial ability score increases
+    for (const ability in raceAbilityBonuses) {
+      const typedAbility = ability as Ability;
+      abilities[typedAbility] += raceAbilityBonuses[typedAbility] || 0;
+    }
+    
+    // Calculate hit points
+    const conModifier = Math.floor((abilities.constitution - 10) / 2);
+    const firstLevelHP = characterClass.hitDieSize + conModifier;
+    const additionalLevelsHP = level &gt; 1 
+      ? (level - 1) * (Math.floor(characterClass.hitDieSize / 2) + 1 + conModifier)
+      : 0;
+    const totalHP = firstLevelHP + additionalLevelsHP;
+    
+    // Calculate armor class (simplified)
+    const dexModifier = Math.floor((abilities.dexterity - 10) / 2);
+    const baseAC = 10 + dexModifier;
+    
+    // Call the StatBlock constructor
+    super(
+      name,
+      race.size,
+      abilities,
+      baseAC,
+      totalHP,
+      { walk: race.speed }
+    );
+    
+    this.race = race;
+    this.characterClass = characterClass;
+    this.level = level;
+    this.background = background;
+    this.alignment = alignment;
+    this.experience = 0;
+    
+    // Calculate proficiency bonus
+    this.proficiencyBonus = Math.floor((level - 1) / 4) + 2;
+    
+    // Apply features, proficiencies, etc.
+    this.initializeCharacter();
+  }
+  
+  private initializeCharacter(): void {
+    // Apply saving throw proficiencies
+    for (const ability of this.characterClass.savingThrowProficiencies) {
+      this.savingThrowBonuses[ability] = this.proficiencyBonus;
+    }
+    
+    // Apply skill proficiencies (simplified - would normally involve choices)
+    for (const skill of this.background.skillProficiencies) {
+      this.skillBonuses[skill] = this.proficiencyBonus;
+    }
+    
+    // Apply racial traits
+    for (const trait of this.race.traits) {
+      this.features.push(trait);
+      // Apply trait effects (resistance, skills, etc.)
+      this.applyTraitEffects(trait);
+    }
+    
+    // Apply class features for current level
+    for (let i = 1; i &lt;= this.level; i++) {
+      const levelFeatures = this.characterClass.features[i] || [];
+      for (const feature of levelFeatures) {
+        this.features.push(feature);
+        // Apply feature effects
+        this.applyFeatureEffects(feature);
+      }
+    }
+    
+    // Apply starting equipment (simplified)
+    for (const item of this.characterClass.startingEquipment) {
+      this.inventory.push(item);
+    }
+    
+    for (const item of this.background.equipment) {
+      this.inventory.push(item);
+    }
+    
+    // Initialize spellbook for spellcasting classes
+    if (this.hasSpellcasting()) {
+      this.spellbook = new Spellbook(this);
+    }
+  }
+  
+  private applyTraitEffects(trait: Trait): void {
+    // Implementation depends on trait type
+    switch (trait.type) {
+      case &quot;resistance&quot;:
+        if (trait.damageType) {
+          this.damageResistances.push(trait.damageType);
+        }
+        break;
+      case &quot;skill&quot;:
+        if (trait.skill) {
+          this.skillBonuses[trait.skill] = this.proficiencyBonus;
+        }
+        break;
+      // Additional trait types...
+    }
+  }
+  
+  private applyFeatureEffects(feature: Feature): void {
+    // Implementation depends on feature type
+    switch (feature.type) {
+      case &quot;armor_proficiency&quot;:
+        // Add armor proficiency
+        break;
+      case &quot;extra_attack&quot;:
+        // Add extra attack capability
+        break;
+      // Additional feature types...
+    }
+  }
+  
+  hasSpellcasting(): boolean {
+    // Check if class has spellcasting or if any feature grants spellcasting
+    return this.characterClass.name === &quot;Wizard&quot; || 
+            this.characterClass.name === &quot;Cleric&quot; ||
+            this.characterClass.name === &quot;Bard&quot; ||
+            this.features.some(f =&gt; f.grantsSpellcasting);
+  }
+  
+  gainExperience(amount: number): boolean {
+    this.experience += amount;
+    
+    // Check if level up is available
+    const experienceThresholds = [
+      0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 
+      64000, 85000, 100000, 120000, 140000, 165000, 195000, 
+      225000, 265000, 305000, 355000
+    ];
+    
+    if (this.level &lt; 20 &amp;&amp; this.experience &gt;= experienceThresholds[this.level]) {
+      return true; // Level up available
+    }
+    
+    return false;
+  }
+  
+  levelUp(): void {
+    if (this.level &gt;= 20) return; // Already max level
+    
+    this.level++;
+    
+    // Update proficiency bonus
+    this.proficiencyBonus = Math.floor((this.level - 1) / 4) + 2;
+    
+    // Add hit points
+    const conModifier = this.getAbilityModifier(&quot;constitution&quot;);
+    const hitDieAverage = Math.floor(this.characterClass.hitDieSize / 2) + 1;
+    this.maxHitPoints += hitDieAverage + conModifier;
+    this.hitPoints += hitDieAverage + conModifier;
+    
+    // Add new class features
+    const newFeatures = this.characterClass.features[this.level] || [];
+    for (const feature of newFeatures) {
+      this.features.push(feature);
+      this.applyFeatureEffects(feature);
+    }
+    
+    // Update saving throws and skill proficiencies
+    this.updateProficiencies();
+    
+    // Update spellbook if applicable
+    if (this.spellbook) {
+      this.spellbook.updateForLevel(this.level);
+    }
+  }
+  
+  private updateProficiencies(): void {
+    // Update saving throw bonuses
+    for (const ability of this.characterClass.savingThrowProficiencies) {
+      this.savingThrowBonuses[ability] = this.proficiencyBonus;
+    }
+    
+    // Update skill bonuses
+    for (const skill in this.skillBonuses) {
+      if (this.skillBonuses[skill] &gt; 0) { // If proficient
+        this.skillBonuses[skill] = this.proficiencyBonus;
+      }
+    }
+  }
+  
+  equipItem(item: Item): boolean {
+    if (!this.inventory.includes(item)) {
+      return false; // Can't equip what you don't have
+    }
+    
+    // Check if you can equip this item (proficiency, etc.)
+    // ...
+    
+    // Equip the item
+    const slot = item.equipSlot;
+    if (slot) {
+      // Unequip any item already in that slot
+      if (this.equippedItems[slot]) {
+        this.unequipItem(slot);
+      }
+      
+      this.equippedItems[slot] = item;
+      
+      // Apply item effects (AC changes, etc.)
+      // ...
+      
+      return true;
+    }
+    
+    return false;
+  }
+  
+  unequipItem(slot: string): Item | null {
+    const item = this.equippedItems[slot];
+    if (item) {
+      delete this.equippedItems[slot];
+      
+      // Remove item effects
+      // ...
+      
+      return item;
+    }
+    
+    return null;
+  }
+}
+</code></pre>
+</details>
+
+<p>
+  This PlayerCharacter class demonstrates how composition and inheritance can be combined:
+</p>
+
+<ul>
+  <li><strong>Inheritance</strong> is used for the base StatBlock functionality</li>
+  <li><strong>Composition</strong> is used for incorporating the race, class, background, and equipment</li>
+</ul>
+
+<h3>Component-Based Design</h3>
+
+<p>
+  For a more flexible system, we could further refactor our design to use a component-based approach, where each
+  capability is a separate component that can be attached to any entity:
+</p>
+
+<details>
+  <summary>Click to view the full code</summary>
+<pre><code class="language-typescript">// Component interface
+interface Component {
+  owner: StatBlock;
+  initialize(): void;
+  update(deltaTime: number): void;
+}
+
+// Enhanced StatBlock with component support
+class EntityWithComponents extends StatBlock {
+  private components: Map&lt;string, Component&gt; = new Map();
+  
+  addComponent(id: string, component: Component): void {
+    component.owner = this;
+    component.initialize();
+    this.components.set(id, component);
+  }
+  
+  getComponent(id: string): Component | undefined {
+    return this.components.get(id);
+  }
+  
+  hasComponent(id: string): boolean {
+    return this.components.has(id);
+  }
+  
+  removeComponent(id: string): boolean {
+    return this.components.delete(id);
+  }
+  
+  update(deltaTime: number): void {
+    for (const component of this.components.values()) {
+      component.update(deltaTime);
+    }
+  }
+}
+
+// Example component: Spellcasting
+class SpellcastingComponent implements Component {
+  owner!: StatBlock;
+  spellcastingAbility: Ability;
+  maxSpellLevel: number;
+  knownSpells: Spell[] = [];
+  spellSlots: Record&lt;number, number&gt; = {}; // Level -&gt; count
+  
+  constructor(spellcastingAbility: Ability, maxSpellLevel: number) {
+    this.spellcastingAbility = spellcastingAbility;
+    this.maxSpellLevel = maxSpellLevel;
+  }
+  
+  initialize(): void {
+    // Set up spell slots based on class/level
+    // ...
+  }
+  
+  update(deltaTime: number): void {
+    // Handle regeneration of spell slots, etc.
+    // ...
+  }
+  
+  getSpellSaveDC(): number {
+    const abilityModifier = this.owner.getAbilityModifier(this.spellcastingAbility);
+    
+    // Assuming owner is a player character with proficiency bonus
+    let profBonus = 0;
+    if ('proficiencyBonus' in this.owner) {
+      profBonus = (this.owner as unknown as PlayerCharacter).proficiencyBonus;
+    }
+    
+    return 8 + abilityModifier + profBonus;
+  }
+  
+  getSpellAttackBonus(): number {
+    const abilityModifier = this.owner.getAbilityModifier(this.spellcastingAbility);
+    
+    // Assuming owner is a player character with proficiency bonus
+    let profBonus = 0;
+    if ('proficiencyBonus' in this.owner) {
+      profBonus = (this.owner as unknown as PlayerCharacter).proficiencyBonus;
+    }
+    
+    return abilityModifier + profBonus;
+  }
+  
+  castSpell(spell: Spell, level: number, target: StatBlock): boolean {
+    // Check if we have an appropriate spell slot
+    if (this.spellSlots[level] &lt;= 0) {
+      return false;
+    }
+    
+    // Consume spell slot
+    this.spellSlots[level]--;
+    
+    // Execute spell effect
+    spell.cast(this.owner, target, level, this.getSpellSaveDC(), this.getSpellAttackBonus());
+    
+    return true;
+  }
+}
+
+// Example component: Weapon Proficiency
+class WeaponProficiencyComponent implements Component {
+  owner!: StatBlock;
+  proficientWeaponTypes: string[];
+  
+  constructor(weaponTypes: string[]) {
+    this.proficientWeaponTypes = weaponTypes;
+  }
+  
+  initialize(): void {
+    // No initialization needed
+  }
+  
+  update(deltaTime: number): void {
+    // No update needed, this is a passive component
+  }
+  
+  isProficientWith(weapon: Weapon): boolean {
+    return this.proficientWeaponTypes.includes(weapon.type);
+  }
+  
+  getAttackBonus(weapon: Weapon): number {
+    // Determine which ability to use
+    let abilityModifier: number;
+    if (weapon.hasProperty(&quot;finesse&quot;)) {
+      // Use the better of STR or DEX
+      const strMod = this.owner.getAbilityModifier(&quot;strength&quot;);
+      const dexMod = this.owner.getAbilityModifier(&quot;dexterity&quot;);
+      abilityModifier = Math.max(strMod, dexMod);
+    } else if (weapon.hasProperty(&quot;ranged&quot;)) {
+      abilityModifier = this.owner.getAbilityModifier(&quot;dexterity&quot;);
+    } else {
+      abilityModifier = this.owner.getAbilityModifier(&quot;strength&quot;);
+    }
+    
+    // Add proficiency if proficient
+    let profBonus = 0;
+    if (this.isProficientWith(weapon) &amp;&amp; 'proficiencyBonus' in this.owner) {
+      profBonus = (this.owner as unknown as PlayerCharacter).proficiencyBonus;
+    }
+    
+    return abilityModifier + profBonus;
+  }
+  
+  getDamageBonus(weapon: Weapon): number {
+    // Similar to attack bonus, but without proficiency
+    if (weapon.hasProperty(&quot;finesse&quot;)) {
+      const strMod = this.owner.getAbilityModifier(&quot;strength&quot;);
+      const dexMod = this.owner.getAbilityModifier(&quot;dexterity&quot;);
+      return Math.max(strMod, dexMod);
+    } else if (weapon.hasProperty(&quot;ranged&quot;)) {
+      return this.owner.getAbilityModifier(&quot;dexterity&quot;);
+    } else {
+      return this.owner.getAbilityModifier(&quot;strength&quot;);
+    }
+  }
+}
+</code></pre>
+</details>
+
+<p>
+  This component-based approach provides greater flexibility than inheritance alone:
+</p>
+
+<ul>
+  <li>Components can be added or removed dynamically</li>
+  <li>Entities can have a customized set of capabilities</li>
+  <li>Composition avoids the &quot;diamond problem&quot; of multiple inheritance</li>
+  <li>New functionality can be added without modifying existing classes</li>
+</ul>
+
+<p>
+  The entity-component pattern is widely used in modern game development for precisely these reasons. It creates a more
+  modular system where capabilities can be mixed and matched to create diverse entity types without an explosion of
+  class hierarchies.
+</p>
+
+<h3>Factory Method Pattern for Character Creation</h3>
+
+<p>
+  To streamline character creation, we can implement a factory pattern:
+</p>
+<details>
+  <summary>Click to view the full code</summary>
+
+<pre><code class="language-typescript">class CharacterFactory {
+  static createFighter(
+    name: string,
+    race: Race,
+    level: number = 1,
+    background: Background,
+    abilities: Record&lt;Ability, number&gt;,
+    fightingStyle: string
+  ): PlayerCharacter {
+    // Create base character
+    const fighter = new PlayerCharacter(
+      name,
+      race,
+      this.getFighterClass(fightingStyle),
+      level,
+      background,
+      abilities,
+      &quot;Lawful Neutral&quot; // Default alignment
+    );
+    
+    // Add fighter-specific components
+    fighter.addComponent(&quot;weaponProficiency&quot;, new WeaponProficiencyComponent([
+      &quot;simple&quot;, &quot;martial&quot;
+    ]));
+    
+    // Add specific equipment based on fighting style
+    switch (fightingStyle) {
+      case &quot;two-handed&quot;:
+        const greatsword = ItemFactory.createWeapon(&quot;greatsword&quot;);
+        fighter.inventory.push(greatsword);
+        fighter.equipItem(greatsword);
+        break;
+      case &quot;dueling&quot;:
+        const longsword = ItemFactory.createWeapon(&quot;longsword&quot;);
+        const shield = ItemFactory.createArmor(&quot;shield&quot;);
+        fighter.inventory.push(longsword, shield);
+        fighter.equipItem(longsword);
+        fighter.equipItem(shield);
+        break;
+      // Additional fighting styles...
+    }
+    
+    return fighter;
+  }
+  
+  static createWizard(
+    name: string,
+    race: Race,
+    level: number = 1,
+    background: Background,
+    abilities: Record&lt;Ability, number&gt;,
+    specialization: string
+  ): PlayerCharacter {
+    // Create base character
+    const wizard = new PlayerCharacter(
+      name,
+      race,
+      this.getWizardClass(specialization),
+      level,
+      background,
+      abilities,
+      &quot;Neutral&quot; // Default alignment
+    );
+    
+    // Add wizard-specific components
+    wizard.addComponent(&quot;spellcasting&quot;, new SpellcastingComponent(
+      &quot;intelligence&quot;,
+      Math.ceil(level / 2)
+    ));
+    
+    // Add starting spells based on level and specialization
+    const spellcastingComponent = wizard.getComponent(&quot;spellcasting&quot;) as SpellcastingComponent;
+    
+    // Add cantrips
+    spellcastingComponent.knownSpells.push(SpellFactory.createSpell(&quot;mage_hand&quot;));
+    spellcastingComponent.knownSpells.push(SpellFactory.createSpell(&quot;fire_bolt&quot;));
+    
+    // Add first level spells
+    spellcastingComponent.knownSpells.push(SpellFactory.createSpell(&quot;magic_missile&quot;));
+    spellcastingComponent.knownSpells.push(SpellFactory.createSpell(&quot;shield&quot;));
+    
+    // Add specialization spells
+    switch (specialization) {
+      case &quot;evocation&quot;:
+        spellcastingComponent.knownSpells.push(SpellFactory.createSpell(&quot;burning_hands&quot;));
+        break;
+      case &quot;divination&quot;:
+        spellcastingComponent.knownSpells.push(SpellFactory.createSpell(&quot;identify&quot;));
+        break;
+      // Additional specializations...
+    }
+    
+    // Add starting equipment
+    const quarterstaff = ItemFactory.createWeapon(&quot;quarterstaff&quot;);
+    wizard.inventory.push(quarterstaff);
+    wizard.equipItem(quarterstaff);
+    
+    return wizard;
+  }
+  
+  // Helper methods to create class objects
+  private static getFighterClass(fightingStyle: string): CharacterClass {
+    return {
+      name: &quot;Fighter&quot;,
+      hitDieSize: 10,
+      primaryAbility: &quot;strength&quot;,
+      savingThrowProficiencies: [&quot;strength&quot;, &quot;constitution&quot;],
+      armorProficiencies: [&quot;light&quot;, &quot;medium&quot;, &quot;heavy&quot;, &quot;shields&quot;],
+      weaponProficiencies: [&quot;simple&quot;, &quot;martial&quot;],
+      skillProficiencyChoices: [&quot;Acrobatics&quot;, &quot;Animal Handling&quot;, &quot;Athletics&quot;, &quot;History&quot;, &quot;Insight&quot;, &quot;Intimidation&quot;, &quot;Perception&quot;, &quot;Survival&quot;],
+      startingEquipment: [],
+      features: {
+        1: [
+          {
+            name: &quot;Fighting Style&quot;,
+            description: `You adopt a particular style of fighting as your specialty. You gain the following benefit based on the style you choose: ${fightingStyle}`,
+            type: &quot;class_feature&quot;
+          },
+          {
+            name: &quot;Second Wind&quot;,
+            description: &quot;You have a limited well of stamina that you can draw on to protect yourself from harm.&quot;,
+            type: &quot;class_feature&quot;
+          }
+        ],
+        2: [
+          {
+            name: &quot;Action Surge&quot;,
+            description: &quot;You can push yourself beyond your normal limits for a moment.&quot;,
+            type: &quot;class_feature&quot;
+          }
+        ],
+        // Additional levels...
+      }
+    };
+  }
+  
+  private static getWizardClass(specialization: string): CharacterClass {
+    return {
+      name: &quot;Wizard&quot;,
+      hitDieSize: 6,
+      primaryAbility: &quot;intelligence&quot;,
+      savingThrowProficiencies: [&quot;intelligence&quot;, &quot;wisdom&quot;],
+      armorProficiencies: [],
+      weaponProficiencies: [&quot;dagger&quot;, &quot;dart&quot;, &quot;sling&quot;, &quot;quarterstaff&quot;, &quot;light crossbow&quot;],
+      skillProficiencyChoices: [&quot;Arcana&quot;, &quot;History&quot;, &quot;Insight&quot;, &quot;Investigation&quot;, &quot;Medicine&quot;, &quot;Religion&quot;],
+      startingEquipment: [],
+      features: {
+        1: [
+          {
+            name: &quot;Spellcasting&quot;,
+            description: &quot;As a student of arcane magic, you have a spellbook containing spells that show the first glimmerings of your true power.&quot;,
+            type: &quot;class_feature&quot;,
+            grantsSpellcasting: true
+          },
+          {
+            name: &quot;Arcane Recovery&quot;,
+            description: &quot;You have learned to regain some of your magical energy by studying your spellbook.&quot;,
+            type: &quot;class_feature&quot;
+          }
+        ],
+        2: [
+          {
+            name: `Arcane Tradition: ${specialization}`,
+            description: `You have focused your studies on one of the eight schools of magic: ${specialization}.`,
+            type: &quot;class_feature&quot;
+          }
+        ],
+        // Additional levels...
+      }
+    };
+  }
+}
+</code></pre>
+</details>
+
+<p>
+  This factory approach encapsulates the complex logic of character creation, making it easier to create consistent
+  character objects with appropriate components, abilities, and equipment.
+</p>

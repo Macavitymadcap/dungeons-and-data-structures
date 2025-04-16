@@ -1,0 +1,47 @@
+<menu>
+  <li>
+    <a href="/index.html">
+      Home
+    </a>
+  </li>
+    <li>
+      <button 
+        hx-get="/nodes.html" 
+        hx-target="main"
+        @click="$store.pagesVisited.nodes = true">
+        Choose your Node Adventure
+      </button>
+    </li>
+    <li>
+      <button 
+        hx-get="/stats.html" 
+        hx-target="main"
+        @click="$store.pagesVisited.stats = true"
+      >
+        Abstract Stats
+      </button>
+    </li>
+    <li>
+      <button 
+        hx-get="/character.html" 
+        hx-target="main"
+        @click="$store.pagesVisited.character = true"
+      >
+        Character Composition &amp; Inheritance
+      </button>
+    </li>
+    <li x-show="$store.pagesVisited.all">
+      <button
+        :disabled="!$store.pagesVisited.all"
+        hx-get="/conclusion.html" 
+        hx-target="main"
+      >
+        Conclusion
+      </button>
+    </li>
+    <li>
+      <button hx-get="/glossary.html" hx-target="main">
+        Glossary
+      </button>
+    </li>
+</menu>
