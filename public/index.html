@@ -36,6 +36,7 @@
     <!-- Load Scripts and Initialise-->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+
           mermaid.initialize({ startOnLoad: false });
           document.querySelectorAll(".mermaid").forEach((el) => {
             mermaid.init(undefined, el);
@@ -50,7 +51,7 @@
           hljs.highlightAll();
         });
 
-        document.addEventListener("ampline:init", () => {
+        document.addEventListener("alpine:init", () => {
             Alpine.store('pagesVisited', {
                 character: false,
                 nodes: false,
