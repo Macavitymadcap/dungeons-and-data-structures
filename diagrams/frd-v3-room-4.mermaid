@@ -1,0 +1,37 @@
+graph TD
+    %% Define node styles
+    classDef room fill:#f9d77e,stroke:#333,stroke-width:2px
+    classDef choice fill:#f9f9f9,stroke:#333,stroke-width:1px
+    classDef outcome fill:#99ff99,stroke:#333,stroke-width:2px
+    classDef combat fill:#ff9999,stroke:#333,stroke-width:2px
+    classDef death fill:#000000,color:#ffffff,stroke:#ff0000,stroke-width:2px
+    classDef exit fill:#99ff99,stroke:#333,stroke-width:2px
+    
+    %% Room 4 Entry Point
+    R4[Room 4: Dragon's Lair]
+    
+    %% Initial choices
+    R4 --> C1{Choose Action}
+    C1 -->|"Fight Dragon"| CO1[Dragon Combat]
+    C1 -->|"Flee"| O1[Escaped from Dragon]
+    
+    %% Combat path
+    CO1 -->|"Victory"| O2[Dragon Defeated]
+    CO1 -->|"Defeat"| D1[Death]
+    
+    %% Outcomes lead to movement
+    O1 --> M1{Choose Path}
+    O2 --> E[Exit Dungeon]
+    
+    %% Movement options from fleeing
+    M1 -->|"Go West"| R2[To Room 2]
+    M1 -->|"Go South West"| R3[To Room 3]
+    M1 -->|"Go South"| E[Exit Dungeon]
+
+    %% Apply styles
+    class R2,R3,R4 room
+    class C1,M1 choice
+    class O1,O2 outcome
+    class CO1 combat
+    class D1 death
+    class E exit

@@ -1,0 +1,56 @@
+graph TD
+    %% Define node styles
+    classDef room fill:#f9d77e,stroke:#333,stroke-width:2px
+    classDef choice fill:#f9f9f9,stroke:#333,stroke-width:1px
+    classDef outcome fill:#99ff99,stroke:#333,stroke-width:2px
+    classDef trap fill:#ff9999,stroke:#333,stroke-width:2px
+    classDef death fill:#000000,color:#ffffff,stroke:#ff0000,stroke-width:2px
+    classDef check fill:#99ccff,stroke:#333,stroke-width:2px
+    classDef item fill:#ffcc99,stroke:#333,stroke-width:2px
+    
+    %% Room 3 Entry Point
+    R3[Room 3: Trapped Treasure Room]
+    
+    %% Initial choices
+    R3 --> C1{Choose Action}
+    C1 -->|"Take Treasure Directly"| CH1[Passive Perception Check]
+    C1 -->|"Ignore Treasure"| M1{Choose Path}
+    C1 -->|"Examine for Traps"| CH2[Active Perception Check]
+    
+    %% Passive perception path
+    CH1 -->|"Success"| CH3[Trap Detected]
+    CH1 -->|"Failure"| T1[Trap Triggered]
+    
+    %% Active detection path
+    CH2 -->|"Success"| CH3
+    CH2 -->|"Failure"| T1
+    
+    %% Disarm attempt
+    CH3 --> C2{Choose Action}
+    C2 -->|"Disarm Trap"| CH4[Dexterity Check]
+    C2 -->|"Take Treasure Anyway"| T1
+    
+    %% Disarm outcomes
+    CH4 -->|"Success"| I1[Trap Disarmed]
+    CH4 -->|"Failure"| T1
+    
+    %% Trap consequences
+    T1 -->|"Survive Damage"| I1
+    T1 -->|"Too Much Damage"| D1[Death]
+    
+    %% Get treasure
+    I1 --> I2[Gain Treasure and Healing Potion]
+    I2 --> M1
+    
+    %% Movement options
+    M1 -->|"Go North"| R1[To Room 1]
+    M1 -->|"Go North East"| R4[To Room 4]
+    
+    %% Apply styles
+    class R1,R3,R4 room
+    class C1,C2,M1 choice
+    class CH3 outcome
+    class T1 trap
+    class D1 death
+    class CH1,CH2,CH4 check
+    class I1,I2 item

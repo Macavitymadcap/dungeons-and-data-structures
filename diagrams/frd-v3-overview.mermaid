@@ -1,0 +1,51 @@
+graph TD
+    %% Define node styles
+    classDef room fill:#f9d77e,stroke:#333,stroke-width:2px
+    classDef choice fill:#f9f9f9,stroke:#333,stroke-width:1px
+    classDef outcome fill:#99ff99,stroke:#333,stroke-width:2px
+    classDef combat fill:#ff9999,stroke:#333,stroke-width:2px
+    classDef death fill:#000000,color:#ffffff,stroke:#ff0000,stroke-width:2px
+    classDef check fill:#99ccff,stroke:#333,stroke-width:2px
+    classDef item fill:#ffcc99,stroke:#333,stroke-width:2px
+    classDef exit fill:#99ff99,stroke:#333,stroke-width:2px
+
+    %% Rooms
+    R1[Room 1: Entrance<br>Goblin Guardian]
+    R2[Room 2: Puzzle Room]
+    R3[Room 3: Trapped Treasure]
+    R4[Room 4: Dragon's Lair]
+    E[Exit: Determine Final Outcome]
+    
+    %% Room 1 Main Paths
+    R1 -->|"Handle Goblin<br>(Persuade/Fight/Sneak)"| RC1{Choose Path}
+    RC1 -->|"East"| R2
+    RC1 -->|"South"| R3
+    
+    %% Room 2 Main Paths
+    R2 -->|"Handle Puzzle/Golem<br>(Solve/Break/Fight)"| RC2{Choose Path}
+    RC2 -->|"West"| R1
+    RC2 -->|"East"| R4
+    
+    %% Room 3 Main Paths
+    R3 -->|"Handle Trapped Treasure<br>(Detect/Disarm/Take/Ignore)"| RC3{Choose Path}
+    RC3 -->|"North"| R1
+    RC3 -->|"North East"| R4
+    
+    %% Room 4 Main Paths
+    R4 -->|"Flee/Fight Dragon"| RC4{Choose Path}
+    RC4 -->|"West"| R2
+    RC4 -->|"South West"| R3
+    RC4 -->|"South"| E[Exit Dungeon]
+    
+    %% Death nodes from each room (simplified)
+    R1 -.->|"Death"| DEATH[Game Over]
+    R2 -.->|"Death"| DEATH
+    R3 -.->|"Death"| DEATH
+    R4 -.->|"Death"| DEATH
+    
+    %% Apply styles
+    class R1,R2,R3,R4 room
+    class RC1,RC2,RC3,RC4 choice
+    class DEATH death
+    class E exit
+    class FO outcome
