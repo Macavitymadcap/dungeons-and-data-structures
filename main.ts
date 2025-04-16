@@ -6,11 +6,13 @@ Deno.serve(async (req) => {
     const { pathname } = new URL(req.url);
     const method = req.method;
     
-    const validPath = pathname === '/' || await exists(`${rootPath}${pathname}`);
+    const fiePath = pathname === '/' ? '/index.html' : pathname;
+    const validPath = pathname === '/' || await exists(`${rootPath}${fiePath}`);
     
     if (validPath && method === 'GET') {
         return serveDir(req, {
             fsRoot: rootPath,
+            showDirListing: false,
         });
     }
     
