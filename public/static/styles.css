@@ -89,6 +89,20 @@ button:focus-visible {
   outline: 4px auto var(--focus-ring-color);
 }
 
+/* Blockquote */
+blockquote {
+  padding: 1em;
+  margin-bottom: 1em;
+  border-radius: 5px;
+  background-color: var(--link-hover-color);
+  font-family: var(--font-family-serif);
+  font-size: 1.2em;
+
+  p {
+    font-style: italic;
+  }
+}
+
 /* Code */
 code {
   font-family: var(--font-family-monospace);
@@ -132,7 +146,6 @@ summary::marker {
   display: none;
 }
 summary::-webkit-details-marker {
-  /* Add a plus/minus icon */
   display: none;
 }
 summary::before {
@@ -148,7 +161,6 @@ details[open] > summary::before {
   transform: rotate(0deg);
 }
 summary:hover {
-  /* Add hover effect */
   background-color: rgba(0, 0, 0, 0.1);
 }
 
@@ -264,9 +276,17 @@ main {
 
 
 /* Menu */
-menu li {
-  list-style-type: none;
-  margin: 0;
+menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(5em, 1fr));
+  grid-template-rows: repeat(auto-fit, minmax(2em, 1fr));
+  gap: 0.5em;
+  justify-items: center;
+  
+  li {
+    list-style-type: none;
+    margin: 0;
+  }
 }
 
 /* Card class*/
