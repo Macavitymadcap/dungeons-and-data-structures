@@ -1,4 +1,4 @@
-import { AdventureNode } from "./model.ts";
+import { AdventureNode, Choice } from "./model.ts";
 
 export class AdventureGraph {
     private nodes: Map<number, AdventureNode> = new Map();
@@ -32,13 +32,20 @@ export class AdventureGraph {
         return currentNode ? currentNode.isEnding : false;
     }
 
+    private validateChoice(choice: Choice, node: AdventureNode): boolean {
+        if (!this.nodes.has(choice.nextNodeId)) {
+            console.error(
+                `Node ${node.id} has invalid choice to ${choice.nextNodeId}`
+            );
+            return false;
+        }
+        return true;
+    }
+
     validateGraph(): boolean {
         for (const node of this.nodes.values()) {
             for (const choice of node.choices) {
-                if (!this.nodes.has(choice.nextNodeId)) {
-                    console.error(`Node ${node.id} has invalid choice to ${choice.nextNodeId}`);
-                    return false;
-                }
+                if (!this.validateChoice(choice, node)) return false;
             }
         }
         return true;

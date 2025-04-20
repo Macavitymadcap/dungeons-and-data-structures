@@ -7,7 +7,7 @@ const getNextNodeId = (choiceIds: number[]): number => {
         nextNodeId = prompt("Choose: ")
 
         if (!nextNodeId || !choiceIds.includes(parseInt(nextNodeId))) {
-            console.log('Please choose from the listed numbers in square brackets');
+            console.log('Choose from the listed numbers in square brackets');
             getNextNodeId(choiceIds);
         }
     }
@@ -16,7 +16,6 @@ const getNextNodeId = (choiceIds: number[]): number => {
 }
 
 export const runGame = (graph: AdventureGraph) => {
-    
     const currentNode = graph.getCurrentNode();
     
     if (!currentNode) {
@@ -29,10 +28,15 @@ export const runGame = (graph: AdventureGraph) => {
     }
 
     if (currentNode.choices.length !== 0) {
-        currentNode.choices.forEach((choice) => console.log(`[${choice.nextNodeId}]: ${choice.text}`));
+        currentNode.choices.forEach(
+            (choice) => console.log(`[${choice.nextNodeId}]: ${choice.text}`)
+        );
     }
 
-    const nextNodeId = getNextNodeId(currentNode.choices.map(choice => choice.nextNodeId));
+    const nextNodeId = getNextNodeId(
+        currentNode.choices.map(choice => choice.nextNodeId)
+    );
+
     if (graph.makeChoice(nextNodeId)) {
         runGame(graph);
     }

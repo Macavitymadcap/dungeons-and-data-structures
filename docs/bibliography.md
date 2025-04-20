@@ -3,7 +3,6 @@
 ## Blogs
 - [The Twenty-one Forms of the Five Room Dungeon](https://gnomestew.com/the-twenty-one-forms-of-the-five-room-dungeon/), Matthew J. Neagley
 
-
 - [The Ultimate Guide to 5 Room Dungeons](https://www.roleplayingtips.com/5-room-dungeons/) Johnn Four. 5 Room Dungeons. 2019
 
 ## Books & Papers
