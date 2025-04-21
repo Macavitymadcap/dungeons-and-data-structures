@@ -1,239 +1,364 @@
 <h2>Choose Your Node Adventure</h2>
 
 <p>
-  Adventure gamebooks like the Fighting Fantasy series and Choose Your Own Adventure books implement one of the most
-  recognizable data structures in computer science: the directed graph. Each numbered section or paragraph in these
-  books functions as a node in the graph, with the choices at the end of each section representing directed edges to
-  other nodes.
+  Adventure gamebooks, like the <i>Fighting Fantasy</i> series or <i>Choose Your Own Adventure</i> books, are written
+  as a collection of individual sections which, if read sequentially, make no sense. Each section is a scene in the
+  narrative that YOU, the reader, are currently playing out. At the end of each scene you are presented with a list of
+  choices for the next section to read, representing the consequences of the action described and/or the reactions you
+  can make in response to it. When read as intended, starting with the first section then choosing your path, an
+  interactive narrative unfolds where YOU are the hero. You succeed or fail based on your actions; the story is decided 
+  by you.
 </p>
 
-<h3>Graph Theory in Adventure Books</h3>
+<p>
+  In their simplest form, like a <i>Choose Your Own Adventure</i>, you only ever make choices. These choices can lead,
+  ultimately, down various paths towards an ending. There are usually one or a couple of 'happy path' endings and 
+  handful of less than happy ones. The stories are always moving forward, though in some rare occasions adventurers
+  may have to return to previous sections and make different choices to progress. This is usually done to encourage
+  the reader to explore the story and discover all the possible endings, but it can also be used to create a sense of
+  urgency or danger. The reader is not just a passive observer, but an active participant in the story, making choices
+  that affect the outcome of the narrative. This is a key feature of interactive fiction, and it is what sets it apart
+  from traditional linear storytelling.
+</p>
 
 <p>
-  In computer science terms, a directed graph (or digraph) consists of:
+  Gamebooks spice things up by adding RPG mechanics into the mix: some are simple and limited to just one book or
+  adventure, such as the main <i>Fighting Fantasy</i> series; others span multiple books creating a long form campaign
+  like in the <i>Lone Wolf</i> or <i>Sorcery!</i> books. These mechanics are usually implemented using a simple stat 
+  system. You have a set of stats, like <strong>SKILL</strong>, <strong>STAMINA</strong>, and <strong>LUCK</strong> in
+  the worlds of <i>Fighting Fantasy</i>, which represent your character's combat ability and general aptitude, health
+  and endurance and how much the gods favour you with fortune. The scores can fluctuate during and between adventures,
+  allowing for a sense of character progression and growth. You can also collect items, like weapons and potions, which
+  can likewise aid or hinder you on your quest, further augmenting your character.
+</p>
 
+<p>
+  Gamebooks reached their peak of popularity in the 80's, after which computers had caught up and were able
+  to render these kinds of adventures not just as bare console text, but with actual graphics and mechanics that you
+  didn't have to keep track of yourself. There has been a slight comeback in recent years, with new titles added to the
+  <i>Fighting Fantasy</i> series in the last few years; some have even had the adaptation treatment such as
+  <i>Deathtrap Dungeon</i>, back on PlayStation 1, and the <i>Sorcery</i> series on Nintendo Switch, PS5, PC and other
+  platforms of that generation. 
+</p>
+
+<p>
+  Despite this comeback, their moment has gone; the idea behind them, however, lives on. The creator of the
+  popular <i>Dark Souls</i> games Hidetaka Miyazaki has cited <i>Fighting Fantasy</i> as a major influence on his work,
+  and the <i>Soulslike</i> games are often compared to gamebooks for their interconnectedness and difficulty. The 
+  genre has become a staple of modern gaming, with many developers taking inspiration from its mechanics and design 
+  philosophy. The genre has also spawned a number of imitators, with many games attempting to capture the same sense 
+  of challenge and exploration that defines the genre.
+</p>
+
+<p>
+  This format is not limited to pen &amp; paper, nor is it confined to gaming; there are interactive
+  short stories like <i>The Garden of Forking Paths</i> by Jorge Luis Borges; programmed learning materials like the
+  <i>TutorText</i> series and <i>Bandersnatch</i> - the Choose Your Own Episode of Netflix's <i>Black Mirror</i> 
+  written by Charlie Brooker. A basic website also works, in some ways, like a gamebook. The user navigates the website 
+  like an adventurer delving the depths of <i>Deathtrap Dungeon</i>. Instead of fighting monsters and overcoming traps, 
+  they have to contend with adverts and cookie policies. Each page of the site contains text and links to other pages, 
+  just like how each section in a gamebook. 
+</p>
+
+<p>
+  The ease with which you can find examples of this format is not some stretch of the human proclivity for pattern
+  recognition. The scenes, pages and other individual sections of these examples are known as <strong>nodes</strong>,
+  and the adventures, websites and so on that collect them are known as <strong>graphs</strong>.
+</p>
+
+<h3>Graph Theory</h3>
+
+<p>
+  Graph Theory is a branch of mathematics and computer science that studies the properties and applications of graphs.
+  It can help us understand the structure and behaviour of complex systems, such as social networks, transportation 
+  systems and, like in our case, the possible paths in adventure gamebooks. 
+</p>
+
+<p>
+  Let's clarify some of the terminology used in graph theory, as it can be a bit confusing at first. Graph theory is a
+  vast field with many different concepts and terms, but we will focus on the most relevant ones for our discussion of
+  adventure gamebooks and websites. The following terms are commonly used in graph theory and are important to 
+  understand when discussing the structure and behaviour of graphs:
 </p>
 
 <ul>
-  <li><strong>Vertices (nodes)</strong>: The individual locations or states in the system</li>
-  <li><strong>Edges (connections)</strong>: The relationships or transitions between nodes</li>
-  <li><strong>Direction</strong>: The permitted flow from one node to another</li>
+  <li>
+    <strong>Nodes</strong> (also called vertices) are the fundamental units in graph theory, representing entities or 
+    points that can be connected to other nodes. In the context of adventure gamebooks, nodes represent the individual
+    scenes in the narrative that players experience; in a website, they would be the individual pages. 
+  </li>
+
+  <li>
+    A <strong>graph</strong> models the relationships between a collection of nodes. This would be the entire website or 
+    gamebook.
+  </li>
+
+  <li>
+    <strong>Edges</strong> are the relationships between nodes, which connect the nodes and define how they interact with
+    each other. These are hyperlinks on a page or choices in a gamebook scene.
+  </li>
+
+  <li>
+    Graphs can be <strong>directed</strong> or <strong>undirected</strong>, with a directed graph also being known as a
+    <strong>digraph</strong>. A hyperlink on a page is directed, as it takes you to another page when clicked. A choice
+    in a gamebook is undirected, as it allows you to choose which path to take next. 
+  </li>
+
+  <li>
+    A graph can be <strong>cyclic</strong> or <strong>acyclic</strong>; it can contain loops that lead back to previous
+    nodes or not. A website is a cyclic graph, as you can navigate back to previous pages. Gamebooks, on the other hand,
+    are (usually) acyclic graphs, as they do not allow you to return to previous nodes once you have made a choice.
+  </li>
 </ul>
 
 <p>
-  Adventure gamebooks typically implement a directed acyclic graph (DAG) to prevent infinite loops, though some may
-  include cycles for specific gameplay mechanics. The reader traverses this graph through decision-making, performing
-  what amounts to a depth-first search through the narrative space.
-</p>
-
-<h3>Implementing an Adventure Node System</h3>
-
-<p>
-  Let's implement a simple Choose Your Own Adventure system using TypeScript:
-</p>
-
-<details>
-  <summary>Click to view the code</summary>
-
-<pre><code class="language-typescript">interface AdventureNode {
-  id: number;
-  text: string;
-  choices: Choice[];
-  isEnding: boolean;
-}
-
-interface Choice {
-  text: string;
-  nextNodeId: number;
-}
-
-class AdventureGraph {
-  private nodes: Map&lt;number, AdventureNode&gt; = new Map();
-  private currentNodeId: number;
-  
-  constructor(startingNodeId: number) {
-    this.currentNodeId = startingNodeId;
-  }
-  
-  addNode(node: AdventureNode): void {
-    this.nodes.set(node.id, node);
-  }
-  
-  getCurrentNode(): AdventureNode | undefined {
-    return this.nodes.get(this.currentNodeId);
-  }
-  
-  makeChoice(choiceIndex: number): boolean {
-    const currentNode = this.getCurrentNode();
-    if (!currentNode || choiceIndex &gt;= currentNode.choices.length) {
-      return false;
-    }
-    
-    this.currentNodeId = currentNode.choices[choiceIndex].nextNodeId;
-    return true;
-  }
-  
-  isAtEnding(): boolean {
-    const currentNode = this.getCurrentNode();
-    return currentNode ? currentNode.isEnding : false;
-  }
-  
-  // Validate that all choices lead to valid nodes
-  validateGraph(): boolean {
-    for (const node of this.nodes.values()) {
-      for (const choice of node.choices) {
-        if (!this.nodes.has(choice.nextNodeId)) {
-          console.error(`Node ${node.id} has invalid choice to ${choice.nextNodeId}`);
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-}
-</code></pre>
-</details>
-
-
-<h3>Five Room Dungeon Example</h3>
-
-<p>
-  To illustrate this concept, let's create a simple five-room dungeon adventure using our node system. First, let's
-  visualize the structure using a Mermaid diagram:
+  To illustrate these concepts, let's look some examples. First, we will use a simple eCommerce website as our graph. 
+  The nodes represent the different pages on the website, and the edges represent the links between them:
 </p>
 
 <div class="mermaid">
 graph TD
-  A[1: Entrance: Guardian Goblin]
-  A -->|"Fight"| B
-  A -->|"Sneak past"| B
-  A -->|"Bribe"| B
+  A[Homepage] -->|"Menu link"| B[Products]
+  B -->|"View details"| C[Product Details]
+  C -->|"Add to cart"| D[Shopping Cart]
+  D -->|"Continue shopping"| B
+  D -->|"Checkout"| E[Checkout]
+  E -->|"Order confirmation"| F[Order Complete]
+  F -->|"Return to home"| A
+  A -->|"View cart"| D
 
-  B[2: Puzzle Room]
-  B -->|"Solve riddle"| C
-  B -->|"Break mechanism"| E
-
-  C[3: Treasure Room]
-  C -->|"Take treasure"| D
-  C -->|"Leave treasure"| E
-
-  D[4: Trap Room]
-  D -->|"Disarm trap"| E
-  D -->|"Triggered trap"| F
-
-  E[5: Boss Chamber]
-  E -->|"Fight dragon"| G
-  E -->|"Flee dungeon"| H
-
-  F[Ending: Death]
-  G[Ending: Victory]
-  H[Ending: Escape]
+classDef darkTheme fill:#2e2e2e,stroke:#646cff,stroke-width:2px,color:#ffffff;
+class A,B,C,D,E,F darkTheme;
+linkStyle default stroke: white;
 </div>
 
 <p>
-  Now, let's implement this adventure using our node system:
-</p>
-
-<details>
-  <summary>Click to view the code</summary>
-
-<pre><code class="language-typescript">// Create the adventure
-const dungeon = new AdventureGraph(1);
-
-// Add the nodes
-dungeon.addNode({
-  id: 1,
-  text: &quot;You stand at the entrance of the dungeon. A goblin guards the doorway, eyeing you suspiciously.&quot;,
-  choices: [
-    { text: &quot;Attack the goblin&quot;, nextNodeId: 2 },
-    { text: &quot;Try to sneak past while it's distracted&quot;, nextNodeId: 2 },
-    { text: &quot;Offer gold to pass&quot;, nextNodeId: 2 }
-  ],
-  isEnding: false
-});
-
-dungeon.addNode({
-  id: 2,
-  text: &quot;You enter a chamber with a stone pedestal in the center. There's a riddle inscribed: 'I speak without a mouth and hear without ears. I have no body, but I come alive with wind.'&quot;,
-  choices: [
-    { text: &quot;Answer 'Echo'&quot;, nextNodeId: 3 },
-    { text: &quot;Smash the pedestal&quot;, nextNodeId: 5 }
-  ],
-  isEnding: false
-});
-
-dungeon.addNode({
-  id: 3,
-  text: &quot;The pedestal slides away, revealing a hidden compartment with a glittering treasure chest.&quot;,
-  choices: [
-    { text: &quot;Take the treasure&quot;, nextNodeId: 4 },
-    { text: &quot;Leave it and proceed&quot;, nextNodeId: 5 }
-  ],
-  isEnding: false
-});
-
-dungeon.addNode({
-  id: 4,
-  text: &quot;As you lift the treasure, you hear a click. The floor beneath you begins to crumble, revealing spikes!&quot;,
-  choices: [
-    { text: &quot;Try to disarm the trap&quot;, nextNodeId: 5 },
-    { text: &quot;Jump but fail to escape&quot;, nextNodeId: 6 }
-  ],
-  isEnding: false
-});
-
-dungeon.addNode({
-  id: 5,
-  text: &quot;You enter a massive chamber with ancient columns. A dragon sleeps on a pile of gold in the center.&quot;,
-  choices: [
-    { text: &quot;Fight the dragon&quot;, nextNodeId: 7 },
-    { text: &quot;Flee the dungeon&quot;, nextNodeId: 8 }
-  ],
-  isEnding: false
-});
-
-dungeon.addNode({
-  id: 6,
-  text: &quot;The spikes impale you. Your adventure ends here.&quot;,
-  choices: [],
-  isEnding: true
-});
-
-dungeon.addNode({
-  id: 7,
-  text: &quot;After a fierce battle, you defeat the dragon and claim its hoard. You are victorious!&quot;,
-  choices: [],
-  isEnding: true
-});
-
-dungeon.addNode({
-  id: 8,
-  text: &quot;You escape the dungeon with your life, if not your pride. Perhaps another day you'll return better prepared.&quot;,
-  choices: [],
-  isEnding: true
-});
-
-// Validate the graph
-if (dungeon.validateGraph()) {
-  console.log(&quot;Adventure is ready to play!&quot;);
-}
-</code></pre>
-</details>
-
-<p>
-  This implementation demonstrates how adventure books structure their narratives as traversable graphs. Each choice
-  represents an edge leading to another node, and the reader's decisions determine their path through the story. The
-  same approach is used in digital RPGs, interactive fiction, and even modern narrative-heavy video games.
+  This forms a <strong>directed cyclic graph</strong> comprising the <code>Products</code>,
+  <code>Product Details</code>, <code>Shopping Cart</code> and <code>Checkout</code> nodes. The <code>Homepage</code>
+  and <code>Order Complete</code> nodes are part of this cycle as well, allowing users to navigate back to the starting 
+  point after completing their purchase.
 </p>
 
 <p>
-  From a computational perspective, this structure offers several advantages:
+ For our second example, consider this outline of a simple adventure gamebook plot:
+</p>
+
+<div class="mermaid">
+graph TD
+  1[Start Adventure] -->|"Enter forest"| 2[Forest Encounter]
+  1 -->|"Visit town"| 3[Town Market]
+  2 -->|"Fight monster"| 4[Combat]
+  2 -->|"Hide"| 5[Escape]
+  3 -->|"Buy weapons"| 6[Armory]
+  3 -->|"Get information"| 7[Tavern]
+  4 -->|"Victory"| 8[Treasure]
+  5 -->|"Continue journey"| 9[Mountain Path]
+  6 -->|"Test weapon"| 4
+  7 -->|"Learn secret"| 9
+  8 -->|"Find map"| 10[Final Dungeon]
+  9 -->|"Enter castle"| 10
+  10 -->|"Face final boss"| 11[Ending]
+
+classDef darkTheme fill:#2e2e2e,stroke:#646cff,stroke-width:2px,color:#ffffff;
+class 1,2,3,4,5,6,7,8,9,10,11 darkTheme;
+linkStyle default stroke: white;
+</div>
+
+<p>
+  This is a <strong>directed acyclic graph (DAG)</strong>. The player can start their adventure by entering the forest
+  or visiting the town. Each choice leads to different encounters and outcomes, but once a path is chosen, it cannot be
+  revisited. The player must navigate through the nodes, making decisions that affect the flow of the story. The edges 
+  represent the choices made by the player, leading them to different nodes based on their decisions.
+</p>
+
+<p>
+  Gamebooks and adventure modules tend to mostly use DAGs to prevent infinite loops, though some may include cycles for
+  specific gameplay mechanics. For example, a gamebook may allow the player to return to a previous node if they make a 
+  specific choice, but this is usually done to create a sense of urgency or danger. The player may have to make a 
+  choice quickly, or they may be forced to return to a previous node if they fail to complete a task. This can create a
+  sense of tension and excitement, as the player must make quick decisions and navigate the graph carefully to avoid
+  getting stuck or losing progress. The use of cycles in gamebooks is less common, but it can also be an effective way
+  to create a more dynamic and engaging experience for the player.
+</p>
+
+<p>
+  Published adventure modules or homebrewed adventures for table top RPGs, like <i>Dungeons &amp; Dragons</i> are often
+  written in a similar way. They typically consist of a series of interconnected nodes that guide players through the
+  narrative. Whether the graph is cyclic, and what direction it takes, depends on the choices made by the players and
+  how the Dungeon Master weaves those choices into the narrative.  The variety of formats such adventures can take is
+  limitless, but a few common structures have emerged over the years. One such, which allows for an almost endless 
+  number of adventures to be created, is the Five Room Dungeon.
+</p>
+
+<h3>Five Room Dungeons</h3>
+
+<p>
+  The Five Room Dungeon is a popular structure for creating adventure modules in tabletop role-playing games. It is
+  designed to provide a balanced and engaging experience for players, with a focus on exploration, combat, and
+  problem-solving. The structure consists of five rooms or encounters, each with its own purpose and challenges. The
+  five rooms are:
 </p>
 
 <ul>
-  <li><strong>Modularity</strong>: Each node can be designed independently</li>
-  <li><strong>Reusability</strong>: Multiple paths can lead to the same node</li>
-  <li><strong>Analyzability</strong>: The narrative structure can be validated programmatically</li>
-  <li><strong>Extensibility</strong>: New nodes and paths can be added without disrupting existing ones</li>
+  <li>
+    <strong>Room 1: Entrance and Guardian</strong> - This encounter introduces the players to the adventure and sets 
+    the stage for the challenges ahead. It often includes a guardian or obstacle that must be overcome to proceed. For
+    example, a lone goblin sits asleep at the entrance to a cave, allowing for the players to sneak past, ambush it or
+    try to talk their way past it.
+  </li>
+
+  <li>
+    <strong>Room 2: Puzzle or Roleplaying Challenge</strong> - This encounter presents a puzzle or roleplaying
+    challenge that requires players to think creatively and work together to solve it. For example, a riddle
+    is written on the wall of a room containing a treasure chest, which can only be opened by solving the 
+    riddle and saying the answer aloud.
+  </li>
+
+  <li>
+    <strong>Room 3: Red Herring, Trick or Setback</strong> - This encounter introduces a twist or setback that
+    complicates the players' progress. For example, the players find a treasure chest, but when they try to open it,
+    they get bitten by a mimic.
+  </li>
+  
+  <li>
+    <strong>Room 4: Climax and Final Challenge</strong> - This encounter presents the ultimate challenge that players
+    must face to complete the adventure. For example, a vast cavern home to a dragon sleeping atop a pile of gold.
+  </li>
+
+  <li>
+    <strong>Room 5: Reward and Conclusion</strong> - This encounter provides the players with a reward for their 
+    efforts, wrapping up the adventure and offering closure to the story. Alternatively, it can set the stage for
+    future with a shocking twist or cliffhanger. For example, the player's may leave having defeated the dragon, but
+    failed to find it's eggs - setting up the next session when the they can hatch and run amok on the surrounding
+    countryside.
+  </li>
 </ul>
 
+<p>
+  The 'dungeon' can be a literal dungeon, a forest, a town or any other location that fits the adventure, and the
+  number of rooms can be anywhere from five to thousands. While the structure is designed around five encounters, 
+  additional ones or rooms can be added depending on the needs of the story. The encounters can take place in one 
+  location or span multiple, and they can be approached in a number of different ways.
+</p>
+
+<p>
+  The nodes, specifically the geographical ones, represent an interesting challenge for the Dungeon Master. They
+  must create a map that allows players to navigate the encounters in a way that makes sense and is engaging. The
+  rooms can be connected with passageways, secret tunnels, teleportation circles or by any number of other means. They
+  can be locked behind doors or easily accessible, and the design of these connections can greatly influence the flow
+  of the adventure.
+</p>
+
+<p>
+  Interestingly, if the adventure is a literal five room dungeon, then we know thanks to the research of 
+  <a href="https://enac.hal.science/hal-03097484/document" target="_blank">Steve Lawford</a> that the rooms can be 
+  joined in one of 21 different ways: 
+</p>
+
+<img src="assets/lawford-five-node-subgraphs.png" alt="Five Room Dungeon Node Connections" />
+
+<p>
+  The Five Room Dungeon is a versatile and effective structure for creating engaging adventures in tabletop role-playing
+  games. It provides a balanced mix of exploration, combat, and problem-solving, allowing players to experience a variety
+  of challenges and rewards. The structure can be adapted to fit any setting or theme, making it a popular choice for
+  game masters looking to create memorable adventures for their players.
+</p>
+
+<h3>Implementing a Five Room Dungeon Gamebook</h3>
+
+<p>
+  To wrap up this chapter, let's implement a simple gamebook using the concepts we have discussed. We will create a
+  simple adventure gamebook using TypeScript, which will allow players to navigate through the nodes and make choices
+  that affect the outcome of the story. 
+</p>
+
+<p>
+  In terms of a gamebook, we can think of the nodes as resembling something like this:
+</p>
+
+<pre><code class="language-typescript">interface Choice {
+  text: string;
+  nextNodeId: number;
+}
+
+interface AdventureNode {
+  id: number;
+  text: string;
+  choices: Choice[];
+  isEnding: boolean;
+}</code></pre>
+
+<p>
+  Each node is made up of a unique ID to identify it; a text description of the scene; a list of choices that
+  the player can make and a boolean value indicating whether the node is an ending point in the narrative. The
+  <code>choices</code> property is an array of <code>Choice</code> objects, each containing a text description of the
+  choice and the ID of the next node that the player will be taken to if they select that choice. The edges are the 
+  connections between nodes, representing the choices that players can make. Each choice leads to a different node,
+  creating a branching structure that allows for multiple paths through the narrative. The direction of the edges 
+  indicates the flow of the story, guiding players from one node to another based on their decisions.
+</p>
+
+<p>
+  We can then create an adventure graph to store all the nodes and handle the navigation between them:
+</p>
+
+<pre><code class="language-typescript">class AdventureGraph {
+  private nodes: Map&lt;number, AdventureNode&gt; = new Map();
+  private currentNodeId: number;
+
+  constructor(startingNodeId: number) {
+    this.currentNodeId = startingNodeId;
+  }
+
+  addNode(node: AdventureNode): void {
+    this.nodes.set(node.id, node);
+  }
+
+  getCurrentNode(): AdventureNode | undefined {
+    return this.nodes.get(this.currentNodeId);
+  }
+
+  makeChoice(choiceId: number): boolean {
+    const currentNode = this.getCurrentNode();
+    const choiceIds = currentNode?.choices.map(choice => choice.nextNodeId)
+    if (!currentNode || !choiceIds?.includes(choiceId)) {
+      return false;
+    }
+
+    this.currentNodeId = choiceId;
+    return true;
+  }
+
+  isAtEnding(): boolean {
+    const currentNode = this.getCurrentNode();
+    return currentNode ? currentNode.isEnding : false;
+  }
+
+  private validateChoice(choice: Choice, node: AdventureNode): boolean {
+    if (!this.nodes.has(choice.nextNodeId)) {
+      console.error(
+        `Node ${node.id} has invalid choice to ${choice.nextNodeId}`
+      );
+      return false;
+    }
+    return true;
+  }
+
+  validateGraph(): boolean {
+    for (const node of this.nodes.values()) {
+      for (const choice of node.choices) {
+        if (!this.validateChoice(choice, node)) return false;
+      }
+    }
+    return true;
+  }
+}</code></pre>
+
+<p>
+  This class allows you to create an adventure graph, add nodes to it, and navigate through the nodes based on
+  player choices. The <code>validateGraph</code> method checks that all choices lead to valid nodes, ensuring the
+  integrity of the graph. This is important for ensuring that players can only make valid choices and that the
+  narrative flows correctly. It also helps to prevent errors or inconsistencies in the game, such as leading players
+  to dead ends or invalid states. By validating the graph, you can ensure that the game is playable and that players
+  can progress through the story without encountering any issues.
+</p>
