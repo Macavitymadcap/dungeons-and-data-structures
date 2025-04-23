@@ -154,10 +154,11 @@ linkStyle default stroke: white;
   adventure gamebooks and table top adventures. When an adventure is ran by a person for a group of players, suddenly
   non-linearity is on the table. Say, for example, the adventurers head off to the Dungeon of Elemental Fire, but 
   realise their wizard doesn't know any fire protection spells. They turn around and head back to the apothecary in
-  the last town to buy some potions of fire resistance instead. In an adventure gamebook, there would be no option to
-  go back and buy potions if you had the option to previously. In some ways, an adventure session is an undirected
-  cyclic graph, where the players can go back and forth between nodes, but the DM is the one who decides which nodes
-  are connected - and that's not even considering if any of the players, NPCs or monsters know any time travel magic.
+  the last town to buy some potions of fire resistance instead. In an adventure gamebook, you can't just go back to
+  a previous scene with a potion shop, or suddenly decide you are invincible to fire (unless you cheat, of course). In 
+  some ways, an adventure session is an undirected cyclic graph, where the players can go back and forth between nodes,
+  but the DM is the one who decides which nodes are connected - and that's not even considering if any of the players, 
+  NPCs or monsters know any time travel magic.
 </p>
 
 <p>
@@ -354,7 +355,8 @@ linkStyle default stroke: white;
 </div>
 
 <p>
-  This scene card provides the basis for our graph of adventure nodes. To make the game more interesting we can use
+  This scene card provides the basis for our graph of adventure nodes - in fact, just this concept and a couple hundred
+  odd nodes and you've got a <i>Choose Your Own Adventure</i>. To make the game more interesting we can use
   Alpine to keep track of game state, run combat encounters, and manage the player's stats. The precise nature of how
   these components can be implemented will be covered in future chapters, but for now you can enjoy the simple adventure
   below as an interactive example of graphs and node traversal, with added goblins.
