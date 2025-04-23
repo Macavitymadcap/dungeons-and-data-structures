@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <base href="./">
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+    <title>5 Rooms 1 Bard</title>
+
+    <link rel="stylesheet" href="../static/styles.css">
+
+    <!-- htmx -->
+    <script 
+        src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.js" 
+        integrity="sha384-oeUn82QNXPuVkGCkcrInrS1twIxKhkZiFfr2TdiuObZ3n3yIeMiqcRzkIcguaof1" 
+        crossorigin="anonymous"
+    >
+    </script>
+    
+    <!-- Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    <!-- Load Scripts and Initialise-->
+    <script>
+        document.addEventListener("alpine:init", () => {
+            Alpine.store('pagesVisited', {
+                character: false,
+                nodes: false,
+                stats: false,
+                get all() {
+                    return this.character && this.nodes && this.stats;
+                },
+            });
+        });
+      </script>
+</head>
+
+<body>
+    <header>
+        <h1>Five Rooms: One Bard</h1>
+    </header>
+
+    <main id="main">
+        <div 
+            id="scene" 
+            class="card" 
+            hx-get="./backstory.html" 
+            hx-trigger="load once"
+        >
+        </div>
+    </main>
+
+    <footer>
+    </footer>
+</body>
+
+</html>
