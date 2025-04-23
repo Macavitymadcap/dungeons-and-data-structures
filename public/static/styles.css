@@ -118,8 +118,6 @@ button:focus-visible {
   outline: 4px auto var(--focus-ring-color);
 }
 
-
-
 /* Blockquote */
 blockquote {
   padding: 1em;
@@ -215,7 +213,7 @@ footer {
   width: 100%;
   background-color: var(--article-background-color);
   text-align: center;
-  padding: 1em;
+  padding: 0 .5em;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 
   nav menu {
@@ -231,44 +229,28 @@ footer {
 
     a {
       text-decoration: none;
-      color: var(--link-color);
       font-family: var(--font-family-fantasy);
       font-weight: bold;
       height: 100%;
       width: 100%;
-      padding: 0.5em;
+      display: flex;
+      justify-content: center;
+      padding: 0 0.5em;
       border-radius: 5px;
-      margin: 0 auto;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-
-    /* Hover state */
-    a:hover {
+      margin: .5em 0;
       color: var(--text-color);
-      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-      background-color: var(--link-hover-color);
-      transform: scale(1.05);
-    }
-
-    /* Focus state */
-    a:focus,
-    a:focus-visible {
-      outline: 4px auto var(--focus-ring-color);
-    }
-
-    /* Active state */
-    a:active {
-      color: var(--text-color);
-      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
       background-color: var(--link-background-color);
     }
 
-    /* Visited state */
-    a:visited {
-      color: var(--text-color);
+    a:hover {
+      background-color: var(--link-hover-background-color);
+      color: var(--code-text-color);
       box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    a:visited {
+      color: var(--code-text-color);
       background-color: var(--link-hover-color);
-      transform: scale(1.05);
     }
 
     button {
@@ -288,6 +270,7 @@ h1, h2, h3, h4, h5, h6, summary {
   font-weight: bold;
 }
 
+/* Images */
 img {
   max-width: 90vw;
   height: auto;
@@ -319,7 +302,7 @@ ul {
 main {
   flex: 1;
   padding: 1em;
-  padding-bottom: 11em;
+  padding-bottom: 5em;
   overflow-y: auto;
 }
 
