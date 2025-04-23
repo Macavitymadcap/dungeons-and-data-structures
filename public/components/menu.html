@@ -8,7 +8,7 @@
     </li>
       <li>
         <button 
-          hx-get="./nodes.html" 
+          hx-get="./pages/nodes.html" 
           hx-target="main"
           @click="$store.pagesVisited.nodes = true">
           Choose your Node Adventure
@@ -16,7 +16,7 @@
       </li>
       <li>
         <button 
-          hx-get="./stats.html" 
+          hx-get="./pages/stats.html" 
           hx-target="main"
           @click="$store.pagesVisited.stats = true"
         >
@@ -25,7 +25,7 @@
       </li>
       <li>
         <button 
-          hx-get="./character.html" 
+          hx-get="./pages/character.html" 
           hx-target="main"
           @click="$store.pagesVisited.character = true"
         >
@@ -35,14 +35,14 @@
       <li x-show="$store.pagesVisited.all">
         <button
           :disabled="!$store.pagesVisited.all"
-          hx-get="./conclusion.html" 
+          hx-get="./pages/conclusion.html" 
           hx-target="main"
         >
           Conclusion
         </button>
       </li>
       <li>
-        <button hx-get="./glossary.html" hx-target="main">
+        <button hx-get="./pages/glossary.html" hx-target="main">
           Glossary
         </button>
       </li>
