@@ -100,10 +100,3 @@ export class EncounterEvaluator implements Encounter, Evaluation {
     return new EncounterEvaluator(encounter);
   }
 }
-
-export const evaluateEncounter = (
-  levels: number[],
-  xp: number[],
-): Evaluation => {
-  return EncounterEvaluator.evaluate({ party: levels, opponents: xp });
-};
