@@ -17,6 +17,7 @@ await esbuild.build({
   sourcemap: true,
   target: ['chrome58', 'firefox57', 'safari11', 'edge16'],
   outfile: "./public/static/script.js",
+  format: "esm",
 });
 
 esbuild.stop();

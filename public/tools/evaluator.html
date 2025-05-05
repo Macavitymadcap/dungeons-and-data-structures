@@ -1,40 +1,83 @@
-<h2>D&D Encounter Evaluator</h2>
-
-<div class="input-group">
-  <h3>Party Members</h3>
-  <div id="party-inputs" class="dynamic-inputs">
-    <input type="number" class="party-level" min="1" max="20" value="1" placeholder="Level">
-  </div>
-  <button id="add-party-member">Add Party Member</button>
-  <button id="remove-party-member">Remove Party Member</button>
-</div>
-
-<div class="input-group">
-  <h3>Opponents</h3>
-  <div id="opponent-inputs" class="dynamic-inputs">
-    <input type="number" class="opponent-xp" min="0" value="25" placeholder="XP">
-  </div>
-  <button id="add-opponent">Add Opponent</button>
-  <button id="remove-opponent">Remove Opponent</button>
-</div>
-
-<button id="evaluate-encounter">Evaluate Encounter</button>
-
-<div id="results" class="results">
-  <h3>Evaluation Results</h3>
-  <div>
-    <p><strong>Difficulty:</strong> <span id="difficulty-result" class="difficulty-badge">-</span></p>
-    <p><strong>Actual XP:</strong> <span id="actual-xp-result">-</span></p>
-    <p><strong>Adjusted XP:</strong> <span id="adjusted-xp-result">-</span></p>
-  </div>
-
-  <details>
-    <summary>Party XP Thresholds</summary>
-    <div id="thresholds-result">
-      <p><strong>Easy:</strong> <span id="easy-threshold">-</span></p>
-      <p><strong>Medium:</strong> <span id="medium-threshold">-</span></p>
-      <p><strong>Hard:</strong> <span id="hard-threshold">-</span></p>
-      <p><strong>Deadly:</strong> <span id="deadly-threshold">-</span></p>
+<h2 >D&D Encounter Evaluator</h2>
+<div x-data="{
+  party: [1],
+  opponents: [25],
+  results: {
+    difficulty: '-',
+    actualXp: '-',
+    adjustedXp: '-',
+    partyXpThresholds: {
+      Easy: '-',
+      Medium: '-',
+      Hard: '-',
+      Deadly: '-'
+    }
+  },
+  addPartyMember() {
+    this.party.push(1);
+  },
+  removePartyMember() {
+    if (this.party.length > 1) this.party.pop();
+  },
+  addOpponent() {
+    this.opponents.push(25);
+  },
+  removeOpponent() {
+    if (this.opponents.length > 1) this.opponents.pop();
+  },
+  evaluateEncounter() {
+    const encounter = { party: this.party, opponents: this.opponents };
+    const evaluation = EncounterEvaluator.evaluate(encounter);
+    this.results = {
+      difficulty: evaluation.difficulty,
+      actualXp: evaluation.actualXp,
+      adjustedXp: evaluation.adjustedXp,
+      partyXpThresholds: evaluation.partyXpThresholds
+    };
+  }
+}"
+>
+  <div class="input-group">
+    <h3>Party Members</h3>
+    <div id="party-inputs" class="dynamic-inputs">
+      <template x-for="(level, index) in party" :key="index">
+        <input type="number" class="party-level" min="1" max="20" x-model.number="party[index]" placeholder="Level">
+      </template>
     </div>
-  </details>
+    <button @click="addPartyMember">Add Party Member</button>
+    <button @click="removePartyMember">Remove Party Member</button>
+  </div>
+
+  <div class="input-group">
+    <h3>Opponents</h3>
+    <div id="opponent-inputs" class="dynamic-inputs">
+      <template x-for="(xp, index) in opponents" :key="index">
+        <input type="number" class="opponent-xp" min="0" x-model.number="opponents[index]" placeholder="XP">
+      </template>
+    </div>
+    <button @click="addOpponent">Add Opponent</button>
+    <button @click="removeOpponent">Remove Opponent</button>
+  </div>
+
+  <button @click="evaluateEncounter">Evaluate Encounter</button>
+
+  <div id="results" class="results">
+    <h3>Evaluation Results</h3>
+    <div>
+      <p><strong>Difficulty:</strong> <span id="difficulty-result" class="difficulty-badge"
+          x-text="results.difficulty">-</span></p>
+      <p><strong>Actual XP:</strong> <span id="actual-xp-result" x-text="results.actualXp">-</span></p>
+      <p><strong>Adjusted XP:</strong> <span id="adjusted-xp-result" x-text="results.adjustedXp">-</span></p>
+    </div>
+
+    <details>
+      <summary>Party XP Thresholds</summary>
+      <div id="thresholds-result">
+        <p><strong>Easy:</strong> <span id="easy-threshold" x-text="results.partyXpThresholds.Easy">-</span></p>
+        <p><strong>Medium:</strong> <span id="medium-threshold" x-text="results.partyXpThresholds.Medium">-</span></p>
+        <p><strong>Hard:</strong> <span id="hard-threshold" x-text="results.partyXpThresholds.Hard">-</span></p>
+        <p><strong>Deadly:</strong> <span id="deadly-threshold" x-text="results.partyXpThresholds.Deadly">-</span></p>
+      </div>
+    </details>
+  </div>
 </div>
