@@ -1,4 +1,4 @@
-import { Ability, ActionsArray, Condition, DamageType, Roll, Size, Speed, Trait } from "./model.ts";
+import { Ability, ActionsArray, Condition, DamageType, Roll, Size, Speed, Trait, type Attack } from "./model.ts";
 
 export abstract class StatBlock {
   name: string;
@@ -40,6 +40,10 @@ export abstract class StatBlock {
     this.speed = speed;
     this.actions = actions
   }
+
+  private rollD20(): number {
+    return Math.floor(Math.random() * 20) + 1; 
+  }
   
   getAbilityModifier(ability: Ability): number {
     return Math.floor((this.abilities[ability] - 10) / 2);
@@ -47,18 +51,18 @@ export abstract class StatBlock {
   
   rollAbilityCheck(ability: Ability): number {
     const modifier = this.getAbilityModifier(ability);
-    const roll = Math.floor(Math.random() * 20) + 1;
+    const roll = this.rollD20();
     return roll + modifier;
   }
   
-  rollSavingThrow(ability: Ability, ): number {
+  rollSavingThrow(ability: Ability): number {
     let modifier = this.getAbilityModifier(ability);
     
     if (ability in this.savingThrowBonuses) {
       modifier += this.savingThrowBonuses[ability] || 0;
     }
     
-    const roll = Math.floor(Math.random() * 20) + 1;
+    const roll = this.rollD20();
     return roll + modifier;
   }
   
@@ -69,7 +73,7 @@ export abstract class StatBlock {
       modifier += this.skillBonuses[skill];
     }
     
-    const roll = Math.floor(Math.random() * 20) + 1;
+    const roll = this.rollD20();
     return roll + modifier;
   }
 
@@ -115,6 +119,20 @@ export abstract class StatBlock {
   
   addTemporaryHitPoints(amount: number): void {
     this.temporaryHitPoints = Math.max(this.temporaryHitPoints, amount);
+  }
+
+  rollAttack(attackName: string): number | void {
+    const attack = this.actions.find(
+      action => action.name.toLowerCase() === attackName.toLowerCase()
+    );
+
+    if (!attack) {
+      console.log(`No Attack found with name matching: ${attackName}`);
+      return;
+    }
+
+    return this.rollD20() + (attack as Attack).modifier;
+
   }
   
   isAlive(): boolean {

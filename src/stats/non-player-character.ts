@@ -1,4 +1,4 @@
-import { Ability, ActionsArray, DialogueOption, Item, Roll } from "./model.ts";
+import { Ability, ActionsArray, DialogueOption, Item, Roll, type Size } from "./model.ts";
 import { StatBlock } from "./stat-block.ts";
 
 export class NonPlayerCharacter extends StatBlock {
@@ -9,6 +9,7 @@ export class NonPlayerCharacter extends StatBlock {
   
   constructor(
     name: string,
+    size: Size,
     abilities: Record<Ability, number>,
     armorClass: number,
     hitPoints: number,
@@ -21,7 +22,7 @@ export class NonPlayerCharacter extends StatBlock {
   ) {
     super(
       name, 
-      'Medium',
+      size,
       abilities,
       armorClass,
       hitPoints,

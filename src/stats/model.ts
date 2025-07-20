@@ -36,6 +36,10 @@ export type Condition =
 'stunned' | 
 'unconscious';
 
+export type CharacterClass = 'Bard';
+
+export type Race = 'Human';
+
 export type Speed = { 
     walk?: number; 
     fly?: number; 
