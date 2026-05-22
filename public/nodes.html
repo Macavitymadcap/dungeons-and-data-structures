@@ -2,19 +2,18 @@
 
 <p>
   Adventure gamebooks, like the <i>Fighting Fantasy</i> series or <i>Choose Your Own Adventure</i> books, are written
-  as a bunch of scenes which, if read in the order printed, make no sense. Each is a scene in the narrative that YOU, 
-  the reader, are currently playing out, and ends with a list of choices for the next section to read, representing 
-  the consequences of the action described and/or the reactions you can make in response. When read as intended,
-  starting with the first section then choosing your path, an interactive story unfolds where YOU are the hero. You
-  succeed or fail based on your actions; the story is decided by your choices. 
+  as a set of scenes that make little sense if you read them in print order. Each scene describes what is happening to
+  you, the reader, then offers a list of choices for the next section to read. Read as intended, starting with the first
+  section and choosing your path, the book becomes an interactive story where you are the hero. You succeed or fail
+  through your choices.
 </p>
 
 <p>
-  The books always move forward from choice to choice towards one of several endings, though in some rare
-  occasions adventurers may have to return to previous scenes and make different choices to progress. The more 
-  advanced kind spice things up by adding RPG mechanics into the mix. They range from the simple and limited to just 
-  one book or adventure, such as the main <i>Fighting Fantasy</i> series, to the complex and multi-book spanning like 
-  the <i>Lone Wolf</i> or <i>Sorcery!</i> adventures. These mechanics are usually implemented using a simple stat 
+  The books usually move forward from choice to choice towards one of several endings, though in rare cases
+  adventurers must return to earlier scenes and make different choices to progress. More advanced gamebooks add RPG
+  mechanics. These range from simple, single-book systems, such as the main <i>Fighting Fantasy</i> series, to complex
+  systems that span several books, such as the <i>Lone Wolf</i> or <i>Sorcery!</i> adventures. These mechanics are
+  usually implemented using a simple stat
   system (like <strong>SKILL</strong>, <strong>STAMINA</strong>, and <strong>LUCK</strong> in the worlds of
   <i>Fighting Fantasy</i>): scores against which dice can be rolled to determine outcomes. The stats fluctuate during
   and between adventures, and can be supplemented by finding items like enchanted weapons, potions of healing and other
@@ -22,12 +21,12 @@
 </p>
 
 <p>
-  Gamebooks reached their peak of popularity in the 80's, after which computers had caught up and were able
-  to render these kinds of adventures not just as bare console text, but with actual graphics and mechanics that you
-  didn't have to keep track of yourself. Recently there has been a comeback of sorts, with new titles added to the
-  <i>Fighting Fantasy</i> series in the last few years; but despite this, their moment has gone. The idea behind them,
-  however, has not. The creator of the popular <i>Dark Souls</i> games Hidetaka Miyazaki has cited 
-  <i>Fighting Fantasy</i> as a major influence on his work, and his work is often compared to gamebooks for their 
+  Gamebooks reached their peak of popularity in the 80s. After that, computers caught up and could render these
+  adventures with graphics and mechanics players did not have to track by hand. Recently there has been a comeback of
+  sorts, with new titles added to the <i>Fighting Fantasy</i> series in the last few years; but despite this, their
+  moment has gone. The idea behind them, however, has not. Hidetaka Miyazaki, creator of the popular <i>Dark Souls</i>
+  games, has cited <i>Fighting Fantasy</i> as a major influence on his work, and his work is often compared to
+  gamebooks for its
   interconnectedness and difficulty. The genre has become a staple of modern gaming, with many developers taking 
   inspiration from its mechanics and design philosophy.
 </p>
@@ -35,11 +34,11 @@
 <p>
   The format used by gamebooks is not limited to gaming or books; there are interactive short stories like
   <i>The Garden of Forking Paths</i> by Jorge Luis Borges; programmed learning materials like the <i>TutorText</i>
-  series and <i>Bandersnatch</i> - the <i>Choose Your Own Adventure</i> episode of Netflix's <i>Black Mirror</i> series 
+  series and <i>Bandersnatch</i>, the <i>Choose Your Own Adventure</i> episode of Netflix's <i>Black Mirror</i> series 
   written by Charlie Brooker. A basic website also works, in some ways, like a gamebook. The user navigates the website
   like an adventurer delving the depths of <i>Deathtrap Dungeon</i>. Instead of fighting monsters and overcoming traps,
   they must battle with adverts and answer cookie policy preferences. Each page contains text and links to other pages, 
-  just like how each scene in a gamebook is a description and list of choices. This shared structure is known as a
+  just as each scene in a gamebook is a description and list of choices. This shared structure is known as a
   graph, and fortunately for us, there is a theory that describes them.
 </p>
 
@@ -81,7 +80,7 @@
 </ul>
 
 <p>
-  To illustrate these concepts, let's look some examples. First, consider a simple eCommerce website:
+  To illustrate these concepts, let's look at some examples. First, consider a simple e-commerce website:
 </p>
 
 <div class="mermaid">
@@ -108,7 +107,7 @@ linkStyle default stroke: white;
 </p>
 
 <p>
- For our second example, consider this outline of a simple adventure gamebook plot:
+  For our second example, consider this outline of a simple adventure gamebook plot:
 </p>
 
 <div class="mermaid">
@@ -141,8 +140,8 @@ linkStyle default stroke: white;
 
 <p>
   Gamebooks and adventure modules tend to mostly use DAGs to prevent infinite loops, though some may include cycles for
-  specific gameplay mechanics. Published adventure modules and homebrewed adventures for table top RPGs like 
-  <i>Dungeons &amp; Dragons</i>, are often written in a similar way. They typically consist of a series of 
+  specific gameplay mechanics. Published adventure modules and homebrewed adventures for tabletop RPGs like 
+  <i>Dungeons &amp; Dragons</i> are often written in a similar way. They typically consist of a series of 
   interconnected nodes that guide players through the narrative. Some of these nodes are cyclic graphs, for example, if
   the players are exploring a bazaar they can go into shops multiple times, engaging in haggling loops with the
   shopkeeper (much to the DM's dismay). Most, however, are acyclic graphs: adventures have branching paths that lead to
@@ -150,9 +149,9 @@ linkStyle default stroke: white;
 </p>
 
 <p>
-  This highlights how the intersection of geographical, narrative and encounter-based nodes differs significantly in 
-  adventure gamebooks and table top adventures. When an adventure is ran by a person for a group of players, suddenly
-  non-linearity is on the table. Say, for example, the adventurers head off to the Dungeon of Elemental Fire, but 
+  This highlights how geographical, narrative and encounter-based nodes differ in 
+  adventure gamebooks and tabletop adventures. When an adventure is run by a person for a group of players,
+  non-linearity is suddenly on the table. Say, for example, the adventurers head off to the Dungeon of Elemental Fire, but 
   realise their wizard doesn't know any fire protection spells. They turn around and head back to the apothecary in
   the last town to buy some potions of fire resistance instead. In an adventure gamebook, you can't just go back to
   a previous scene with a potion shop, or suddenly decide you are invincible to fire (unless you cheat, of course). In 
@@ -171,7 +170,7 @@ linkStyle default stroke: white;
 <h2>Five Room Dungeons</h2>
 
 <p>
-  The structure of a Five Room Dungeon consists of five nodes, often rooms in a dungeon but not exclusivly, which are:
+  The structure of a Five Room Dungeon consists of five nodes, often rooms in a dungeon but not exclusively:
 </p>
 
 <ul>
@@ -197,9 +196,9 @@ linkStyle default stroke: white;
     challenge that requires players to think creatively and work together to solve it.
     <blockquote>
       <p>
-        The room is circular and covered wall to wall in arcane symbols. In the center you see a scroll floating in mid
+        The room is circular and covered wall to wall in arcane symbols. In the centre you see a scroll floating in mid
         air. Initially the scroll is made up of the same symbols on the wall and is undecipherable, but slowly the
-        lines and shapes on the velum coalesce into a language you can understand, and reads:
+        lines and shapes on the vellum coalesce into a language you can understand. It reads:
       </p>
 
       <p class="written">
@@ -284,23 +283,23 @@ linkStyle default stroke: white;
 <img src="assets/lawford-five-node-subgraphs.png" alt="Five Room Dungeon Node Connections" />
 
 <p>
-  With 21 different ways to connect locations and a near infinite number of variations on the encounters, the Five Room
-  Dungeon is a flexible and adaptable structure that can be used to create a wide range of adventures, and offers an 
-  a fascinating glimpse into the complexities that can arise from linking nodes together.  
+  With 21 ways to connect locations and an almost endless number of encounter variations, the Five Room Dungeon is a
+  flexible structure for adventure design. It also offers a fascinating glimpse of the complexity that can arise from
+  linking nodes together.
 </p>
 
 <h2>Implementing a Five Room Dungeon Gamebook</h2>
 
 <p>
   To wrap up this chapter, let's implement a simple gamebook using the concepts we have discussed. We will create a
-  simple adventure gamebook using htmx and Alpine js. Gamebook scenes and webpages map to each other swimmingly, for
+  simple adventure gamebook using htmx and Alpine.js. Gamebook scenes and webpages map neatly to each other, for
   example:
 </p>
 
 <pre><code class="language-html">&lt;div id="scene" class="card"&gt;
   &lt;blockquote&gt;
     &lt;p&gt;
-      You awake to find your self in a dark room. Your eyes adjust to the gloom and you lift your head off the bed, 
+      You awake to find yourself in a dark room. Your eyes adjust to the gloom and you lift your head off the bed, 
       the only thing in this barren room aside from two doors.
     &lt;/p&gt;
   &lt;/blockquote&gt;
@@ -319,23 +318,23 @@ linkStyle default stroke: white;
 
 <p>
   The HTML above represents a simple gamebook scene, where the player is presented with a description of their
-  surroundings and two choices. The <code>&lt;blockquote&gt;</code> element contains the text description of the scene,
+  surroundings and three choices. The <code>&lt;blockquote&gt;</code> element contains the text description of the scene,
   while the <code>&lt;menu&gt;</code> element contains a list of <code>&lt;a&gt;</code> elements that link to the next
   scenes in the adventure. While this approach is fine, it suffers from using raw anchor tags to make the requests for 
-  the next node, which will force a full page refresh. To improve this, we can replace them with buttons powered by
+  the next node, which forces a full page refresh. To improve this, we can replace them with buttons powered by
   htmx to only update the scene element with the new content:
 </p>
 
 <pre><code class="language-html">&lt;button hx-get="/left-door" hx-target="#scene"&gt;Try the door on the left&lt;/button&gt;</code></pre>
 
 <p>
-  If we apply some stylings and render it on the page, we have a something that looks like this:
+  If we add some styling and render it on the page, we have something that looks like this:
 </p>
 
 <div class="card">
   <blockquote>
     <p>
-      You awake to find your self in a dark room. Your eyes adjust to the gloom and you lift your head off the bed, 
+      You awake to find yourself in a dark room. Your eyes adjust to the gloom and you lift your head off the bed, 
       the only thing in this barren room aside from two doors.
     </p>
   </blockquote>
@@ -355,9 +354,9 @@ linkStyle default stroke: white;
 </div>
 
 <p>
-  This scene card provides the basis for our graph of adventure nodes - in fact, just this concept and a couple hundred
-  odd nodes and you've got a <i>Choose Your Own Adventure</i>. To make the game more interesting we can use
-  Alpine to keep track of game state, run combat encounters, and manage the player's stats. The precise nature of how
-  these components can be implemented will be covered in future chapters, but for now you can enjoy the simple adventure
+  This scene card provides the basis for our graph of adventure nodes. With this concept and a couple of hundred
+  nodes, you have a <i>Choose Your Own Adventure</i>. To make the game more interesting, we can use Alpine to keep
+  track of game state, run combat encounters, and manage the player's stats. Future chapters will cover how to
+  implement these components, but for now you can enjoy the simple adventure
   below as an interactive example of graphs and node traversal, with added goblins.
 </p>
