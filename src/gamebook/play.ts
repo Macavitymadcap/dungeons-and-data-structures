@@ -45,6 +45,10 @@ export function resolveChoice(
 
   let nextPassageId = choice.targetId;
   let nextState = applyChoiceEffects(state, choice.effects, now());
+  nextState = describeChoiceEffects(state, nextState, choice).reduce(
+    (currentState, message) => appendLog(currentState, message, now()),
+    nextState,
+  );
   let roll: RollResult | undefined;
   let combat: CombatRoundResult | undefined;
 
@@ -110,4 +114,46 @@ export function resolveChoice(
     roll,
     combat,
   };
+}
+
+function describeChoiceEffects(
+  before: GameState,
+  after: GameState,
+  choice: Choice,
+): string[] {
+  const effects = choice.effects;
+  if (!effects) {
+    return [];
+  }
+
+  const messages: string[] = [];
+  const hitPointChange = after.hitPoints - before.hitPoints;
+  if (hitPointChange > 0) {
+    messages.push(`Recovered ${hitPointChange} ${plural("hit point", hitPointChange)}.`);
+  } else if (hitPointChange < 0) {
+    const lost = Math.abs(hitPointChange);
+    messages.push(`Lost ${lost} ${plural("hit point", lost)}.`);
+  }
+
+  for (const item of effects.removeItems ?? []) {
+    if (before.inventory.includes(item) && !after.inventory.includes(item)) {
+      messages.push(`Used ${item}.`);
+    }
+  }
+  for (const item of effects.addItems ?? []) {
+    if (!before.inventory.includes(item) && after.inventory.includes(item)) {
+      messages.push(`Gained ${item}.`);
+    }
+  }
+  for (const flag of effects.setFlags ?? []) {
+    if (!before.flags.includes(flag) && after.flags.includes(flag)) {
+      messages.push(`Noted ${flag}.`);
+    }
+  }
+
+  return messages;
+}
+
+function plural(noun: string, count: number): string {
+  return count === 1 ? noun : `${noun}s`;
 }

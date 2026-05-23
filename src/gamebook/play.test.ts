@@ -36,3 +36,32 @@ test("combat choices skip rolls when the encounter is already defeated", () => {
     "Door Guardian has already been defeated.",
   );
 });
+
+test("choice effects append readable state-transition log entries", () => {
+  const character = createCharacter("hero-1", "Ash", "fighter");
+  const state = {
+    ...createInitialState(mtGraphnorAdventure, character),
+    currentPassageId: "guardian-clash",
+    hitPoints: character.maxHitPoints - 3,
+  };
+  const passage = mtGraphnorAdventure.passages.find((item) =>
+    item.id === "guardian-clash"
+  );
+  const choice = passage?.choices.find((item) => item.id === "catch-breath-guardian");
+
+  if (!choice) {
+    throw new Error("Expected recovery choice to exist.");
+  }
+
+  const result = resolveChoice(state, choice, {
+    adventure: mtGraphnorAdventure,
+    now: () => new Date("2026-05-23T12:00:00.000Z"),
+  });
+  const messages = result.state.log.map((entry) => entry.message);
+
+  expect(result.error).toBeUndefined();
+  expect(result.state.hitPoints).toBe(character.maxHitPoints - 1);
+  expect(messages).toContain("Recovered 2 hit points.");
+  expect(messages).toContain("Used ration.");
+  expect(messages).toContain("Use a ration and catch your breath");
+});
