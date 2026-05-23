@@ -65,6 +65,7 @@ function renderPassagePanel(
       <h2 id="${escapeHtml(passage.id)}-title">${escapeHtml(passage.title)}</h2>
       <p>${escapeHtml(passage.body)}</p>
       ${renderStateSummary(adventure, state)}
+      ${passage.encounterId ? renderEncounterStatus(adventure, passage.encounterId, state) : ""}
       ${roll ? renderRollSummary(roll) : ""}
       ${combat ? renderCombatSummary(combat) : ""}
       ${authorMode ? renderDebugPanel(state) : ""}
@@ -88,7 +89,9 @@ function renderDebugPanel(state: GameState): string {
 
 function encounterDebugText(state: GameState): string {
   const entries = Object.entries(state.encounters).map(([id, encounter]) =>
-    `${id}: ${encounter.hitPoints} HP${encounter.defeated ? ", defeated" : ""}`
+    `${id}: ${encounter.hitPoints} HP, round ${encounter.rounds}${
+      encounter.defeated ? ", defeated" : ""
+    }`
   );
   return entries.join("; ") || "None";
 }
@@ -97,7 +100,24 @@ function renderCombatSummary(combat: CombatRoundResult): string {
   const tone = combat.outcome === "victory" ? "success" : "info";
   return `<section class="notice" data-tone="${tone}" role="status">
     <h2>Combat round</h2>
-    <div class="notice-body">${escapeHtml(combat.log.join(" "))}</div>
+    <div class="notice-body">Round ${combat.round}: ${escapeHtml(combat.log.join(" "))}</div>
+  </section>`;
+}
+
+function renderEncounterStatus(
+  adventure: Adventure,
+  encounterId: string,
+  state: GameState,
+): string {
+  const encounter = adventure.encounters?.find((item) => item.id === encounterId);
+  const encounterState = state.encounters[encounterId];
+  if (!encounter || !encounterState) {
+    return "";
+  }
+  const tone = encounterState.defeated ? "success" : "info";
+  return `<section class="notice" data-tone="${tone}" role="status">
+    <h2>Encounter status</h2>
+    <div class="notice-body">${escapeHtml(encounter.name)}: ${encounterState.hitPoints}/${encounter.hitPoints} HP, round ${encounterState.rounds}${encounterState.defeated ? ", defeated." : "."}</div>
   </section>`;
 }
 

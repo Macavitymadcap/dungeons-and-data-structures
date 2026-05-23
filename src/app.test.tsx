@@ -147,8 +147,72 @@ describe("createApp", () => {
     expect(response.status).toBe(200);
     expect(html).toContain("Keyboard Room");
     expect(html).toContain("Combat round");
+    expect(html).toContain("Round 1:");
     expect(html).toContain("Door Guardian is defeated.");
     expect(html).toContain("&quot;defeated&quot;:true");
+  });
+
+  test("combat can continue across visible rounds", async () => {
+    const app = createApp({
+      now: () => new Date("2026-05-23T12:00:00.000Z"),
+      random: sequence([0, 0]),
+    });
+    const character = createCharacter("hero-1", "Adventurer", "fighter");
+    const state = {
+      ...createInitialState(
+        mtGraphnorAdventure,
+        character,
+        new Date("2026-05-23T12:00:00.000Z"),
+      ),
+      currentPassageId: "guardian-clash",
+    };
+    const body = new URLSearchParams({
+      state: JSON.stringify(state),
+    });
+
+    const response = await app.request("/gamebook/choices/win-guardian", {
+      method: "POST",
+      body,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    const html = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(html).toContain("Guardian Clash");
+    expect(html).toContain("Encounter status");
+    expect(html).toContain("Door Guardian: 6/6 HP, round 1.");
+    expect(html).toContain("Round 1:");
+    expect(html).toContain("Use a ration and catch your breath");
+  });
+
+  test("combat recovery consumes a ration and heals", async () => {
+    const app = createApp({
+      now: () => new Date("2026-05-23T12:00:00.000Z"),
+    });
+    const character = createCharacter("hero-1", "Adventurer", "fighter");
+    const state = {
+      ...createInitialState(mtGraphnorAdventure, character),
+      currentPassageId: "guardian-clash",
+      hitPoints: character.maxHitPoints - 3,
+    };
+    const body = new URLSearchParams({
+      state: JSON.stringify(state),
+    });
+
+    const response = await app.request("/gamebook/choices/catch-breath-guardian", {
+      method: "POST",
+      body,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    const html = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(html).toContain(`>${character.maxHitPoints - 1}/${character.maxHitPoints}<`);
+    expect(html).not.toContain("Ration");
   });
 
   test("gated choices are rejected when requirements are missing", async () => {

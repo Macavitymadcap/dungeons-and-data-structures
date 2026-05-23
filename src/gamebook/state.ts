@@ -43,7 +43,7 @@ export function createInitialState(
     encounters: Object.fromEntries(
       (adventure.encounters ?? []).map((encounter) => [
         encounter.id,
-        { hitPoints: encounter.hitPoints, defeated: false },
+        { hitPoints: encounter.hitPoints, defeated: false, rounds: 0 },
       ]),
     ),
     log: [
@@ -278,7 +278,7 @@ function upgradeEncounters(
     return Object.fromEntries(
       (adventure.encounters ?? []).map((encounter) => [
         encounter.id,
-        { hitPoints: encounter.hitPoints, defeated: false },
+        { hitPoints: encounter.hitPoints, defeated: false, rounds: 0 },
       ]),
     );
   }
@@ -297,6 +297,7 @@ function upgradeEncounters(
     encounters[id] = {
       hitPoints: encounter.hitPoints,
       defeated: encounter.defeated,
+      rounds: typeof encounter.rounds === "number" ? encounter.rounds : 0,
     };
   }
 
@@ -304,6 +305,7 @@ function upgradeEncounters(
     encounters[encounter.id] ??= {
       hitPoints: encounter.hitPoints,
       defeated: false,
+      rounds: 0,
     };
   }
 

@@ -22,6 +22,7 @@ test("combat resolves player hit and monster defeat", () => {
   const result = resolveCombatRound({ encounter, state, rng: rolls });
 
   expect(result.outcome).toBe("victory");
+  expect(result.round).toBe(1);
   expect(result.playerAttack.success).toBe(true);
   expect(result.playerDamage?.total).toBe(8);
   expect(result.monsterHitPoints).toBe(0);
@@ -65,12 +66,29 @@ test("combat round updates state encounter and player hit points", () => {
   expect(updated.encounters["door-guardian"]).toEqual({
     hitPoints: 0,
     defeated: true,
+    rounds: 1,
   });
+});
+
+test("combat round count increments from existing encounter state", () => {
+  const state = testState({ hitPoints: 12, monsterHitPoints: 6, rounds: 3 });
+
+  const result = resolveCombatRound({
+    encounter,
+    state,
+    rng: sequence([0, 0]),
+  });
+
+  const updated = applyCombatRound(state, result);
+
+  expect(result.round).toBe(4);
+  expect(updated.encounters["door-guardian"].rounds).toBe(4);
 });
 
 function testState(input: {
   hitPoints: number;
   monsterHitPoints: number;
+  rounds?: number;
 }): GameState {
   const character = createCharacter("hero-1", "Adventurer", "fighter");
   return {
@@ -89,6 +107,7 @@ function testState(input: {
       "door-guardian": {
         hitPoints: input.monsterHitPoints,
         defeated: false,
+        rounds: input.rounds ?? 0,
       },
     },
     updatedAt: new Date("2026-05-23T12:00:00.000Z").toISOString(),

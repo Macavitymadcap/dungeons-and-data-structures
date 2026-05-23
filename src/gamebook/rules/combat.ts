@@ -19,6 +19,7 @@ export function resolveCombatRound({
 }: ResolveCombatRoundInput): CombatRoundResult {
   const existingEncounter = state.encounters[encounter.id] ??
     initialEncounterState(encounter);
+  const round = existingEncounter.rounds + 1;
   const log: string[] = [];
 
   const playerAttack = rollD20Check({
@@ -44,6 +45,7 @@ export function resolveCombatRound({
     log.push(`${encounter.name} is defeated.`);
     return {
       encounterId: encounter.id,
+      round,
       playerAttack,
       playerDamage,
       monsterHitPoints,
@@ -74,6 +76,7 @@ export function resolveCombatRound({
 
   return {
     encounterId: encounter.id,
+    round,
     playerAttack,
     playerDamage,
     monsterAttack,
@@ -97,6 +100,7 @@ export function applyCombatRound(
       [result.encounterId]: {
         hitPoints: result.monsterHitPoints,
         defeated: result.outcome === "victory",
+        rounds: result.round,
       },
     },
   };
@@ -106,6 +110,6 @@ function initialEncounterState(encounter: Encounter): EncounterState {
   return {
     hitPoints: encounter.hitPoints,
     defeated: false,
+    rounds: 0,
   };
 }
-

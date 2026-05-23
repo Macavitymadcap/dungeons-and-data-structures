@@ -26,3 +26,4 @@ Use this log to record major planning, research, manuscript, and gamebook implem
 - Tightened save and authoring validation for submitted state, missing passages, missing combat encounters, and targetless choices.
 - Added a static author tools page with graph validation status and Mermaid passage graph export.
 - Added a debug gamebook variant with live passage, item, flag, encounter, and log state for author-mode testing.
+- Extended combat passages with visible encounter status, persisted combat round counts, and ration-based recovery actions.

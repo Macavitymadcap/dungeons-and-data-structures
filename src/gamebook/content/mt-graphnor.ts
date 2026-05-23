@@ -119,6 +119,13 @@ export const mtGraphnorAdventure: Adventure = {
           text: "Retreat before the dungeon claims more of you",
           targetId: "ending-retreat",
         },
+        {
+          id: "catch-breath-guardian",
+          text: "Use a ration and catch your breath",
+          targetId: "guardian-clash",
+          requires: { itemsAll: ["ration"] },
+          effects: { removeItems: ["ration"], heal: 2 },
+        },
       ],
     },
     {
@@ -258,6 +265,13 @@ export const mtGraphnorAdventure: Adventure = {
           id: "retreat-climax",
           text: "Retreat with what you learned",
           targetId: "ending-retreat",
+        },
+        {
+          id: "catch-breath-climax",
+          text: "Use a ration and catch your breath",
+          targetId: "climax",
+          requires: { itemsAll: ["ration"] },
+          effects: { removeItems: ["ration"], heal: 2 },
         },
       ],
     },

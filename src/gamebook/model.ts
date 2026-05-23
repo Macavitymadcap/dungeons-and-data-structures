@@ -170,6 +170,7 @@ export interface GameState {
 export interface EncounterState {
   hitPoints: number;
   defeated: boolean;
+  rounds: number;
 }
 
 export interface GameLogEntry {
@@ -200,6 +201,7 @@ export interface DamageRollResult {
 
 export interface CombatRoundResult {
   encounterId: string;
+  round: number;
   playerAttack: RollResult;
   playerDamage?: DamageRollResult;
   monsterAttack?: RollResult;

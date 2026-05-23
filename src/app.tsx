@@ -416,6 +416,15 @@ function PassagePanel(props: {
         <h2 id={`${props.passage.id}-title`}>{props.passage.title}</h2>
         <p>{props.passage.body}</p>
         <StateSummary adventure={props.adventure} state={props.state} />
+        {props.passage.encounterId
+          ? (
+            <EncounterStatus
+              adventure={props.adventure}
+              encounterId={props.passage.encounterId}
+              state={props.state}
+            />
+          )
+          : null}
         {props.roll ? <RollSummary roll={props.roll} /> : null}
         {props.combat ? <CombatSummary combat={props.combat} /> : null}
         {props.authorMode ? <DebugPanel state={props.state} /> : null}
@@ -476,14 +485,38 @@ function DebugPanel(props: { state: GameState }) {
 
 function encounterDebugText(state: GameState): string {
   return Object.entries(state.encounters).map(([id, encounter]) =>
-    `${id}: ${encounter.hitPoints} HP${encounter.defeated ? ", defeated" : ""}`
+    `${id}: ${encounter.hitPoints} HP, round ${encounter.rounds}${
+      encounter.defeated ? ", defeated" : ""
+    }`
   ).join("; ") || "None";
 }
 
 function CombatSummary(props: { combat: CombatRoundResult }) {
   return (
     <Notice heading="Combat round" tone={props.combat.outcome === "victory" ? "success" : "info"}>
-      {props.combat.log.join(" ")}
+      Round {props.combat.round}: {props.combat.log.join(" ")}
+    </Notice>
+  );
+}
+
+function EncounterStatus(props: {
+  adventure: Adventure;
+  encounterId: string;
+  state: GameState;
+}) {
+  const encounter = props.adventure.encounters?.find((item) =>
+    item.id === props.encounterId
+  );
+  const encounterState = props.state.encounters[props.encounterId];
+  if (!encounter || !encounterState) {
+    return null;
+  }
+
+  return (
+    <Notice heading="Encounter status" tone={encounterState.defeated ? "success" : "info"}>
+      {encounter.name}: {encounterState.hitPoints}/{encounter.hitPoints} HP, round{" "}
+      {encounterState.rounds}
+      {encounterState.defeated ? ", defeated." : "."}
     </Notice>
   );
 }

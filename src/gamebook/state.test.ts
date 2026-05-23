@@ -21,6 +21,7 @@ test("initial state creates a versioned save document", () => {
   expect(state.version).toBe(1);
   expect(state.currentPassageId).toBe("entrance");
   expect(state.hitPoints).toBe(character.maxHitPoints);
+  expect(state.encounters["door-guardian"].rounds).toBe(0);
   expect(state.updatedAt).toBe(now.toISOString());
 });
 
@@ -113,6 +114,7 @@ test("load upgrades earlier saves with missing ancestry and encounter state", ()
     expect(result.state.encounters["door-guardian"]).toEqual({
       hitPoints: 6,
       defeated: false,
+      rounds: 0,
     });
   }
 });

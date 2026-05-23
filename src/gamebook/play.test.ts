@@ -10,7 +10,7 @@ test("combat choices skip rolls when the encounter is already defeated", () => {
     ...createInitialState(mtGraphnorAdventure, character),
     currentPassageId: "guardian-clash",
     encounters: {
-      "door-guardian": { hitPoints: 0, defeated: true },
+      "door-guardian": { hitPoints: 0, defeated: true, rounds: 1 },
     },
   };
   const passage = mtGraphnorAdventure.passages.find((item) =>
