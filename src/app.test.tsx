@@ -24,8 +24,8 @@ describe("createApp", () => {
     expect(html).toContain("Mt. Graphnor");
     expect(html).toContain("Entrance And Guardian");
     expect(html).toContain("Slip past the guard");
-    expect(html).toContain("<dd>rogue</dd>");
-    expect(html).toContain("<dd>elf</dd>");
+    expect(html).toContain('<output class="labelled-output-value">rogue</output>');
+    expect(html).toContain('<output class="labelled-output-value">elf</output>');
     expect(html).toContain("Shortsword");
     expect(html).toContain("Thieves&#39; tools");
     expect(html).toContain("<dt>Discoveries</dt>");

@@ -1,8 +1,14 @@
 import {
   AppShell,
+  Badge,
   Button,
+  ButtonGroup,
+  Card,
   CodeBlock,
   HxForm,
+  Icon,
+  IconButton,
+  LabelledOutput,
   MetadataList,
   Notice,
   PageHeader,
@@ -62,6 +68,12 @@ export function createApp(dependencies: AppDependencies = {}) {
 
   app.get("/assets/hyper-dank-ui.css", () =>
     new Response(Bun.file("node_modules/@macavitymadcap/hyper-dank-ui/src/styles.css"), {
+      headers: { "Content-Type": "text/css; charset=utf-8" },
+    })
+  );
+
+  app.get("/assets/gamebook.css", () =>
+    new Response(Bun.file("src/gamebook/styles.css"), {
       headers: { "Content-Type": "text/css; charset=utf-8" },
     })
   );
@@ -359,12 +371,14 @@ function GamebookPage(props: {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>{props.adventure.title} | {props.appName}</title>
         <link rel="stylesheet" href="/assets/hyper-dank-ui.css" />
+        <link rel="stylesheet" href="/assets/gamebook.css" />
         <script type="module" src="/assets/client.js"></script>
         <script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js">
         </script>
       </head>
       <body>
         <AppShell
+          className="gamebook-shell"
           header={
             <PageHeader
               eyebrow={props.appName}
@@ -408,79 +422,87 @@ function GameControls(props: {
   race: Character["race"];
 }) {
   return (
-    <Panel labelledBy="gamebook-controls-title">
-      <section aria-labelledby="gamebook-controls-title">
-        <h2 id="gamebook-controls-title">Save controls</h2>
-        <Toolbar ariaLabel="Gamebook save controls">
+    <section className="gamebook-command-bar" aria-labelledby="gamebook-controls-title">
+      <h2 id="gamebook-controls-title">Game controls</h2>
+      <details className="gamebook-popover">
+        <summary className="button" data-size="compact" data-variant="outline">
+          <Icon name="settings" /> Settings
+        </summary>
+        <div className="gamebook-popover-panel" role="group" aria-label="Game settings">
+          <h3>New game</h3>
+          <Toolbar ariaLabel="Character setup controls">
+            <HxForm
+              action="/gamebook"
+              className="gamebook-new-game"
+              method="get"
+            >
+              <SelectField
+                id="gamebook-class"
+                label="Character class"
+                name="class"
+                value={props.characterClass}
+                options={[
+                  { label: "Fighter", value: "fighter" },
+                  { label: "Rogue", value: "rogue" },
+                  { label: "Wizard", value: "wizard" },
+                  { label: "Cleric", value: "cleric" },
+                ]}
+              />
+              <SelectField
+                id="gamebook-race"
+                label="Ancestry"
+                name="race"
+                value={props.race}
+                options={[
+                  { label: "Human", value: "human" },
+                  { label: "Elf", value: "elf" },
+                  { label: "Dwarf", value: "dwarf" },
+                  { label: "Halfling", value: "halfling" },
+                ]}
+              />
+              <Button type="submit">New game</Button>
+            </HxForm>
+            <IconButton
+              type="button"
+              variant="danger"
+              icon="delete"
+              label="Reset saved game"
+              {...{ "hx-disable": "true" }}
+              id="gamebook-reset"
+            />
+          </Toolbar>
+          <h3>Save JSON</h3>
           <HxForm
             action="/gamebook"
-            className="gamebook-new-game"
-            method="get"
+            className="gamebook-save-import"
+            method="post"
           >
-            <SelectField
-              id="gamebook-class"
-              label="Character class"
-              name="class"
-              value={props.characterClass}
-              options={[
-                { label: "Fighter", value: "fighter" },
-                { label: "Rogue", value: "rogue" },
-                { label: "Wizard", value: "wizard" },
-                { label: "Cleric", value: "cleric" },
-              ]}
+            <TextareaField
+              id="gamebook-save-json"
+              label="Save JSON"
+              name="save"
+              rows={5}
             />
-            <SelectField
-              id="gamebook-race"
-              label="Ancestry"
-              name="race"
-              value={props.race}
-              options={[
-                { label: "Human", value: "human" },
-                { label: "Elf", value: "elf" },
-                { label: "Dwarf", value: "dwarf" },
-                { label: "Halfling", value: "halfling" },
-              ]}
-            />
-            <Button type="submit">New game</Button>
+            <Toolbar ariaLabel="Save import and export controls">
+              <Button
+                type="button"
+                variant="outline"
+                {...{ "hx-disable": "true" }}
+                id="gamebook-export"
+              >
+                <Icon name="download" /> Export
+              </Button>
+              <Button type="submit" variant="outline">
+                <Icon name="save" /> Import
+              </Button>
+            </Toolbar>
           </HxForm>
-          <Button
-            type="button"
-            variant="danger"
-            {...{ "hx-disable": "true" }}
-            ariaLabel="Reset saved game"
-            id="gamebook-reset"
-          >
-            Reset
-          </Button>
-        </Toolbar>
-        <HxForm
-          action="/gamebook"
-          className="gamebook-save-import"
-          method="post"
-        >
-          <TextareaField
-            id="gamebook-save-json"
-            label="Save JSON"
-            name="save"
-            rows={5}
-          />
-          <Toolbar ariaLabel="Save import and export controls">
-            <Button
-              type="button"
-              variant="outline"
-              {...{ "hx-disable": "true" }}
-              id="gamebook-export"
-            >
-              Export save
-            </Button>
-            <Button type="submit" variant="outline">Import save</Button>
-          </Toolbar>
-        </HxForm>
-        <p id="gamebook-save-status" role="status">
-          Saved progress continues automatically in this browser.
-        </p>
-      </section>
-    </Panel>
+        </div>
+      </details>
+      <p id="gamebook-save-status" role="status">
+        Saved progress continues automatically in this browser.
+      </p>
+    </section>
   );
 }
 
@@ -497,11 +519,15 @@ function PassagePanel(props: {
   );
 
   return (
-    <Panel labelledBy={`${props.passage.id}-title`}>
+    <Card as="section" className="gamebook-passage-card">
       <article data-passage-id={props.passage.id}>
+        <div className="gamebook-passage-kicker">
+          {props.passage.tags?.slice(0, 3).map((tag) => <Badge>{tag}</Badge>)}
+        </div>
         <h2 id={`${props.passage.id}-title`}>{props.passage.title}</h2>
         <p>{props.passage.body}</p>
-        <StateSummary adventure={props.adventure} state={props.state} />
+        <StateStrip state={props.state} />
+        <CharacterSheet adventure={props.adventure} state={props.state} />
         {props.passage.encounterId
           ? (
             <EncounterStatus
@@ -517,45 +543,52 @@ function PassagePanel(props: {
           ? <DebugPanel adventure={props.adventure} state={props.state} />
           : null}
         {props.passage.ending
-          ? <p data-ending={props.passage.ending}>Ending: {props.passage.ending}</p>
+          ? (
+            <Notice heading="Ending" tone="success">
+              <span data-ending={props.passage.ending}>{props.passage.ending}</span>
+            </Notice>
+          )
           : (
-            <menu className="button-group">
+            <ButtonGroup ariaLabel="Choices" className="gamebook-choice-list">
               {availableChoices.map((choice) => (
-                <li>
-                  <HxForm
-                    action={`/gamebook/choices/${choice.id}`}
-                    method="post"
-                    className="gamebook-choice"
-                    {...{
-                      "hx-post": `/gamebook/choices/${choice.id}`,
-                      "hx-target": "#gamebook-passage",
-                      "hx-swap": "innerHTML",
-                    }}
-                  >
-                    <input
-                      type="hidden"
-                      name="state"
-                      value={JSON.stringify(props.state)}
-                    />
-                    <input type="hidden" name="choiceId" value={choice.id} />
-                    {props.authorMode
-                      ? <input type="hidden" name="authorMode" value="1" />
-                      : null}
-                    <Button type="submit" variant="outline">{choice.text}</Button>
-                  </HxForm>
-                </li>
+                <HxForm
+                  action={`/gamebook/choices/${choice.id}`}
+                  method="post"
+                  className="gamebook-choice"
+                  {...{
+                    "hx-post": `/gamebook/choices/${choice.id}`,
+                    "hx-target": "#gamebook-passage",
+                    "hx-swap": "innerHTML",
+                  }}
+                >
+                  <input
+                    type="hidden"
+                    name="state"
+                    value={JSON.stringify(props.state)}
+                  />
+                  <input type="hidden" name="choiceId" value={choice.id} />
+                  {props.authorMode
+                    ? <input type="hidden" name="authorMode" value="1" />
+                    : null}
+                  <Button type="submit" variant="outline">
+                    <Icon name="book" /> {choice.text}
+                  </Button>
+                </HxForm>
               ))}
-            </menu>
+            </ButtonGroup>
           )}
       </article>
-    </Panel>
+    </Card>
   );
 }
 
 function DebugPanel(props: { adventure: Adventure; state: GameState }) {
   return (
-    <Panel labelledBy="debug-state-title">
-      <section data-author-debug="true" aria-labelledby="debug-state-title">
+    <details className="gamebook-popover gamebook-debug-popover" data-author-debug="true">
+      <summary className="button" data-size="compact" data-variant="ghost">
+        <Icon name="database" /> Debug
+      </summary>
+      <section className="gamebook-popover-panel" aria-labelledby="debug-state-title">
         <h2 id="debug-state-title">Debug state</h2>
         <MetadataList
           items={[
@@ -595,7 +628,7 @@ function DebugPanel(props: { adventure: Adventure; state: GameState }) {
           <Button type="submit" variant="outline">Go</Button>
         </HxForm>
       </section>
-    </Panel>
+    </details>
   );
 }
 
@@ -637,27 +670,46 @@ function EncounterStatus(props: {
   );
 }
 
-function StateSummary(props: { adventure: Adventure; state: GameState }) {
+function StateStrip(props: { state: GameState }) {
   return (
-    <MetadataList
-      items={[
-        { label: "Class", value: props.state.character.class },
-        { label: "Ancestry", value: props.state.character.race },
-        {
-          label: "HP",
-          value: hitPointSummary(props.state),
-        },
-        {
-          label: "Conditions",
-          value: props.state.conditions.join(", ") || "None",
-        },
-        { label: "Inventory", value: itemList(props.adventure, props.state.inventory) },
-        {
-          label: "Discoveries",
-          value: discoveryList(props.adventure, props.state.flags),
-        },
-      ]}
-    />
+    <div className="gamebook-status-strip" aria-label="Character status">
+      <LabelledOutput label="HP" value={hitPointSummary(props.state)} />
+      <LabelledOutput label="Class" value={props.state.character.class} />
+      <LabelledOutput label="Ancestry" value={props.state.character.race} />
+    </div>
+  );
+}
+
+function CharacterSheet(props: { adventure: Adventure; state: GameState }) {
+  return (
+    <details className="gamebook-popover">
+      <summary className="button" data-size="compact" data-variant="ghost">
+        <Icon name="document" /> Character
+      </summary>
+      <div className="gamebook-popover-panel" role="group" aria-label="Character sheet">
+        <div className="gamebook-output-grid">
+          <LabelledOutput label="Armour class" value={String(props.state.character.armourClass)} />
+          <LabelledOutput label="Level" value={String(props.state.character.level)} />
+          <LabelledOutput
+            label="Proficiency"
+            value={`+${props.state.character.proficiencyBonus}`}
+          />
+        </div>
+        <MetadataList
+          items={[
+            {
+              label: "Conditions",
+              value: props.state.conditions.join(", ") || "None",
+            },
+            { label: "Inventory", value: itemList(props.adventure, props.state.inventory) },
+            {
+              label: "Discoveries",
+              value: discoveryList(props.adventure, props.state.flags),
+            },
+          ]}
+        />
+      </div>
+    </details>
   );
 }
 

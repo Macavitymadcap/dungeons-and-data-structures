@@ -12,6 +12,7 @@ await cp(
   "node_modules/@macavitymadcap/hyper-dank-ui/src/styles.css",
   `${outDir}/assets/hyper-dank-ui.css`,
 );
+await cp("src/gamebook/styles.css", `${outDir}/assets/gamebook.css`);
 await Bun.build({
   entrypoints: ["src/gamebook/player-client.ts"],
   minify: true,

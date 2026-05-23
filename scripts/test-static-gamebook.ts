@@ -31,14 +31,15 @@ try {
   await expectText(page.locator("[data-passage-id] > h2"), "Entrance And Guardian");
   await expectText(page.locator("#gamebook-save-status"), "Started a new game.");
 
+  await page.getByText("Settings").click();
   await page.selectOption("#gamebook-class", "rogue");
   await page.selectOption("#gamebook-race", "elf");
   await page.getByRole("button", { name: "New game" }).click();
-  await expectText(page.locator(".metadata-list dd").first(), "rogue");
-  await expectText(page.locator(".metadata-list dd").nth(1), "elf");
-  await expectText(page.locator(".metadata-list dd").nth(3), "None");
-  await expectText(page.locator(".metadata-list dd").nth(4), "Shortsword, Thieves' tools, Ration");
-  await expectText(page.locator(".metadata-list dd").nth(5), "None");
+  await expectText(page.locator(".labelled-output-value").nth(1), "rogue");
+  await expectText(page.locator(".labelled-output-value").nth(2), "elf");
+  await expectText(page.locator(".metadata-list dd").nth(0), "None");
+  await expectText(page.locator(".metadata-list dd").nth(1), "Shortsword, Thieves' tools, Ration");
+  await expectText(page.locator(".metadata-list dd").nth(2), "None");
   await expectStorage(page, "character.class", "rogue");
   await expectStorage(page, "character.race", "elf");
 
@@ -56,11 +57,11 @@ try {
   await expectText(page.locator(".notice h2"), "Combat round");
   await page.getByRole("button", { name: "Probe the mechanism with thieves' tools" }).click();
   await expectText(page.locator("[data-passage-id] > h2"), "Keyboard Room Clue");
-  await expectText(page.locator(".metadata-list dd").nth(5), "Challenged the door guardian, Solved the keyboard room");
+  await expectText(page.locator(".metadata-list dd").nth(2), "Challenged the door guardian, Solved the keyboard room");
   await expectStorage(page, "currentPassageId", "keyboard-room-clue");
   await expectEncounterDefeated(page, "door-guardian");
 
-  await page.getByRole("button", { name: "Export save" }).click();
+  await page.getByRole("button", { name: "Export" }).click();
   const exportedSave = await page.locator("#gamebook-save-json").inputValue();
   if (!exportedSave.includes('"currentPassageId": "keyboard-room-clue"')) {
     throw new Error("Expected exported save JSON to include the current passage.");
@@ -74,7 +75,7 @@ try {
     throw new Error("Expected reset to clear localStorage save.");
   }
 
-  await page.getByRole("button", { name: "Import save" }).click();
+  await page.getByRole("button", { name: "Import" }).click();
   await expectText(page.locator("[data-passage-id] > h2"), "Keyboard Room Clue");
   await expectText(page.locator("#gamebook-save-status"), "Imported saved game.");
   await expectStorage(page, "currentPassageId", "keyboard-room-clue");
