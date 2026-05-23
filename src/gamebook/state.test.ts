@@ -1,0 +1,377 @@
+import { expect, test } from "bun:test";
+import { mtGraphnorAdventure } from "./content/mt-graphnor.ts";
+import { createCharacter } from "./rules/character.ts";
+import {
+  applyChoiceEffects,
+  applyDamage,
+  createInitialState,
+  isChoiceAvailable,
+  loadGame,
+  parseGame,
+  resetGame,
+  saveGame,
+  CURRENT_SAVE_VERSION,
+  StorageAdapter,
+} from "./state.ts";
+
+test("initial state creates a versioned save document", () => {
+  const now = new Date("2026-05-23T12:00:00.000Z");
+  const character = createCharacter("hero-1", "Ash", "fighter");
+  const state = createInitialState(mtGraphnorAdventure, character, now);
+
+  expect(state.schema).toBe("dads-gamebook-save");
+  expect(state.version).toBe(CURRENT_SAVE_VERSION);
+  expect(state.currentPassageId).toBe("entrance");
+  expect(state.hitPoints).toBe(character.maxHitPoints);
+  expect(state.encounters["door-guardian"].rounds).toBe(0);
+  expect(state.updatedAt).toBe(now.toISOString());
+});
+
+test("choice requirements can gate by inventory and flags", () => {
+  const character = createCharacter("hero-1", "Ash", "fighter");
+  const state = createInitialState(mtGraphnorAdventure, character);
+  const choice = {
+    id: "use-key",
+    text: "Use key",
+    targetId: "next",
+    requires: {
+      itemsAll: ["brass-key"],
+      flagsAll: ["puzzle-solved"],
+    },
+  };
+
+  expect(isChoiceAvailable(choice, state)).toBe(false);
+  const updated = applyChoiceEffects(state, {
+    addItems: ["brass-key"],
+    setFlags: ["puzzle-solved"],
+  });
+  expect(isChoiceAvailable(choice, updated)).toBe(true);
+});
+
+test("choice requirements can gate by missing hit points", () => {
+  const character = createCharacter("hero-1", "Ash", "fighter");
+  const state = createInitialState(mtGraphnorAdventure, character);
+  const choice = {
+    id: "heal",
+    text: "Heal",
+    targetId: "next",
+    requires: {
+      hitPointsBelowMax: true,
+    },
+  };
+
+  expect(isChoiceAvailable(choice, state)).toBe(false);
+  expect(isChoiceAvailable(choice, { ...state, hitPoints: character.maxHitPoints - 1 }))
+    .toBe(true);
+});
+
+test("choice requirements can gate by conditions", () => {
+  const character = createCharacter("hero-1", "Ash", "fighter");
+  const state = createInitialState(mtGraphnorAdventure, character);
+  const choice = {
+    id: "push-on",
+    text: "Push on",
+    targetId: "next",
+    requires: {
+      conditionsAll: ["blessed"],
+      conditionsNone: ["rattled"],
+    },
+  };
+
+  expect(isChoiceAvailable(choice, state)).toBe(false);
+  const blessed = applyChoiceEffects(state, {
+    addConditions: ["blessed", "rattled"],
+  });
+  expect(isChoiceAvailable(choice, blessed)).toBe(false);
+  const steady = applyChoiceEffects(blessed, {
+    removeConditions: ["rattled"],
+  });
+  expect(isChoiceAvailable(choice, steady)).toBe(true);
+});
+
+test("choice effects update inventory, flags, hit points, and timestamp", () => {
+  const now = new Date("2026-05-23T12:00:00.000Z");
+  const character = createCharacter("hero-1", "Ash", "rogue");
+  const state = createInitialState(mtGraphnorAdventure, character, now);
+  const updated = applyChoiceEffects(state, {
+    addItems: ["brass-key"],
+    removeItems: ["ration"],
+    setFlags: ["puzzle-solved"],
+    damage: 2,
+  }, new Date("2026-05-23T12:01:00.000Z"));
+
+  expect(updated.inventory.includes("brass-key")).toBe(true);
+  expect(updated.inventory.includes("ration")).toBe(false);
+  expect(updated.flags.includes("puzzle-solved")).toBe(true);
+  expect(updated.hitPoints).toBe(character.maxHitPoints - 2);
+  expect(updated.updatedAt).toBe("2026-05-23T12:01:00.000Z");
+});
+
+test("choice damage consumes temporary hit points first", () => {
+  const character = createCharacter("hero-1", "Ash", "fighter");
+  const state = {
+    ...createInitialState(mtGraphnorAdventure, character),
+    temporaryHitPoints: 3,
+  };
+  const updated = applyChoiceEffects(state, {
+    damage: 5,
+  });
+
+  expect(updated.temporaryHitPoints).toBe(0);
+  expect(updated.hitPoints).toBe(character.maxHitPoints - 2);
+});
+
+test("choice effects keep the larger temporary hit point pool", () => {
+  const character = createCharacter("hero-1", "Ash", "cleric");
+  const state = {
+    ...createInitialState(mtGraphnorAdventure, character),
+    temporaryHitPoints: 4,
+  };
+
+  expect(applyChoiceEffects(state, { temporaryHitPoints: 2 }).temporaryHitPoints)
+    .toBe(4);
+  expect(applyChoiceEffects(state, { temporaryHitPoints: 6 }).temporaryHitPoints)
+    .toBe(6);
+});
+
+test("choice effects add and remove conditions", () => {
+  const character = createCharacter("hero-1", "Ash", "cleric");
+  const state = {
+    ...createInitialState(mtGraphnorAdventure, character),
+    conditions: ["rattled"],
+  };
+  const updated = applyChoiceEffects(state, {
+    addConditions: ["blessed"],
+    removeConditions: ["rattled"],
+  });
+
+  expect(updated.conditions).toEqual(["blessed"]);
+});
+
+test("applyDamage subtracts temporary hit points before hit points", () => {
+  expect(applyDamage(10, 4, 3)).toEqual({
+    hitPoints: 10,
+    temporaryHitPoints: 1,
+  });
+  expect(applyDamage(10, 4, 7)).toEqual({
+    hitPoints: 7,
+    temporaryHitPoints: 0,
+  });
+});
+
+test("applyDamage clamps negative inputs before calculating overflow", () => {
+  expect(applyDamage(10, -4, 0)).toEqual({
+    hitPoints: 10,
+    temporaryHitPoints: 0,
+  });
+  expect(applyDamage(-1, 4, 7)).toEqual({
+    hitPoints: 0,
+    temporaryHitPoints: 0,
+  });
+});
+
+test("save and load round-trip through a storage adapter", () => {
+  const storage = new MemoryStorage();
+  const character = createCharacter("hero-1", "Ash", "cleric");
+  const state = createInitialState(mtGraphnorAdventure, character);
+
+  saveGame(storage, state);
+  const result = loadGame(storage);
+
+  expect(result.ok).toBe(true);
+  if (result.ok) {
+    expect(result.state.currentPassageId).toBe("entrance");
+    expect(result.state.character.class).toBe("cleric");
+  }
+});
+
+test("load upgrades earlier saves with missing ancestry and encounter state", () => {
+  const storage = new MemoryStorage();
+  const character = createCharacter("hero-1", "Ash", "rogue");
+  const oldSave = createInitialState(mtGraphnorAdventure, character);
+  const { encounters: _encounters, character: _character, ...saveWithoutEncounters } =
+    oldSave;
+
+  storage.setItem(
+    "dads-gamebook-save",
+    JSON.stringify({
+      ...saveWithoutEncounters,
+      version: 1,
+      character: {
+        id: character.id,
+        name: character.name,
+        class: character.class,
+        level: character.level,
+        abilityScores: character.abilityScores,
+        maxHitPoints: character.maxHitPoints,
+        armourClass: character.armourClass,
+        proficiencyBonus: character.proficiencyBonus,
+        skillProficiencies: character.skillProficiencies,
+        inventory: character.inventory,
+      },
+    }),
+  );
+
+  const result = loadGame(storage, "dads-gamebook-save", mtGraphnorAdventure);
+
+  expect(result.ok).toBe(true);
+  if (result.ok) {
+    expect(result.state.version).toBe(CURRENT_SAVE_VERSION);
+    expect(result.state.character.race).toBe("human");
+    expect(result.state.character.attack.name).toBe("Shortsword");
+    expect(result.state.encounters["door-guardian"]).toEqual({
+      hitPoints: 6,
+      defeated: false,
+      rounds: 0,
+    });
+  }
+});
+
+test("parse migrates version one saves to the current save version", () => {
+  const character = createCharacter("hero-1", "Ash", "fighter");
+  const state = createInitialState(mtGraphnorAdventure, character);
+
+  const result = parseGame(
+    JSON.stringify({ ...state, version: 1 }),
+    mtGraphnorAdventure,
+  );
+
+  expect(result.ok).toBe(true);
+  if (result.ok) {
+    expect(result.state.version).toBe(CURRENT_SAVE_VERSION);
+  }
+});
+
+test("parse rejects unsupported future save versions", () => {
+  const character = createCharacter("hero-1", "Ash", "fighter");
+  const state = createInitialState(mtGraphnorAdventure, character);
+
+  const result = parseGame(
+    JSON.stringify({ ...state, version: 999 }),
+    mtGraphnorAdventure,
+  );
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) {
+    expect(result.error).toBe("Saved game version is not supported.");
+  }
+});
+
+test("parse rejects negative temporary hit points", () => {
+  const character = createCharacter("hero-1", "Ash", "fighter");
+  const state = {
+    ...createInitialState(mtGraphnorAdventure, character),
+    temporaryHitPoints: -1,
+  };
+
+  const result = parseGame(JSON.stringify(state), mtGraphnorAdventure);
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) {
+    expect(result.error).toBe("Saved game is missing required fields.");
+  }
+});
+
+test("parse validates imported save JSON", () => {
+  const character = createCharacter("hero-1", "Ash", "wizard", "elf");
+  const state = createInitialState(mtGraphnorAdventure, character);
+
+  const result = parseGame(JSON.stringify(state), mtGraphnorAdventure);
+
+  expect(result.ok).toBe(true);
+  if (result.ok) {
+    expect(result.state.character.race).toBe("elf");
+    expect(result.state.character.attack.name).toBe("Staff");
+  }
+});
+
+test("parse rejects saves whose current passage is not in the adventure", () => {
+  const character = createCharacter("hero-1", "Ash", "wizard");
+  const state = {
+    ...createInitialState(mtGraphnorAdventure, character),
+    currentPassageId: "missing-room",
+  };
+
+  const result = parseGame(JSON.stringify(state), mtGraphnorAdventure);
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) {
+    expect(result.error).toBe(
+      "Saved game passage is not valid for this adventure.",
+    );
+  }
+});
+
+test("parse can skip current passage validation for author recovery", () => {
+  const character = createCharacter("hero-1", "Ash", "wizard");
+  const state = {
+    ...createInitialState(mtGraphnorAdventure, character),
+    currentPassageId: "missing-room",
+  };
+
+  const result = parseGame(JSON.stringify(state), mtGraphnorAdventure, {
+    validateCurrentPassage: false,
+  });
+
+  expect(result.ok).toBe(true);
+  if (result.ok) {
+    expect(result.state.currentPassageId).toBe("missing-room");
+  }
+});
+
+test("load rejects saves with invalid character classes", () => {
+  const storage = new MemoryStorage();
+  const character = createCharacter("hero-1", "Ash", "cleric");
+  const state = createInitialState(mtGraphnorAdventure, character);
+
+  storage.setItem(
+    "dads-gamebook-save",
+    JSON.stringify({
+      ...state,
+      character: { ...state.character, class: "bard" },
+    }),
+  );
+
+  const result = loadGame(storage, "dads-gamebook-save", mtGraphnorAdventure);
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) {
+    expect(result.error).toBe("Saved game character is not valid.");
+  }
+});
+
+test("invalid save JSON is rejected with a readable error", () => {
+  const storage = new MemoryStorage();
+  storage.setItem("dads-gamebook-save", "{nope");
+
+  const result = loadGame(storage);
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) {
+    expect(result.error).toBe("Saved game is not valid JSON.");
+  }
+});
+
+test("reset removes the saved game", () => {
+  const storage = new MemoryStorage();
+  storage.setItem("dads-gamebook-save", "{}");
+  resetGame(storage);
+
+  expect(storage.getItem("dads-gamebook-save")).toBeNull();
+});
+
+class MemoryStorage implements StorageAdapter {
+  #values = new Map<string, string>();
+
+  getItem(key: string): string | null {
+    return this.#values.get(key) ?? null;
+  }
+
+  setItem(key: string, value: string): void {
+    this.#values.set(key, value);
+  }
+
+  removeItem(key: string): void {
+    this.#values.delete(key);
+  }
+}

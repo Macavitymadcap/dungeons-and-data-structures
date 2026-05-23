@@ -1,8 +1,8 @@
 <h2>Abstract Stats: The Foundation of RPG Entities</h2>
 
 <p>
-  In RPGs like Dungeons &amp; Dragons, diverse entities—players, monsters, NPCs—share fundamental attributes and
-  capabilities. This common structure makes the stat block a perfect candidate for an abstract base class in
+  In RPGs like Dungeons &amp; Dragons, diverse entities such as players, monsters, and NPCs share fundamental attributes
+  and capabilities. This common structure makes the stat block a strong candidate for an abstract base class in
   object-oriented design.
 </p>
 
@@ -15,13 +15,13 @@
 <ul>
   <li><strong>Attributes</strong>: Basic characteristics like strength and intelligence</li>
   <li><strong>Derived Stats</strong>: Values calculated from attributes (like skill bonuses)</li>
-  <li><strong>Combat Statistics</strong>: Hit points, armor class, etc.</li>
+  <li><strong>Combat Statistics</strong>: Hit points, armour class, and similar values</li>
   <li><strong>Abilities</strong>: Special capabilities and actions</li>
 </ul>
 
 <p>
   By creating an abstract base class, we establish a common interface that all game entities can implement while
-  allowing for specialized subclasses.
+  allowing for specialised subclasses.
 </p>
 
 <details>
@@ -176,7 +176,7 @@ abstract class StatBlock {
 <h3>Specialized Entity Types</h3>
 
 <p>
-  From this abstract base, we can derive specialized classes for different entity types:
+  From this abstract base, we can derive specialised classes for different entity types:
 </p>
 
 <details>
@@ -261,7 +261,7 @@ class NonPlayerCharacter extends StatBlock {
 <h3>Benefits of Abstract Stat Blocks</h3>
 
 <p>
-  This approach offers numerous advantages:
+  This approach offers several advantages:
 </p>
 
 <ol>

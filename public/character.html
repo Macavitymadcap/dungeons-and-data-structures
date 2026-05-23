@@ -1,15 +1,15 @@
 <h2>Character Composition &amp; Inheritance</h2>
 
 <p>
-  While the abstract StatBlock provides a solid foundation, player characters in RPGs have significantly more
-  complexity due to the combinatorial nature of races, classes, backgrounds, and equipment. This complexity is best
-  handled through a combination of inheritance and composition.
+  While the abstract StatBlock provides a solid foundation, player characters in RPGs are more complex because they
+  combine races, classes, backgrounds, and equipment. This complexity is best handled through a combination of
+  inheritance and composition.
 </p>
 
 <h3>Character Class Hierarchy</h3>
 
 <p>
-  In our system, the PlayerCharacter class extends the StatBlock but incorporates additional components:
+  In our system, the PlayerCharacter class extends StatBlock and adds character-specific components:
 </p>
 
 <details>
@@ -305,18 +305,18 @@ class PlayerCharacter extends StatBlock {
 </details>
 
 <p>
-  This PlayerCharacter class demonstrates how composition and inheritance can be combined:
+  This PlayerCharacter class demonstrates how composition and inheritance can work together:
 </p>
 
 <ul>
   <li><strong>Inheritance</strong> is used for the base StatBlock functionality</li>
-  <li><strong>Composition</strong> is used for incorporating the race, class, background, and equipment</li>
+  <li><strong>Composition</strong> incorporates race, class, background, and equipment</li>
 </ul>
 
 <h3>Component-Based Design</h3>
 
 <p>
-  For a more flexible system, we could further refactor our design to use a component-based approach, where each
+  For a more flexible system, we could refactor the design to use a component-based approach, where each
   capability is a separate component that can be attached to any entity:
 </p>
 
@@ -487,14 +487,14 @@ class WeaponProficiencyComponent implements Component {
 
 <ul>
   <li>Components can be added or removed dynamically</li>
-  <li>Entities can have a customized set of capabilities</li>
+  <li>Entities can have a customised set of capabilities</li>
   <li>Composition avoids the &quot;diamond problem&quot; of multiple inheritance</li>
   <li>New functionality can be added without modifying existing classes</li>
 </ul>
 
 <p>
-  The entity-component pattern is widely used in modern game development for precisely these reasons. It creates a more
-  modular system where capabilities can be mixed and matched to create diverse entity types without an explosion of
+  The entity-component pattern is widely used in modern game development for these reasons. It creates a more
+  modular system where capabilities can be mixed and matched to create diverse entity types without multiplying
   class hierarchies.
 </p>
 
@@ -683,5 +683,5 @@ class WeaponProficiencyComponent implements Component {
 
 <p>
   This factory approach encapsulates the complex logic of character creation, making it easier to create consistent
-  character objects with appropriate components, abilities, and equipment.
+  characters with appropriate components, abilities, and equipment.
 </p>

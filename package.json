@@ -1,0 +1,29 @@
+{
+  "name": "dungeons-and-data-structures",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun scripts/build-static.ts",
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun src/index.ts",
+    "static:check": "bun scripts/check-static.ts",
+    "test": "bun test",
+    "test:static-gamebook": "bun scripts/test-static-gamebook.ts",
+    "test:watch": "bun test --watch",
+    "typecheck": "tsc --noEmit",
+    "verify": "bun scripts/verify.ts"
+  },
+  "dependencies": {
+    "@macavitymadcap/hyper-dank-automation": "^0.1.0",
+    "@macavitymadcap/hyper-dank-transport": "^0.1.0",
+    "@macavitymadcap/hyper-dank-ui": "^0.1.0",
+    "hono": "^4.0.0",
+    "htmx.org": "^2.0.10"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/bun": "latest",
+    "typescript": "^5"
+  }
+}
