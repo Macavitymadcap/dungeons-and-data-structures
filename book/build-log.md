@@ -30,3 +30,4 @@ Use this log to record major planning, research, manuscript, and gamebook implem
 - Added readable log entries for choice effects such as healing, damage, item use, item gains, and newly noted flags.
 - Exposed recent game log entries in the debug panel so author mode shows the latest state transitions without opening exported JSON.
 - Extended adventure validation to catch duplicate item, discovery, and encounter definitions plus missing item, discovery, and encounter references in choices.
+- Formalised the localStorage save document as schema version 2, with version 1 migration for older character and encounter state.

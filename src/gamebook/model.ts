@@ -154,7 +154,7 @@ export interface Encounter {
 
 export interface GameState {
   schema: "dads-gamebook-save";
-  version: 1;
+  version: 2;
   adventureId: string;
   currentPassageId: PassageId;
   character: Character;

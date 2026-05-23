@@ -13,6 +13,9 @@ import {
 import { createCharacter } from "./rules/character.ts";
 
 export const SAVE_KEY = "dads-gamebook-save";
+export const SAVE_SCHEMA = "dads-gamebook-save";
+export const CURRENT_SAVE_VERSION = 2;
+const SUPPORTED_SAVE_VERSIONS = new Set([1, CURRENT_SAVE_VERSION]);
 
 export interface StorageAdapter {
   getItem(key: string): string | null;
@@ -30,8 +33,8 @@ export function createInitialState(
   now = new Date(),
 ): GameState {
   return {
-    schema: "dads-gamebook-save",
-    version: 1,
+    schema: SAVE_SCHEMA,
+    version: CURRENT_SAVE_VERSION,
     adventureId: adventure.id,
     currentPassageId: adventure.startPassageId,
     character,
@@ -199,10 +202,13 @@ function validateGameState(value: unknown, adventure?: Adventure): LoadResult {
   if (!isRecord(value)) {
     return { ok: false, error: "Saved game must be an object." };
   }
-  if (value.schema !== "dads-gamebook-save") {
+  if (value.schema !== SAVE_SCHEMA) {
     return { ok: false, error: "Saved game schema is not recognised." };
   }
-  if (value.version !== 1) {
+  if (
+    typeof value.version !== "number" ||
+    !SUPPORTED_SAVE_VERSIONS.has(value.version)
+  ) {
     return { ok: false, error: "Saved game version is not supported." };
   }
   if (
@@ -242,6 +248,8 @@ function validateGameState(value: unknown, adventure?: Adventure): LoadResult {
     ok: true,
     state: {
       ...value,
+      schema: SAVE_SCHEMA,
+      version: CURRENT_SAVE_VERSION,
       character,
       encounters,
     } as unknown as GameState,

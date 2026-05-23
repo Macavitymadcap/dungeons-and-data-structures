@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import { Encounter, GameState } from "../model.ts";
+import { CURRENT_SAVE_VERSION } from "../state.ts";
 import { createCharacter } from "./character.ts";
 import { applyCombatRound, resolveCombatRound } from "./combat.ts";
 
@@ -93,7 +94,7 @@ function testState(input: {
   const character = createCharacter("hero-1", "Adventurer", "fighter");
   return {
     schema: "dads-gamebook-save",
-    version: 1,
+    version: CURRENT_SAVE_VERSION,
     adventureId: "test",
     currentPassageId: "guardian-clash",
     character,

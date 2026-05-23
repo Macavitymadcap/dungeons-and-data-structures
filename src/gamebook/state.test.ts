@@ -9,6 +9,7 @@ import {
   parseGame,
   resetGame,
   saveGame,
+  CURRENT_SAVE_VERSION,
   StorageAdapter,
 } from "./state.ts";
 
@@ -18,7 +19,7 @@ test("initial state creates a versioned save document", () => {
   const state = createInitialState(mtGraphnorAdventure, character, now);
 
   expect(state.schema).toBe("dads-gamebook-save");
-  expect(state.version).toBe(1);
+  expect(state.version).toBe(CURRENT_SAVE_VERSION);
   expect(state.currentPassageId).toBe("entrance");
   expect(state.hitPoints).toBe(character.maxHitPoints);
   expect(state.encounters["door-guardian"].rounds).toBe(0);
@@ -107,6 +108,7 @@ test("load upgrades earlier saves with missing ancestry and encounter state", ()
     "dads-gamebook-save",
     JSON.stringify({
       ...saveWithoutEncounters,
+      version: 1,
       character: {
         id: character.id,
         name: character.name,
@@ -126,6 +128,7 @@ test("load upgrades earlier saves with missing ancestry and encounter state", ()
 
   expect(result.ok).toBe(true);
   if (result.ok) {
+    expect(result.state.version).toBe(CURRENT_SAVE_VERSION);
     expect(result.state.character.race).toBe("human");
     expect(result.state.character.attack.name).toBe("Shortsword");
     expect(result.state.encounters["door-guardian"]).toEqual({
@@ -133,6 +136,36 @@ test("load upgrades earlier saves with missing ancestry and encounter state", ()
       defeated: false,
       rounds: 0,
     });
+  }
+});
+
+test("parse migrates version one saves to the current save version", () => {
+  const character = createCharacter("hero-1", "Ash", "fighter");
+  const state = createInitialState(mtGraphnorAdventure, character);
+
+  const result = parseGame(
+    JSON.stringify({ ...state, version: 1 }),
+    mtGraphnorAdventure,
+  );
+
+  expect(result.ok).toBe(true);
+  if (result.ok) {
+    expect(result.state.version).toBe(CURRENT_SAVE_VERSION);
+  }
+});
+
+test("parse rejects unsupported future save versions", () => {
+  const character = createCharacter("hero-1", "Ash", "fighter");
+  const state = createInitialState(mtGraphnorAdventure, character);
+
+  const result = parseGame(
+    JSON.stringify({ ...state, version: 999 }),
+    mtGraphnorAdventure,
+  );
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) {
+    expect(result.error).toBe("Saved game version is not supported.");
   }
 });
 
