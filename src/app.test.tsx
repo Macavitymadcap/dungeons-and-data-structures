@@ -104,6 +104,8 @@ describe("createApp", () => {
     expect(html).toContain("Five-room template");
     expect(html).toContain("Template coverage passed");
     expect(html).toContain("room-1");
+    expect(html).toContain("gamebook-mermaid-diagram mermaid");
+    expect(html).toContain("Mermaid source");
     expect(html).toContain("flowchart TD");
     expect(html).toContain("p_guardian_clash");
   });

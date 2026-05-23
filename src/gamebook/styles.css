@@ -344,6 +344,56 @@ textarea {
   width: min(32rem, calc(100vw - 1.5rem));
 }
 
+.gamebook-author-shell .app-shell-body,
+.gamebook-author-shell .app-shell-main,
+.gamebook-author-shell .page-header-content {
+  width: min(96rem, calc(100vw - 1rem));
+}
+
+.gamebook-author-layout {
+  display: grid;
+  gap: 1rem;
+  width: min(96rem, 100%);
+}
+
+.gamebook-author-layout > *,
+.gamebook-author-mermaid-panel {
+  min-width: 0;
+}
+
+.gamebook-author-layout section {
+  display: grid;
+  gap: 1rem;
+}
+
+.gamebook-mermaid-diagram {
+  max-width: 100%;
+  overflow: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background: var(--surface-raised);
+}
+
+.gamebook-mermaid-diagram svg {
+  display: block;
+  width: max(56rem, 100%);
+  max-width: none;
+  height: auto;
+}
+
+@media (min-width: 64rem) {
+  .gamebook-author-layout {
+    grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .gamebook-author-mermaid-panel {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+
 @media (min-width: 52rem) {
   .gamebook-passage-layout {
     grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);

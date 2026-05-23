@@ -265,9 +265,12 @@ function AuthorPage(props: {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Author Tools | {props.appName}</title>
         <link rel="stylesheet" href="/assets/hyper-dank-ui.css" />
+        <link rel="stylesheet" href="/assets/gamebook.css" />
+        <script type="module" src="/assets/client.js"></script>
       </head>
       <body>
         <AppShell
+          className="gamebook-author-shell"
           header={
             <PageHeader
               eyebrow={props.appName}
@@ -277,86 +280,98 @@ function AuthorPage(props: {
             />
           }
         >
-          <Panel labelledBy="author-validation-title">
-            <section aria-labelledby="author-validation-title">
-              <h2 id="author-validation-title">Graph validation</h2>
-              <MetadataList
-                items={[
-                  { label: "Adventure", value: props.adventure.title },
-                  { label: "Passages", value: String(props.adventure.passages.length) },
-                  {
-                    label: "Reachable passages",
-                    value: String(validation.reachablePassageIds.size),
-                  },
-                  { label: "Issues", value: String(validation.issues.length) },
-                ]}
-              />
-              <Notice
-                heading={validation.valid ? "Validation passed" : "Validation failed"}
-                tone={validation.valid ? "success" : "danger"}
-              >
-                {validation.valid
-                  ? "All passages and endings are currently reachable."
-                  : "Review the issue list before publishing this adventure."}
-              </Notice>
-              {validation.issues.length > 0
-                ? (
-                  <ul>
-                    {validation.issues.map((issue) => (
-                      <li>
-                        <strong>{issue.code}</strong>: {issue.message}
-                      </li>
-                    ))}
-                  </ul>
-                )
-                : null}
-            </section>
-          </Panel>
-          <Panel labelledBy="author-template-title">
-            <section aria-labelledby="author-template-title">
-              <h2 id="author-template-title">Five-room template</h2>
-              <MetadataList
-                items={[
-                  { label: "Required rooms", value: String(FIVE_ROOM_TEMPLATE.length) },
-                  { label: "Template issues", value: String(templateIssues.length) },
-                ]}
-              />
-              <Notice
-                heading={templateIssues.length === 0
-                  ? "Template coverage passed"
-                  : "Template coverage failed"}
-                tone={templateIssues.length === 0 ? "success" : "danger"}
-              >
-                {templateIssues.length === 0
-                  ? "The adventure covers every room role and required ending for the MVP template."
-                  : "Review the missing room roles or endings before using this as the template adventure."}
-              </Notice>
-              <ul>
-                {FIVE_ROOM_TEMPLATE.map((room) => (
-                  <li>
-                    <strong>{room.tag}</strong>: {room.title}. {room.mechanicalRole}
-                  </li>
-                ))}
-              </ul>
-              {templateIssues.length > 0
-                ? (
-                  <ul>
-                    {templateIssues.map((issue) => (
-                      <li>
-                        <strong>{issue.code}</strong>: {issue.message}
-                      </li>
-                    ))}
-                  </ul>
-                )
-                : null}
-            </section>
-          </Panel>
-          <Panel labelledBy="author-mermaid-title">
-            <section aria-labelledby="author-mermaid-title">
-              <h2 id="author-mermaid-title">Mermaid passage graph</h2>
-              <CodeBlock code={mermaid} language="mermaid" />
-            </section>
-          </Panel>
+          <div className="gamebook-author-layout">
+            <Panel labelledBy="author-validation-title">
+              <section aria-labelledby="author-validation-title">
+                <h2 id="author-validation-title">Graph validation</h2>
+                <MetadataList
+                  items={[
+                    { label: "Adventure", value: props.adventure.title },
+                    { label: "Passages", value: String(props.adventure.passages.length) },
+                    {
+                      label: "Reachable passages",
+                      value: String(validation.reachablePassageIds.size),
+                    },
+                    { label: "Issues", value: String(validation.issues.length) },
+                  ]}
+                />
+                <Notice
+                  heading={validation.valid ? "Validation passed" : "Validation failed"}
+                  tone={validation.valid ? "success" : "danger"}
+                >
+                  {validation.valid
+                    ? "All passages and endings are currently reachable."
+                    : "Review the issue list before publishing this adventure."}
+                </Notice>
+                {validation.issues.length > 0
+                  ? (
+                    <ul>
+                      {validation.issues.map((issue) => (
+                        <li>
+                          <strong>{issue.code}</strong>: {issue.message}
+                        </li>
+                      ))}
+                    </ul>
+                  )
+                  : null}
+              </section>
+            </Panel>
+            <Panel labelledBy="author-template-title">
+              <section aria-labelledby="author-template-title">
+                <h2 id="author-template-title">Five-room template</h2>
+                <MetadataList
+                  items={[
+                    { label: "Required rooms", value: String(FIVE_ROOM_TEMPLATE.length) },
+                    { label: "Template issues", value: String(templateIssues.length) },
+                  ]}
+                />
+                <Notice
+                  heading={templateIssues.length === 0
+                    ? "Template coverage passed"
+                    : "Template coverage failed"}
+                  tone={templateIssues.length === 0 ? "success" : "danger"}
+                >
+                  {templateIssues.length === 0
+                    ? "The adventure covers every room role and required ending for the MVP template."
+                    : "Review the missing room roles or endings before using this as the template adventure."}
+                </Notice>
+                <ul>
+                  {FIVE_ROOM_TEMPLATE.map((room) => (
+                    <li>
+                      <strong>{room.tag}</strong>: {room.title}. {room.mechanicalRole}
+                    </li>
+                  ))}
+                </ul>
+                {templateIssues.length > 0
+                  ? (
+                    <ul>
+                      {templateIssues.map((issue) => (
+                        <li>
+                          <strong>{issue.code}</strong>: {issue.message}
+                        </li>
+                      ))}
+                    </ul>
+                  )
+                  : null}
+              </section>
+            </Panel>
+            <div className="gamebook-author-mermaid-panel">
+              <Panel labelledBy="author-mermaid-title">
+                <section aria-labelledby="author-mermaid-title">
+                  <h2 id="author-mermaid-title">Mermaid passage graph</h2>
+                  <div className="gamebook-mermaid-diagram mermaid">{mermaid}</div>
+                  <details className="gamebook-details-card">
+                    <summary className="button" data-size="compact" data-variant="ghost">
+                      <Icon name="code" /> Mermaid source
+                    </summary>
+                    <div className="gamebook-details-body">
+                      <CodeBlock code={mermaid} language="mermaid" />
+                    </div>
+                  </details>
+                </section>
+              </Panel>
+            </div>
+          </div>
         </AppShell>
       </body>
     </html>
