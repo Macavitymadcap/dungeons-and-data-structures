@@ -3,8 +3,13 @@ import { Adventure, Choice, Passage, PassageId } from "./model.ts";
 export type GraphIssueCode =
   | "missing-start"
   | "duplicate-passage"
+  | "duplicate-item"
+  | "duplicate-discovery"
+  | "duplicate-encounter"
   | "missing-target"
   | "missing-encounter"
+  | "missing-item"
+  | "missing-discovery"
   | "targetless-choice"
   | "empty-non-ending"
   | "unreachable-passage"
@@ -17,6 +22,8 @@ export interface GraphIssue {
   choiceId?: string;
   targetId?: PassageId;
   encounterId?: string;
+  itemId?: string;
+  discoveryId?: string;
 }
 
 export interface GraphValidation {
@@ -80,7 +87,30 @@ export function validateAdventure(adventure: Adventure): GraphValidation {
   const issues: GraphIssue[] = [];
   const passages = createPassageMap(adventure.passages);
   const encounterIds = new Set((adventure.encounters ?? []).map((encounter) => encounter.id));
+  const itemIds = new Set((adventure.items ?? []).map((item) => item.id));
+  const discoveryIds = new Set(
+    (adventure.discoveries ?? []).map((discovery) => discovery.id),
+  );
   const seen = new Set<PassageId>();
+
+  addDuplicateIssues(
+    issues,
+    (adventure.items ?? []).map((item) => item.id),
+    "duplicate-item",
+    (id) => `Item "${id}" is defined more than once.`,
+  );
+  addDuplicateIssues(
+    issues,
+    (adventure.discoveries ?? []).map((discovery) => discovery.id),
+    "duplicate-discovery",
+    (id) => `Discovery "${id}" is defined more than once.`,
+  );
+  addDuplicateIssues(
+    issues,
+    (adventure.encounters ?? []).map((encounter) => encounter.id),
+    "duplicate-encounter",
+    (id) => `Encounter "${id}" is defined more than once.`,
+  );
 
   for (const passage of adventure.passages) {
     if (seen.has(passage.id)) {
@@ -130,6 +160,30 @@ export function validateAdventure(adventure: Adventure): GraphValidation {
             `Choice "${choice.id}" in passage "${passage.id}" references missing encounter "${choice.combat.encounterId}".`,
         });
       }
+      for (const itemId of itemReferences(choice)) {
+        if (!itemIds.has(itemId)) {
+          issues.push({
+            code: "missing-item",
+            passageId: passage.id,
+            choiceId: choice.id,
+            itemId,
+            message:
+              `Choice "${choice.id}" in passage "${passage.id}" references missing item "${itemId}".`,
+          });
+        }
+      }
+      for (const discoveryId of discoveryReferences(choice)) {
+        if (!discoveryIds.has(discoveryId)) {
+          issues.push({
+            code: "missing-discovery",
+            passageId: passage.id,
+            choiceId: choice.id,
+            discoveryId,
+            message:
+              `Choice "${choice.id}" in passage "${passage.id}" references missing discovery "${discoveryId}".`,
+          });
+        }
+      }
       for (const targetId of choiceTargets(choice)) {
         if (!passages.has(targetId)) {
           issues.push({
@@ -168,6 +222,43 @@ export function validateAdventure(adventure: Adventure): GraphValidation {
     issues,
     reachablePassageIds,
   };
+}
+
+function addDuplicateIssues(
+  issues: GraphIssue[],
+  values: string[],
+  code: GraphIssueCode,
+  message: (id: string) => string,
+): void {
+  const seen = new Set<string>();
+  const reported = new Set<string>();
+  for (const value of values) {
+    if (!seen.has(value)) {
+      seen.add(value);
+      continue;
+    }
+    if (reported.has(value)) {
+      continue;
+    }
+    reported.add(value);
+    issues.push({ code, message: message(value) });
+  }
+}
+
+function itemReferences(choice: Choice): string[] {
+  return [
+    ...(choice.requires?.itemsAll ?? []),
+    ...(choice.effects?.addItems ?? []),
+    ...(choice.effects?.removeItems ?? []),
+  ];
+}
+
+function discoveryReferences(choice: Choice): string[] {
+  return [
+    ...(choice.requires?.flagsAll ?? []),
+    ...(choice.requires?.flagsNone ?? []),
+    ...(choice.effects?.setFlags ?? []),
+  ];
 }
 
 export function exportMermaid(adventure: Adventure): string {

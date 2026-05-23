@@ -29,3 +29,4 @@ Use this log to record major planning, research, manuscript, and gamebook implem
 - Extended combat passages with visible encounter status, persisted combat round counts, and ration-based recovery actions.
 - Added readable log entries for choice effects such as healing, damage, item use, item gains, and newly noted flags.
 - Exposed recent game log entries in the debug panel so author mode shows the latest state transitions without opening exported JSON.
+- Extended adventure validation to catch duplicate item, discovery, and encounter definitions plus missing item, discovery, and encounter references in choices.

@@ -63,6 +63,49 @@ describe("createApp", () => {
     expect(html).toContain("p_guardian_clash");
   });
 
+  test("author page renders content validation issues", async () => {
+    const app = createApp({
+      adventure: {
+        id: "broken-content",
+        title: "Broken Content",
+        startPassageId: "start",
+        attribution: [],
+        items: [],
+        discoveries: [],
+        passages: [
+          {
+            id: "start",
+            title: "Start",
+            body: "Broken.",
+            choices: [
+              {
+                id: "broken-choice",
+                text: "Broken choice",
+                targetId: "ending",
+                requires: { itemsAll: ["missing-key"] },
+                effects: { setFlags: ["missing-flag"] },
+              },
+            ],
+          },
+          {
+            id: "ending",
+            title: "Ending",
+            body: "Done.",
+            ending: "victory",
+            choices: [],
+          },
+        ],
+      },
+    });
+    const response = await app.request("/gamebook/author");
+    const html = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(html).toContain("Validation failed");
+    expect(html).toContain("missing-item");
+    expect(html).toContain("missing-discovery");
+  });
+
   test("choice post returns the next passage fragment", async () => {
     const app = createApp({
       now: () => new Date("2026-05-23T12:00:00.000Z"),

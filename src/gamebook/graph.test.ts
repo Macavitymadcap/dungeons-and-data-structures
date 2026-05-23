@@ -127,6 +127,120 @@ test("validation reports missing combat encounters", () => {
   ).toBe(true);
 });
 
+test("validation reports missing content references", () => {
+  const adventure: Adventure = {
+    id: "broken-content",
+    title: "Broken Content",
+    startPassageId: "start",
+    attribution: [],
+    items: [{ id: "known-item", name: "Known Item", kind: "key" }],
+    discoveries: [{ id: "known-flag", name: "Known Flag" }],
+    passages: [
+      {
+        id: "start",
+        title: "Start",
+        body: "Broken content.",
+        choices: [
+          {
+            id: "use-missing",
+            text: "Use missing content",
+            targetId: "ending",
+            requires: {
+              flagsAll: ["missing-flag"],
+              itemsAll: ["missing-key"],
+            },
+            effects: {
+              addItems: ["missing-reward"],
+              removeItems: ["known-item"],
+              setFlags: ["known-flag", "missing-discovery"],
+            },
+          },
+        ],
+      },
+      {
+        id: "ending",
+        title: "Ending",
+        body: "Done.",
+        ending: "victory",
+        choices: [],
+      },
+    ],
+  };
+
+  const result = validateAdventure(adventure);
+
+  expect(result.valid).toBe(false);
+  expect(result.issues.filter((issue) => issue.code === "missing-item").map((
+    issue,
+  ) => issue.itemId)).toEqual(["missing-key", "missing-reward"]);
+  expect(result.issues.filter((issue) => issue.code === "missing-discovery").map((
+    issue,
+  ) => issue.discoveryId)).toEqual(["missing-flag", "missing-discovery"]);
+});
+
+test("validation reports duplicate content definitions", () => {
+  const adventure: Adventure = {
+    id: "duplicate-content",
+    title: "Duplicate Content",
+    startPassageId: "start",
+    attribution: [],
+    items: [
+      { id: "key", name: "Key", kind: "key" },
+      { id: "key", name: "Other Key", kind: "key" },
+    ],
+    discoveries: [
+      { id: "flag", name: "Flag" },
+      { id: "flag", name: "Other Flag" },
+    ],
+    encounters: [
+      {
+        id: "guard",
+        name: "Guard",
+        armourClass: 10,
+        hitPoints: 1,
+        attack: {
+          name: "Tap",
+          attackBonus: 1,
+          damage: { dice: 1, sides: 1, modifier: 0, type: "bludgeoning" },
+        },
+      },
+      {
+        id: "guard",
+        name: "Other Guard",
+        armourClass: 10,
+        hitPoints: 1,
+        attack: {
+          name: "Tap",
+          attackBonus: 1,
+          damage: { dice: 1, sides: 1, modifier: 0, type: "bludgeoning" },
+        },
+      },
+    ],
+    passages: [
+      {
+        id: "start",
+        title: "Start",
+        body: "Start.",
+        ending: "victory",
+        choices: [],
+      },
+    ],
+  };
+
+  const result = validateAdventure(adventure);
+
+  expect(result.valid).toBe(false);
+  expect(result.issues.some((issue) => issue.code === "duplicate-item")).toBe(
+    true,
+  );
+  expect(
+    result.issues.some((issue) => issue.code === "duplicate-discovery"),
+  ).toBe(true);
+  expect(
+    result.issues.some((issue) => issue.code === "duplicate-encounter"),
+  ).toBe(true);
+});
+
 test("validation reports unreachable passages", () => {
   const adventure: Adventure = {
     id: "unreachable",
