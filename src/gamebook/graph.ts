@@ -34,6 +34,13 @@ export function choiceTargets(choice: Choice): PassageId[] {
   if (choice.check) {
     targets.push(choice.check.onSuccess, choice.check.onFailure);
   }
+  if (choice.combat) {
+    targets.push(
+      choice.combat.onVictory,
+      choice.combat.onDefeat,
+      choice.combat.onContinue,
+    );
+  }
   return targets;
 }
 

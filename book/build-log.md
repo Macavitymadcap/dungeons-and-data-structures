@@ -22,3 +22,4 @@ Use this log to record major planning, research, manuscript, and gamebook implem
 - Added SRD-safe ancestry/race selection to character creation with Human, Elf, Dwarf, and Halfling options, including small ability, skill, inventory, and hit point effects.
 - Added save-load migration for earlier localStorage saves, deeper character validation, and defeated-encounter handling so the combat layer can evolve without silently discarding progress.
 - Added explicit save JSON export/import controls to support local-first persistence testing and the future save-document chapter.
+- Added item/discovery metadata, labelled inventory and discovery summaries, a thieves' tools puzzle route, and graph validation for combat outcome targets.

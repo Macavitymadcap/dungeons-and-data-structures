@@ -47,7 +47,20 @@ export interface Adventure {
   startPassageId: PassageId;
   passages: Passage[];
   encounters?: Encounter[];
+  items?: ItemDefinition[];
+  discoveries?: DiscoveryDefinition[];
   attribution: string[];
+}
+
+export interface ItemDefinition {
+  id: string;
+  name: string;
+  kind: "equipment" | "key" | "consumable" | "treasure";
+}
+
+export interface DiscoveryDefinition {
+  id: string;
+  name: string;
 }
 
 export interface Passage {

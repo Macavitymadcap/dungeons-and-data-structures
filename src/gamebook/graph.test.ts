@@ -97,5 +97,7 @@ test("Mermaid export includes passage nodes and choice edges", () => {
   expect(mermaid).toContain(
     'p_entrance -->|"Force a way through"| p_guardian_clash',
   );
+  expect(mermaid).toContain(
+    'p_guardian_clash -->|"Trade blows with the guardian"| p_keyboard_room',
+  );
 });
-

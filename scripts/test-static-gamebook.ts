@@ -36,6 +36,8 @@ try {
   await page.getByRole("button", { name: "New game" }).click();
   await expectText(page.locator(".metadata-list dd").first(), "rogue");
   await expectText(page.locator(".metadata-list dd").nth(1), "elf");
+  await expectText(page.locator(".metadata-list dd").nth(3), "Shortsword, Thieves' tools, Ration");
+  await expectText(page.locator(".metadata-list dd").nth(4), "None");
   await expectStorage(page, "character.class", "rogue");
   await expectStorage(page, "character.race", "elf");
 
@@ -51,12 +53,15 @@ try {
   await page.getByRole("button", { name: "Trade blows with the guardian" }).click();
   await expectText(page.locator("[data-passage-id] > h2"), "Keyboard Room");
   await expectText(page.locator(".notice h2"), "Combat round");
-  await expectStorage(page, "currentPassageId", "keyboard-room");
+  await page.getByRole("button", { name: "Probe the mechanism with thieves' tools" }).click();
+  await expectText(page.locator("[data-passage-id] > h2"), "Keyboard Room Clue");
+  await expectText(page.locator(".metadata-list dd").nth(4), "Challenged the door guardian, Solved the keyboard room");
+  await expectStorage(page, "currentPassageId", "keyboard-room-clue");
   await expectEncounterDefeated(page, "door-guardian");
 
   await page.getByRole("button", { name: "Export save" }).click();
   const exportedSave = await page.locator("#gamebook-save-json").inputValue();
-  if (!exportedSave.includes('"currentPassageId": "keyboard-room"')) {
+  if (!exportedSave.includes('"currentPassageId": "keyboard-room-clue"')) {
     throw new Error("Expected exported save JSON to include the current passage.");
   }
   await expectText(page.locator("#gamebook-save-status"), "Exported current save JSON.");
@@ -69,9 +74,9 @@ try {
   }
 
   await page.getByRole("button", { name: "Import save" }).click();
-  await expectText(page.locator("[data-passage-id] > h2"), "Keyboard Room");
+  await expectText(page.locator("[data-passage-id] > h2"), "Keyboard Room Clue");
   await expectText(page.locator("#gamebook-save-status"), "Imported saved game.");
-  await expectStorage(page, "currentPassageId", "keyboard-room");
+  await expectStorage(page, "currentPassageId", "keyboard-room-clue");
   await expectEncounterDefeated(page, "door-guardian");
 } finally {
   await browser.close();

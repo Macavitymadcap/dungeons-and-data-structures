@@ -26,6 +26,9 @@ describe("createApp", () => {
     expect(html).toContain("Slip past the guard");
     expect(html).toContain("<dd>rogue</dd>");
     expect(html).toContain("<dd>elf</dd>");
+    expect(html).toContain("Shortsword");
+    expect(html).toContain("Thieves&#39; tools");
+    expect(html).toContain("<dt>Discoveries</dt>");
     expect(html).toContain("gamebook-save-import");
     expect(html).toContain("gamebook-save-json");
   });
@@ -117,6 +120,35 @@ describe("createApp", () => {
     expect(await response.text()).toContain(
       "That choice is not currently available.",
     );
+  });
+
+  test("class inventory can unlock a puzzle route", async () => {
+    const app = createApp({
+      now: () => new Date("2026-05-23T12:00:00.000Z"),
+    });
+    const state = {
+      ...createInitialState(
+        mtGraphnorAdventure,
+        createCharacter("hero-1", "Adventurer", "rogue"),
+      ),
+      currentPassageId: "keyboard-room",
+    };
+    const body = new URLSearchParams({
+      state: JSON.stringify(state),
+    });
+
+    const response = await app.request("/gamebook/choices/use-tools-on-puzzle", {
+      method: "POST",
+      body,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    const html = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(html).toContain("Keyboard Room Clue");
+    expect(html).toContain("Solved the keyboard room");
   });
 });
 

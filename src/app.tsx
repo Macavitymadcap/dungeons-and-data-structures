@@ -12,6 +12,7 @@ import {
 } from "@macavitymadcap/hyper-dank-ui";
 import { FormValues, routeParam } from "@macavitymadcap/hyper-dank-transport";
 import { Hono } from "hono";
+import { discoveryList, itemList } from "./gamebook/catalog.ts";
 import { mtGraphnorAdventure } from "./gamebook/content/mt-graphnor.ts";
 import { createPassageMap } from "./gamebook/graph.ts";
 import {
@@ -111,6 +112,7 @@ export function createApp(dependencies: AppDependencies = {}) {
 
     return context.html(
       <PassagePanel
+        adventure={adventure}
         passage={nextPassage}
         state={result.state}
         roll={result.roll}
@@ -201,7 +203,11 @@ function GamebookPage(props: {
             race={props.state.character.race}
           />
           <div id="gamebook-passage" aria-live="polite">
-            <PassagePanel passage={props.passage} state={props.state} />
+            <PassagePanel
+              adventure={props.adventure}
+              passage={props.passage}
+              state={props.state}
+            />
           </div>
         </AppShell>
       </body>
@@ -291,6 +297,7 @@ function GameControls(props: {
 }
 
 function PassagePanel(props: {
+  adventure: Adventure;
   passage: Passage;
   state: GameState;
   roll?: RollResult;
@@ -305,7 +312,7 @@ function PassagePanel(props: {
       <article data-passage-id={props.passage.id}>
         <h2 id={`${props.passage.id}-title`}>{props.passage.title}</h2>
         <p>{props.passage.body}</p>
-        <StateSummary state={props.state} />
+        <StateSummary adventure={props.adventure} state={props.state} />
         {props.roll ? <RollSummary roll={props.roll} /> : null}
         {props.combat ? <CombatSummary combat={props.combat} /> : null}
         {props.passage.ending
@@ -349,7 +356,7 @@ function CombatSummary(props: { combat: CombatRoundResult }) {
   );
 }
 
-function StateSummary(props: { state: GameState }) {
+function StateSummary(props: { adventure: Adventure; state: GameState }) {
   return (
     <MetadataList
       items={[
@@ -359,7 +366,11 @@ function StateSummary(props: { state: GameState }) {
           label: "HP",
           value: `${props.state.hitPoints}/${props.state.character.maxHitPoints}`,
         },
-        { label: "Inventory", value: props.state.inventory.join(", ") || "Empty" },
+        { label: "Inventory", value: itemList(props.adventure, props.state.inventory) },
+        {
+          label: "Discoveries",
+          value: discoveryList(props.adventure, props.state.flags),
+        },
       ]}
     />
   );

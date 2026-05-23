@@ -1,4 +1,5 @@
 import { createPassageMap } from "./graph.ts";
+import { discoveryList, itemList } from "./catalog.ts";
 import {
   Adventure,
   CombatRoundResult,
@@ -19,10 +20,11 @@ export function renderPassage(
     return `<section class="notice" data-tone="danger" role="alert"><div class="notice-body">Current passage could not be found.</div></section>`;
   }
 
-  return renderPassagePanel(passage, state, roll, combat);
+  return renderPassagePanel(adventure, passage, state, roll, combat);
 }
 
 function renderPassagePanel(
+  adventure: Adventure,
   passage: Passage,
   state: GameState,
   roll?: RollResult,
@@ -59,7 +61,7 @@ function renderPassagePanel(
     <article data-passage-id="${escapeHtml(passage.id)}">
       <h2 id="${escapeHtml(passage.id)}-title">${escapeHtml(passage.title)}</h2>
       <p>${escapeHtml(passage.body)}</p>
-      ${renderStateSummary(state)}
+      ${renderStateSummary(adventure, state)}
       ${roll ? renderRollSummary(roll) : ""}
       ${combat ? renderCombatSummary(combat) : ""}
       ${choices}
@@ -75,7 +77,7 @@ function renderCombatSummary(combat: CombatRoundResult): string {
   </section>`;
 }
 
-function renderStateSummary(state: GameState): string {
+function renderStateSummary(adventure: Adventure, state: GameState): string {
   return `<dl class="metadata-list">
     <div class="metadata-list-row"><dt>Class</dt><dd>${escapeHtml(state.character.class)}</dd></div>
     <div class="metadata-list-row"><dt>Ancestry</dt><dd>${escapeHtml(state.character.race)}</dd></div>
@@ -83,7 +85,10 @@ function renderStateSummary(state: GameState): string {
     state.character.maxHitPoints
   }</dd></div>
     <div class="metadata-list-row"><dt>Inventory</dt><dd>${
-    escapeHtml(state.inventory.join(", ") || "Empty")
+    escapeHtml(itemList(adventure, state.inventory))
+  }</dd></div>
+    <div class="metadata-list-row"><dt>Discoveries</dt><dd>${
+    escapeHtml(discoveryList(adventure, state.flags))
   }</dd></div>
   </dl>`;
 }
