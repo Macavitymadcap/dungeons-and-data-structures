@@ -266,6 +266,8 @@ Completion tests should assert:
 - The ending set covers victory, failure, retreat, and cliffhanger.
 - The graph still validates and every ending remains reachable.
 
+The reusable template contract lives in `src/gamebook/content/five-room-template.ts`, with a prose-facing explanation in `book/gamebook-template.md`.
+
 ## Suggested Source Shape
 
 Use this future structure:

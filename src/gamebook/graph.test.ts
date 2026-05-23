@@ -1,4 +1,9 @@
 import { expect, test } from "bun:test";
+import {
+  FIVE_ROOM_REQUIRED_ENDINGS,
+  FIVE_ROOM_TEMPLATE,
+  validateFiveRoomTemplate,
+} from "./content/five-room-template.ts";
 import { mtGraphnorAdventure } from "./content/mt-graphnor.ts";
 import {
   exportMermaid,
@@ -31,15 +36,20 @@ test("Mt. Graphnor includes victory, failure, retreat, and cliffhanger endings",
 });
 
 test("Mt. Graphnor follows the five-room MVP template", () => {
-  const tags = new Set(
-    mtGraphnorAdventure.passages.flatMap((passage) => passage.tags ?? []),
-  );
-
-  expect(tags.has("room-1")).toBe(true);
-  expect(tags.has("room-2")).toBe(true);
-  expect(tags.has("room-3")).toBe(true);
-  expect(tags.has("room-4")).toBe(true);
-  expect(tags.has("room-5")).toBe(true);
+  expect(validateFiveRoomTemplate(mtGraphnorAdventure)).toEqual([]);
+  expect(FIVE_ROOM_TEMPLATE.map((room) => room.tag)).toEqual([
+    "room-1",
+    "room-2",
+    "room-3",
+    "room-4",
+    "room-5",
+  ]);
+  expect(FIVE_ROOM_REQUIRED_ENDINGS).toEqual([
+    "victory",
+    "failure",
+    "retreat",
+    "cliffhanger",
+  ]);
 
   expect(choiceIds("entrance")).toEqual([
     "fight-guard",
