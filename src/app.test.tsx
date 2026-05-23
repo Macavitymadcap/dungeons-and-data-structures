@@ -48,6 +48,8 @@ describe("createApp", () => {
     expect(html).toContain("Recent log");
     expect(html).toContain("Game started.");
     expect(html).toContain('name="authorMode" value="1"');
+    expect(html).toContain("gamebook-force-passage");
+    expect(html).toContain("debug-force-passage");
   });
 
   test("author page renders validation summary and Mermaid graph", async () => {
@@ -160,6 +162,62 @@ describe("createApp", () => {
     expect(html).toContain("Guardian Clash");
     expect(html).toContain("Debug state");
     expect(html).toContain("<dd>guardian-clash</dd>");
+  });
+
+  test("author mode can force navigation to a passage", async () => {
+    const app = createApp({
+      now: () => new Date("2026-05-23T12:00:00.000Z"),
+    });
+    const state = createInitialState(
+      mtGraphnorAdventure,
+      createCharacter("hero-1", "Adventurer", "fighter"),
+      new Date("2026-05-23T12:00:00.000Z"),
+    );
+    const body = new URLSearchParams({
+      authorMode: "1",
+      passageId: "keyboard-room",
+      state: JSON.stringify(state),
+    });
+
+    const response = await app.request("/gamebook/passages", {
+      method: "POST",
+      body,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    const html = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(html).toContain("Keyboard Room");
+    expect(html).toContain("Debug state");
+    expect(html).toContain("<dd>keyboard-room</dd>");
+    expect(html).toContain("Forced passage to keyboard-room.");
+  });
+
+  test("force navigation is rejected outside author mode", async () => {
+    const app = createApp();
+    const state = createInitialState(
+      mtGraphnorAdventure,
+      createCharacter("hero-1", "Adventurer", "fighter"),
+    );
+    const body = new URLSearchParams({
+      passageId: "keyboard-room",
+      state: JSON.stringify(state),
+    });
+
+    const response = await app.request("/gamebook/passages", {
+      method: "POST",
+      body,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+
+    expect(response.status).toBe(403);
+    expect(await response.text()).toContain(
+      "Force navigation is only available in author mode.",
+    );
   });
 
   test("combat choice returns combat summary and updates encounter state", async () => {

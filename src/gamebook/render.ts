@@ -68,13 +68,13 @@ function renderPassagePanel(
       ${passage.encounterId ? renderEncounterStatus(adventure, passage.encounterId, state) : ""}
       ${roll ? renderRollSummary(roll) : ""}
       ${combat ? renderCombatSummary(combat) : ""}
-      ${authorMode ? renderDebugPanel(state) : ""}
+      ${authorMode ? renderDebugPanel(adventure, state) : ""}
       ${choices}
     </article>
   </section>`;
 }
 
-function renderDebugPanel(state: GameState): string {
+function renderDebugPanel(adventure: Adventure, state: GameState): string {
   return `<section class="panel" data-width="default" data-author-debug="true" aria-labelledby="debug-state-title">
     <h2 id="debug-state-title">Debug state</h2>
     <dl class="metadata-list">
@@ -88,6 +88,19 @@ function renderDebugPanel(state: GameState): string {
     <ol data-debug-log="recent">
       ${state.log.slice(-5).map((entry) => `<li>${escapeHtml(entry.message)}</li>`).join("")}
     </ol>
+    <form class="gamebook-force-passage" action="/gamebook/passages" method="post" hx-post="/gamebook/passages" hx-target="#gamebook-passage" hx-swap="innerHTML">
+      <input type="hidden" name="authorMode" value="1" />
+      <input type="hidden" name="state" value="${escapeHtml(JSON.stringify(state))}" />
+      <label for="debug-force-passage">Force passage</label>
+      <select id="debug-force-passage" name="passageId">
+        ${adventure.passages.map((passage) =>
+          `<option value="${escapeHtml(passage.id)}"${
+            passage.id === state.currentPassageId ? " selected" : ""
+          }>${escapeHtml(`${passage.title} (${passage.id})`)}</option>`
+        ).join("")}
+      </select>
+      <button class="button" type="submit" data-size="default" data-variant="outline">Go</button>
+    </form>
   </section>`;
 }
 

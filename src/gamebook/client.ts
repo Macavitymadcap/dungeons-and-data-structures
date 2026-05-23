@@ -9,8 +9,10 @@ import { resolveChoice } from "./play.ts";
 import { renderPassage } from "./render.ts";
 import { createCharacter } from "./rules/character.ts";
 import {
+  appendLog,
   createInitialState,
   loadGame,
+  moveToPassage,
   parseGame,
   resetGame,
   saveGame,
@@ -94,6 +96,37 @@ if (bootData && passageRoot) {
         state,
         passageRoot,
         "Imported saved game.",
+      );
+      return;
+    }
+
+    if (form.classList.contains("gamebook-force-passage")) {
+      event.preventDefault();
+      if (!bootData.authorMode) {
+        setStatus("Force navigation is only available in author mode.");
+        return;
+      }
+
+      const formData = new FormData(form);
+      const passageId = formData.get("passageId");
+      const passage = typeof passageId === "string"
+        ? createPassageMap(bootData.adventure.passages).get(passageId)
+        : undefined;
+      if (!passage) {
+        setStatus("Forced passage could not be found.");
+        return;
+      }
+
+      state = appendLog(
+        moveToPassage(state, passage.id),
+        `Forced passage to ${passage.id}.`,
+      );
+      saveGame(storage, state);
+      renderCurrentState(
+        bootData.adventure,
+        state,
+        passageRoot,
+        `Forced passage to ${passage.id}.`,
       );
       return;
     }

@@ -31,8 +31,10 @@ import {
 import { resolveChoice } from "./gamebook/play.ts";
 import { createCharacter } from "./gamebook/rules/character.ts";
 import {
+  appendLog,
   createInitialState,
   isChoiceAvailable,
+  moveToPassage,
   parseGame,
 } from "./gamebook/state.ts";
 
@@ -141,6 +143,46 @@ export function createApp(dependencies: AppDependencies = {}) {
         roll={result.roll}
         combat={result.combat}
         authorMode={form.optionalString("authorMode") === "1"}
+      />,
+    );
+  });
+
+  app.post("/gamebook/passages", async (context) => {
+    const form = await FormValues.from(context);
+    if (form.optionalString("authorMode") !== "1") {
+      return context.html(
+        <Notice tone="danger">Force navigation is only available in author mode.</Notice>,
+        403,
+      );
+    }
+
+    const loadedState = parseSubmittedState(
+      form.optionalString("state"),
+      adventure,
+      now(),
+    );
+    if (!loadedState.ok) {
+      return context.html(<Notice tone="danger">{loadedState.error}</Notice>, 400);
+    }
+
+    const passageId = form.optionalString("passageId");
+    const passage = passageId ? passages.get(passageId) : undefined;
+    if (!passage) {
+      return context.html(<Notice tone="danger">Forced passage could not be found.</Notice>, 404);
+    }
+
+    const forcedState = appendLog(
+      moveToPassage(loadedState.state, passage.id, now()),
+      `Forced passage to ${passage.id}.`,
+      now(),
+    );
+
+    return context.html(
+      <PassagePanel
+        adventure={adventure}
+        passage={passage}
+        state={forcedState}
+        authorMode={true}
       />,
     );
   });
@@ -427,7 +469,9 @@ function PassagePanel(props: {
           : null}
         {props.roll ? <RollSummary roll={props.roll} /> : null}
         {props.combat ? <CombatSummary combat={props.combat} /> : null}
-        {props.authorMode ? <DebugPanel state={props.state} /> : null}
+        {props.authorMode
+          ? <DebugPanel adventure={props.adventure} state={props.state} />
+          : null}
         {props.passage.ending
           ? <p data-ending={props.passage.ending}>Ending: {props.passage.ending}</p>
           : (
@@ -464,7 +508,7 @@ function PassagePanel(props: {
   );
 }
 
-function DebugPanel(props: { state: GameState }) {
+function DebugPanel(props: { adventure: Adventure; state: GameState }) {
   return (
     <Panel labelledBy="debug-state-title">
       <section data-author-debug="true" aria-labelledby="debug-state-title">
@@ -482,6 +526,30 @@ function DebugPanel(props: { state: GameState }) {
         <ol data-debug-log="recent">
           {props.state.log.slice(-5).map((entry) => <li>{entry.message}</li>)}
         </ol>
+        <HxForm
+          action="/gamebook/passages"
+          className="gamebook-force-passage"
+          method="post"
+          {...{
+            "hx-post": "/gamebook/passages",
+            "hx-target": "#gamebook-passage",
+            "hx-swap": "innerHTML",
+          }}
+        >
+          <input type="hidden" name="authorMode" value="1" />
+          <input type="hidden" name="state" value={JSON.stringify(props.state)} />
+          <SelectField
+            id="debug-force-passage"
+            label="Force passage"
+            name="passageId"
+            value={props.state.currentPassageId}
+            options={props.adventure.passages.map((passage) => ({
+              label: `${passage.title} (${passage.id})`,
+              value: passage.id,
+            }))}
+          />
+          <Button type="submit" variant="outline">Go</Button>
+        </HxForm>
       </section>
     </Panel>
   );
