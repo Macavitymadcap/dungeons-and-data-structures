@@ -345,8 +345,9 @@ describe("createApp", () => {
 
     expect(response.status).toBe(200);
     expect(html).toContain("Keyboard Room");
-    expect(html).toContain("Combat round");
-    expect(html).toContain("Round 1:");
+    expect(html).toContain("Combat round 1");
+    expect(html).toContain("Your attack");
+    expect(html).toContain("Foe HP");
     expect(html).toContain("Door Guardian is defeated.");
     expect(html).toContain("&quot;defeated&quot;:true");
   });
@@ -382,7 +383,8 @@ describe("createApp", () => {
     expect(html).toContain("Guardian Clash");
     expect(html).toContain("Encounter status");
     expect(html).toContain("Door Guardian: 6/6 HP, round 1.");
-    expect(html).toContain("Round 1:");
+    expect(html).toContain("Combat round 1");
+    expect(html).toContain("Foe attack");
     expect(html).not.toContain("Use a ration and catch your breath");
   });
 

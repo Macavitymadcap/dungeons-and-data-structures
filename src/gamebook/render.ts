@@ -1,13 +1,17 @@
 import { createPassageMap } from "./graph.ts";
 import { discoveryList, itemList } from "./catalog.ts";
 import {
+  Ability,
   Adventure,
+  Character,
   CombatRoundResult,
+  DamageRoll,
   GameState,
   Passage,
   RollResult,
 } from "./model.ts";
 import { isChoiceAvailable } from "./state.ts";
+import { abilityModifier } from "./rules/character.ts";
 
 export function renderPassage(
   adventure: Adventure,
@@ -77,6 +81,7 @@ function renderPassagePanel(
       ${passage.encounterId ? renderEncounterStatus(adventure, passage.encounterId, state) : ""}
       ${roll ? renderRollSummary(roll) : ""}
       ${combat ? renderCombatSummary(combat) : ""}
+      ${renderActionLog(state)}
       ${authorMode ? renderDebugPanel(adventure, state) : ""}
       ${choices}
     </article>
@@ -128,8 +133,27 @@ function encounterDebugText(state: GameState): string {
 function renderCombatSummary(combat: CombatRoundResult): string {
   const tone = combat.outcome === "victory" ? "success" : "info";
   return `<section class="notice" data-tone="${tone}" role="status">
-    <h2>Combat round</h2>
-    <div class="notice-body">Round ${combat.round}: ${escapeHtml(combat.log.join(" "))}</div>
+    <h2>Combat round ${combat.round}</h2>
+    <div class="notice-body">
+      <div class="gamebook-output-grid">
+        ${labelledOutput(
+          "Your attack",
+          `${combat.playerAttack.total} vs AC ${combat.playerAttack.dc ?? "?"}`,
+          combat.playerAttack.success ? "Hit" : "Miss",
+        )}
+        ${labelledOutput("Foe HP", String(combat.monsterHitPoints), combat.outcome)}
+        ${
+    combat.monsterAttack
+      ? labelledOutput(
+        "Foe attack",
+        `${combat.monsterAttack.total} vs AC ${combat.monsterAttack.dc ?? "?"}`,
+        combat.monsterAttack.success ? "Hit" : "Miss",
+      )
+      : ""
+  }
+      </div>
+      <p>${escapeHtml(combat.log.join(" "))}</p>
+    </div>
   </section>`;
 }
 
@@ -159,15 +183,29 @@ function renderStateStrip(state: GameState): string {
 }
 
 function renderCharacterSheet(adventure: Adventure, state: GameState): string {
+  const character = state.character;
   return `<details class="gamebook-popover">
     <summary class="button" data-size="compact" data-variant="ghost">Character</summary>
     <div class="gamebook-popover-panel" role="group" aria-label="Character sheet">
       <div class="gamebook-output-grid">
-        ${labelledOutput("Armour class", String(state.character.armourClass))}
-        ${labelledOutput("Level", String(state.character.level))}
-        ${labelledOutput("Proficiency", `+${state.character.proficiencyBonus}`)}
+        ${labelledOutput("Armour class", String(character.armourClass))}
+        ${labelledOutput("Level", String(character.level))}
+        ${labelledOutput("Proficiency", `+${character.proficiencyBonus}`)}
       </div>
       <dl class="metadata-list">
+        <div class="metadata-list-row"><dt>Attack</dt><dd>${
+    escapeHtml(
+      `${character.attack.name} +${character.attack.attackBonus}, ${
+        damageNotation(character.attack.damage)
+      }`,
+    )
+  }</dd></div>
+        <div class="metadata-list-row"><dt>Abilities</dt><dd>${
+    escapeHtml(abilitySummary(character))
+  }</dd></div>
+        <div class="metadata-list-row"><dt>Trained skills</dt><dd>${
+    escapeHtml(character.skillProficiencies.join(", ") || "None")
+  }</dd></div>
         <div class="metadata-list-row"><dt>Conditions</dt><dd>${
     escapeHtml(state.conditions.join(", ") || "None")
   }</dd></div>
@@ -182,10 +220,27 @@ function renderCharacterSheet(adventure: Adventure, state: GameState): string {
   </details>`;
 }
 
-function labelledOutput(label: string, value: string): string {
+function renderActionLog(state: GameState): string {
+  const entries = state.log.slice(-4).reverse();
+  return `<section class="gamebook-action-log" aria-labelledby="gamebook-action-log-title">
+    <h3 id="gamebook-action-log-title">Recent events</h3>
+    <ol class="timeline-list">
+      ${
+    entries.map((entry) =>
+      `<li class="timeline-list-item"><div><time datetime="${escapeHtml(entry.createdAt)}">${
+        escapeHtml(shortTime(entry.createdAt))
+      }</time><strong>${escapeHtml(entry.message)}</strong></div></li>`
+    ).join("")
+  }
+    </ol>
+  </section>`;
+}
+
+function labelledOutput(label: string, value: string, meta?: string): string {
   return `<div class="labelled-output">
     <output class="labelled-output-label">${escapeHtml(label)}</output>
     <output class="labelled-output-value">${escapeHtml(value)}</output>
+    ${meta ? `<span class="labelled-output-meta">${escapeHtml(meta)}</span>` : ""}
   </div>`;
 }
 
@@ -217,12 +272,35 @@ function renderRollSummary(roll: RollResult): string {
 
   return `<section class="notice" data-tone="${tone}" role="status">
     <h2>Roll result</h2>
-    <div class="notice-body">Rolled ${
-    roll.rolls.join(", ")
-  }; kept ${roll.kept}; total ${roll.total}${
-    roll.dc === undefined ? "" : ` against DC ${roll.dc}`
-  }${outcome}</div>
+    <div class="notice-body">
+      <div class="gamebook-output-grid">
+        ${labelledOutput("Rolls", roll.rolls.join(", "))}
+        ${labelledOutput("Kept", String(roll.kept))}
+        ${labelledOutput("Total", String(roll.total), roll.dc === undefined ? undefined : `DC ${roll.dc}`)}
+      </div>
+      <p>${escapeHtml(roll.reason ?? "Check")}${outcome}</p>
+    </div>
   </section>`;
+}
+
+function abilitySummary(character: Character): string {
+  return (Object.entries(character.abilityScores) as [Ability, number][]).map(([ability, score]) => {
+    const modifier = abilityModifier(score);
+    return `${ability.slice(0, 3)} ${score} (${modifier >= 0 ? "+" : ""}${modifier})`;
+  }).join(", ");
+}
+
+function damageNotation(damage: DamageRoll): string {
+  return `${damage.dice}d${damage.sides}${damage.modifier >= 0 ? "+" : ""}${
+    damage.modifier
+  } ${damage.type}`;
+}
+
+function shortTime(value: string): string {
+  return new Date(value).toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function escapeHtml(value: string): string {

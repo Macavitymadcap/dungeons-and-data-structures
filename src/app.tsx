@@ -15,6 +15,7 @@ import {
   Panel,
   SelectField,
   TextareaField,
+  TimelineList,
   Toolbar,
 } from "@macavitymadcap/hyper-dank-ui";
 import { FormValues, routeParam } from "@macavitymadcap/hyper-dank-transport";
@@ -35,7 +36,7 @@ import {
   RollResult,
 } from "./gamebook/model.ts";
 import { resolveChoice } from "./gamebook/play.ts";
-import { createCharacter } from "./gamebook/rules/character.ts";
+import { abilityModifier, createCharacter } from "./gamebook/rules/character.ts";
 import {
   appendLog,
   createInitialState,
@@ -539,6 +540,7 @@ function PassagePanel(props: {
           : null}
         {props.roll ? <RollSummary roll={props.roll} /> : null}
         {props.combat ? <CombatSummary combat={props.combat} /> : null}
+        <ActionLog state={props.state} />
         {props.authorMode
           ? <DebugPanel adventure={props.adventure} state={props.state} />
           : null}
@@ -642,8 +644,36 @@ function encounterDebugText(state: GameState): string {
 
 function CombatSummary(props: { combat: CombatRoundResult }) {
   return (
-    <Notice heading="Combat round" tone={props.combat.outcome === "victory" ? "success" : "info"}>
-      Round {props.combat.round}: {props.combat.log.join(" ")}
+    <Notice
+      heading={`Combat round ${props.combat.round}`}
+      tone={props.combat.outcome === "victory" ? "success" : "info"}
+    >
+      <div className="gamebook-output-grid">
+        <LabelledOutput
+          label="Your attack"
+          value={`${props.combat.playerAttack.total} vs AC ${
+            props.combat.playerAttack.dc ?? "?"
+          }`}
+          meta={props.combat.playerAttack.success ? "Hit" : "Miss"}
+        />
+        <LabelledOutput
+          label="Foe HP"
+          value={String(props.combat.monsterHitPoints)}
+          meta={props.combat.outcome}
+        />
+        {props.combat.monsterAttack
+          ? (
+            <LabelledOutput
+              label="Foe attack"
+              value={`${props.combat.monsterAttack.total} vs AC ${
+                props.combat.monsterAttack.dc ?? "?"
+              }`}
+              meta={props.combat.monsterAttack.success ? "Hit" : "Miss"}
+            />
+          )
+          : null}
+      </div>
+      <p>{props.combat.log.join(" ")}</p>
     </Notice>
   );
 }
@@ -681,6 +711,7 @@ function StateStrip(props: { state: GameState }) {
 }
 
 function CharacterSheet(props: { adventure: Adventure; state: GameState }) {
+  const character = props.state.character;
   return (
     <details className="gamebook-popover">
       <summary className="button" data-size="compact" data-variant="ghost">
@@ -688,15 +719,29 @@ function CharacterSheet(props: { adventure: Adventure; state: GameState }) {
       </summary>
       <div className="gamebook-popover-panel" role="group" aria-label="Character sheet">
         <div className="gamebook-output-grid">
-          <LabelledOutput label="Armour class" value={String(props.state.character.armourClass)} />
-          <LabelledOutput label="Level" value={String(props.state.character.level)} />
+          <LabelledOutput label="Armour class" value={String(character.armourClass)} />
+          <LabelledOutput label="Level" value={String(character.level)} />
           <LabelledOutput
             label="Proficiency"
-            value={`+${props.state.character.proficiencyBonus}`}
+            value={`+${character.proficiencyBonus}`}
           />
         </div>
         <MetadataList
           items={[
+            {
+              label: "Attack",
+              value: `${character.attack.name} +${character.attack.attackBonus}, ${
+                damageNotation(character.attack.damage)
+              }`,
+            },
+            {
+              label: "Abilities",
+              value: abilitySummary(character),
+            },
+            {
+              label: "Trained skills",
+              value: character.skillProficiencies.join(", ") || "None",
+            },
             {
               label: "Conditions",
               value: props.state.conditions.join(", ") || "None",
@@ -713,6 +758,22 @@ function CharacterSheet(props: { adventure: Adventure; state: GameState }) {
   );
 }
 
+function ActionLog(props: { state: GameState }) {
+  const entries = props.state.log.slice(-4).reverse();
+  return (
+    <section className="gamebook-action-log" aria-labelledby="gamebook-action-log-title">
+      <h3 id="gamebook-action-log-title">Recent events</h3>
+      <TimelineList
+        items={entries.map((entry) => ({
+          label: entry.message,
+          time: entry.createdAt,
+          meta: shortTime(entry.createdAt),
+        }))}
+      />
+    </section>
+  );
+}
+
 function hitPointSummary(state: GameState): string {
   const summary = `${state.hitPoints}/${state.character.maxHitPoints}`;
   return state.temporaryHitPoints > 0
@@ -723,14 +784,43 @@ function hitPointSummary(state: GameState): string {
 function RollSummary(props: { roll: RollResult }) {
   return (
     <Notice heading="Roll result" tone={props.roll.success ? "success" : "info"}>
-      Rolled {props.roll.rolls.join(", ")}; kept {props.roll.kept}; total{" "}
-      {props.roll.total}
-      {props.roll.dc === undefined ? "" : ` against DC ${props.roll.dc}`}
-      {props.roll.success === undefined
-        ? "."
-        : props.roll.success
-        ? ": success."
-        : ": failure."}
+      <div className="gamebook-output-grid">
+        <LabelledOutput label="Rolls" value={props.roll.rolls.join(", ")} />
+        <LabelledOutput label="Kept" value={String(props.roll.kept)} />
+        <LabelledOutput
+          label="Total"
+          value={String(props.roll.total)}
+          meta={props.roll.dc === undefined ? undefined : `DC ${props.roll.dc}`}
+        />
+      </div>
+      <p>
+        {props.roll.reason ?? "Check"}
+        {props.roll.success === undefined
+          ? "."
+          : props.roll.success
+          ? ": success."
+          : ": failure."}
+      </p>
     </Notice>
   );
+}
+
+function abilitySummary(character: Character): string {
+  return Object.entries(character.abilityScores).map(([ability, score]) => {
+    const modifier = abilityModifier(score);
+    return `${ability.slice(0, 3)} ${score} (${modifier >= 0 ? "+" : ""}${modifier})`;
+  }).join(", ");
+}
+
+function damageNotation(damage: Character["attack"]["damage"]): string {
+  return `${damage.dice}d${damage.sides}${damage.modifier >= 0 ? "+" : ""}${
+    damage.modifier
+  } ${damage.type}`;
+}
+
+function shortTime(value: string): string {
+  return new Date(value).toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }

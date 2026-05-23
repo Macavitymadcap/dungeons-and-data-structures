@@ -277,6 +277,33 @@ textarea {
   text-align: start;
 }
 
+.gamebook-action-log {
+  display: grid;
+  gap: 0.5rem;
+  border-block-start: 1px solid var(--border-subtle);
+  padding-block-start: 0.75rem;
+}
+
+.gamebook-action-log h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.gamebook-action-log .timeline-list {
+  gap: 0.4rem;
+  font-size: 0.95rem;
+}
+
+.gamebook-action-log .timeline-list-item > div:first-child {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.gamebook-action-log time {
+  color: color-mix(in oklab, currentColor 62%, transparent);
+  font-size: 0.85rem;
+}
+
 .gamebook-debug-popover .gamebook-popover-panel {
   width: min(32rem, calc(100vw - 1.5rem));
 }
