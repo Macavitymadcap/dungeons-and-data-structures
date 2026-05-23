@@ -33,3 +33,4 @@ Use this log to record major planning, research, manuscript, and gamebook implem
 - Formalised the localStorage save document as schema version 2, with version 1 migration for older character and encounter state.
 - Added author-mode force navigation so debug sessions can jump to any passage without mutating the adventure graph.
 - Tightened author force navigation so development-only debug jumps can recover from stale passage IDs after passage renames.
+- Build-gated author/debug tooling so the published static gamebook omits debug pages, author routes, and force-passage controls.

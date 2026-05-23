@@ -41,6 +41,7 @@ import {
 export interface AppDependencies {
   adventure?: Adventure;
   appName?: string;
+  authorToolsEnabled?: boolean;
   now?: () => Date;
   random?: () => number;
 }
@@ -48,6 +49,7 @@ export interface AppDependencies {
 export function createApp(dependencies: AppDependencies = {}) {
   const adventure = dependencies.adventure ?? mtGraphnorAdventure;
   const appName = dependencies.appName ?? "Dungeons & Data Structures";
+  const authorToolsEnabled = dependencies.authorToolsEnabled ?? true;
   const now = dependencies.now ?? (() => new Date());
   const random = dependencies.random ?? Math.random;
   const passages = createPassageMap(adventure.passages);
@@ -69,7 +71,7 @@ export function createApp(dependencies: AppDependencies = {}) {
       context.req.query("class"),
     );
     const race = normaliseCharacterRace(context.req.query("race"));
-    const authorMode = context.req.query("debug") === "1";
+    const authorMode = authorToolsEnabled && context.req.query("debug") === "1";
     const character = createCharacter("hero-1", "Adventurer", characterClass, race);
     const state = createInitialState(adventure, character, now());
 
@@ -84,14 +86,18 @@ export function createApp(dependencies: AppDependencies = {}) {
     );
   });
 
-  app.get("/gamebook/author", (context) =>
-    context.html(
+  app.get("/gamebook/author", (context) => {
+    if (!authorToolsEnabled) {
+      return context.notFound();
+    }
+
+    return context.html(
       <AuthorPage
         appName={appName}
         adventure={adventure}
       />,
-    )
-  );
+    );
+  });
 
   app.post("/gamebook/choices/:choiceId", async (context) => {
     const form = await FormValues.from(context);
@@ -148,6 +154,10 @@ export function createApp(dependencies: AppDependencies = {}) {
   });
 
   app.post("/gamebook/passages", async (context) => {
+    if (!authorToolsEnabled) {
+      return context.notFound();
+    }
+
     const form = await FormValues.from(context);
     if (form.optionalString("authorMode") !== "1") {
       return context.html(
@@ -338,7 +348,7 @@ function GamebookPage(props: {
             dangerouslySetInnerHTML={{
               __html: JSON.stringify({
                 adventure: props.adventure,
-                authorMode: props.authorMode,
+                ...(props.authorMode ? { authorMode: true } : {}),
                 state: props.state,
               }),
             }}

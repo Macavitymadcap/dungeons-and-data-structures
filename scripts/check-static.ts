@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { smokeStaticSite } from "@macavitymadcap/hyper-dank-automation";
 
 const checked = await smokeStaticSite({
@@ -21,25 +22,9 @@ const checked = await smokeStaticSite({
     },
     {
       path: "gamebook/index.html",
-      includes: ["Slip past the guard", "Dungeons &amp; Data Structures"],
-    },
-    {
-      path: "gamebook/debug/index.html",
       includes: [
-        "Debug state",
-        "Passage ID",
-        "Encounter state",
-        "authorMode",
-      ],
-    },
-    {
-      path: "gamebook/author/index.html",
-      includes: [
-        "Author Tools",
-        "Graph validation",
-        "Validation passed",
-        "flowchart TD",
-        "p_guardian_clash",
+        "Slip past the guard",
+        "Dungeons &amp; Data Structures",
       ],
     },
     {
@@ -52,5 +37,12 @@ const checked = await smokeStaticSite({
     },
   ],
 });
+
+const gamebookHtml = await readFile("dist/gamebook/index.html", "utf8");
+for (const forbidden of ["Debug state", "gamebook-force-passage", "authorMode"]) {
+  if (gamebookHtml.includes(forbidden)) {
+    throw new Error(`Published gamebook HTML included development-only text: ${forbidden}`);
+  }
+}
 
 console.log(`Checked ${checked.length} static artifacts.`);

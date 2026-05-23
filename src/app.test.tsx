@@ -52,6 +52,23 @@ describe("createApp", () => {
     expect(html).toContain("debug-force-passage");
   });
 
+  test("disabled author tools hide debug mode and author routes", async () => {
+    const app = createApp({
+      authorToolsEnabled: false,
+      now: () => new Date("2026-05-23T12:00:00.000Z"),
+    });
+    const pageResponse = await app.request("/gamebook?debug=1");
+    const pageHtml = await pageResponse.text();
+
+    expect(pageResponse.status).toBe(200);
+    expect(pageHtml).not.toContain("Debug state");
+    expect(pageHtml).not.toContain("gamebook-force-passage");
+    expect(pageHtml).not.toContain('name="authorMode" value="1"');
+
+    const authorResponse = await app.request("/gamebook/author");
+    expect(authorResponse.status).toBe(404);
+  });
+
   test("author page renders validation summary and Mermaid graph", async () => {
     const app = createApp();
     const response = await app.request("/gamebook/author");
@@ -251,6 +268,29 @@ describe("createApp", () => {
     expect(await response.text()).toContain(
       "Force navigation is only available in author mode.",
     );
+  });
+
+  test("force navigation is not mounted when author tools are disabled", async () => {
+    const app = createApp({ authorToolsEnabled: false });
+    const state = createInitialState(
+      mtGraphnorAdventure,
+      createCharacter("hero-1", "Adventurer", "fighter"),
+    );
+    const body = new URLSearchParams({
+      authorMode: "1",
+      passageId: "keyboard-room",
+      state: JSON.stringify(state),
+    });
+
+    const response = await app.request("/gamebook/passages", {
+      method: "POST",
+      body,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+
+    expect(response.status).toBe(404);
   });
 
   test("combat choice returns combat summary and updates encounter state", async () => {
