@@ -64,6 +64,30 @@ test("choice requirements can gate by missing hit points", () => {
     .toBe(true);
 });
 
+test("choice requirements can gate by conditions", () => {
+  const character = createCharacter("hero-1", "Ash", "fighter");
+  const state = createInitialState(mtGraphnorAdventure, character);
+  const choice = {
+    id: "push-on",
+    text: "Push on",
+    targetId: "next",
+    requires: {
+      conditionsAll: ["blessed"],
+      conditionsNone: ["rattled"],
+    },
+  };
+
+  expect(isChoiceAvailable(choice, state)).toBe(false);
+  const blessed = applyChoiceEffects(state, {
+    addConditions: ["blessed", "rattled"],
+  });
+  expect(isChoiceAvailable(choice, blessed)).toBe(false);
+  const steady = applyChoiceEffects(blessed, {
+    removeConditions: ["rattled"],
+  });
+  expect(isChoiceAvailable(choice, steady)).toBe(true);
+});
+
 test("choice effects update inventory, flags, hit points, and timestamp", () => {
   const now = new Date("2026-05-23T12:00:00.000Z");
   const character = createCharacter("hero-1", "Ash", "rogue");
@@ -80,6 +104,20 @@ test("choice effects update inventory, flags, hit points, and timestamp", () => 
   expect(updated.flags.includes("puzzle-solved")).toBe(true);
   expect(updated.hitPoints).toBe(character.maxHitPoints - 2);
   expect(updated.updatedAt).toBe("2026-05-23T12:01:00.000Z");
+});
+
+test("choice effects add and remove conditions", () => {
+  const character = createCharacter("hero-1", "Ash", "cleric");
+  const state = {
+    ...createInitialState(mtGraphnorAdventure, character),
+    conditions: ["rattled"],
+  };
+  const updated = applyChoiceEffects(state, {
+    addConditions: ["blessed"],
+    removeConditions: ["rattled"],
+  });
+
+  expect(updated.conditions).toEqual(["blessed"]);
 });
 
 test("save and load round-trip through a storage adapter", () => {

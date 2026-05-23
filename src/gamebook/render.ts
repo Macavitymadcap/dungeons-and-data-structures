@@ -145,6 +145,9 @@ function renderStateSummary(adventure: Adventure, state: GameState): string {
     <div class="metadata-list-row"><dt>HP</dt><dd>${state.hitPoints}/${
     state.character.maxHitPoints
   }</dd></div>
+    <div class="metadata-list-row"><dt>Conditions</dt><dd>${
+    escapeHtml(state.conditions.join(", ") || "None")
+  }</dd></div>
     <div class="metadata-list-row"><dt>Inventory</dt><dd>${
     escapeHtml(itemList(adventure, state.inventory))
   }</dd></div>

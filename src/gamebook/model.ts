@@ -101,6 +101,8 @@ export interface CheckDefinition {
 }
 
 export interface ChoiceRequirement {
+  conditionsAll?: string[];
+  conditionsNone?: string[];
   flagsAll?: string[];
   flagsNone?: string[];
   hitPointsBelowMax?: boolean;
@@ -109,8 +111,10 @@ export interface ChoiceRequirement {
 }
 
 export interface ChoiceEffect {
+  addConditions?: string[];
   setFlags?: string[];
   addItems?: string[];
+  removeConditions?: string[];
   removeItems?: string[];
   damage?: number;
   heal?: number;

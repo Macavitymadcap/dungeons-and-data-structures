@@ -151,6 +151,16 @@ function describeChoiceEffects(
       messages.push(`Noted ${flag}.`);
     }
   }
+  for (const condition of effects.addConditions ?? []) {
+    if (!before.conditions.includes(condition) && after.conditions.includes(condition)) {
+      messages.push(`Condition gained: ${condition}.`);
+    }
+  }
+  for (const condition of effects.removeConditions ?? []) {
+    if (before.conditions.includes(condition) && !after.conditions.includes(condition)) {
+      messages.push(`Condition cleared: ${condition}.`);
+    }
+  }
 
   return messages;
 }

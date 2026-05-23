@@ -71,3 +71,34 @@ test("choice effects append readable state-transition log entries", () => {
     messages.indexOf("Used ration."),
   );
 });
+
+test("condition effects append readable state-transition log entries", () => {
+  const character = createCharacter("hero-1", "Ash", "cleric");
+  const state = {
+    ...createInitialState(mtGraphnorAdventure, character),
+    currentPassageId: "trap-hall",
+    conditions: ["rattled"],
+  };
+  const result = resolveChoice(
+    state,
+    {
+      id: "steady-yourself",
+      text: "Steady yourself",
+      targetId: "trap-hall",
+      effects: {
+        addConditions: ["focused"],
+        removeConditions: ["rattled"],
+      },
+    },
+    {
+      adventure: mtGraphnorAdventure,
+      now: () => new Date("2026-05-23T12:00:00.000Z"),
+    },
+  );
+  const messages = result.state.log.map((entry) => entry.message);
+
+  expect(result.error).toBeUndefined();
+  expect(result.state.conditions).toEqual(["focused"]);
+  expect(messages).toContain("Condition gained: focused.");
+  expect(messages).toContain("Condition cleared: rattled.");
+});

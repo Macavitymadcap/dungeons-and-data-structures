@@ -36,8 +36,9 @@ try {
   await page.getByRole("button", { name: "New game" }).click();
   await expectText(page.locator(".metadata-list dd").first(), "rogue");
   await expectText(page.locator(".metadata-list dd").nth(1), "elf");
-  await expectText(page.locator(".metadata-list dd").nth(3), "Shortsword, Thieves' tools, Ration");
-  await expectText(page.locator(".metadata-list dd").nth(4), "None");
+  await expectText(page.locator(".metadata-list dd").nth(3), "None");
+  await expectText(page.locator(".metadata-list dd").nth(4), "Shortsword, Thieves' tools, Ration");
+  await expectText(page.locator(".metadata-list dd").nth(5), "None");
   await expectStorage(page, "character.class", "rogue");
   await expectStorage(page, "character.race", "elf");
 
@@ -55,7 +56,7 @@ try {
   await expectText(page.locator(".notice h2"), "Combat round");
   await page.getByRole("button", { name: "Probe the mechanism with thieves' tools" }).click();
   await expectText(page.locator("[data-passage-id] > h2"), "Keyboard Room Clue");
-  await expectText(page.locator(".metadata-list dd").nth(4), "Challenged the door guardian, Solved the keyboard room");
+  await expectText(page.locator(".metadata-list dd").nth(5), "Challenged the door guardian, Solved the keyboard room");
   await expectStorage(page, "currentPassageId", "keyboard-room-clue");
   await expectEncounterDefeated(page, "door-guardian");
 

@@ -36,3 +36,4 @@ Use this log to record major planning, research, manuscript, and gamebook implem
 - Build-gated author/debug tooling so the published static gamebook omits debug pages, author routes, and force-passage controls.
 - Split the published browser bundle onto a player-only client and renderer so development-only debug code is not shipped in static assets.
 - Added a development asset route that serves an in-memory browser client bundle, using the author-capable client in dev and player-only client when author tools are disabled.
+- Added condition-based choice requirements and effects so the existing save-state `conditions` field now participates in mechanics and player summaries.

@@ -90,6 +90,14 @@ export function applyChoiceEffects(
     flags.add(flag);
   }
 
+  const conditions = new Set(state.conditions);
+  for (const condition of effects.addConditions ?? []) {
+    conditions.add(condition);
+  }
+  for (const condition of effects.removeConditions ?? []) {
+    conditions.delete(condition);
+  }
+
   const damagedHitPoints = Math.max(0, state.hitPoints - (effects.damage ?? 0));
   const hitPoints = Math.min(
     state.character.maxHitPoints,
@@ -99,6 +107,7 @@ export function applyChoiceEffects(
   return {
     ...state,
     hitPoints,
+    conditions: [...conditions],
     inventory: [...inventory],
     flags: [...flags],
     updatedAt: now.toISOString(),
@@ -177,6 +186,8 @@ function requirementsMet(
 ): boolean {
   return allIncluded(state.flags, requirements.flagsAll) &&
     noneIncluded(state.flags, requirements.flagsNone) &&
+    allIncluded(state.conditions, requirements.conditionsAll) &&
+    noneIncluded(state.conditions, requirements.conditionsNone) &&
     allIncluded(state.inventory, requirements.itemsAll) &&
     (requirements.hitPointsBelowMax !== true ||
       state.hitPoints < state.character.maxHitPoints) &&

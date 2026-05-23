@@ -647,6 +647,10 @@ function StateSummary(props: { adventure: Adventure; state: GameState }) {
           label: "HP",
           value: `${props.state.hitPoints}/${props.state.character.maxHitPoints}`,
         },
+        {
+          label: "Conditions",
+          value: props.state.conditions.join(", ") || "None",
+        },
         { label: "Inventory", value: itemList(props.adventure, props.state.inventory) },
         {
           label: "Discoveries",
