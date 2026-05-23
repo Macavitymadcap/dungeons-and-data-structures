@@ -21,6 +21,10 @@ import {
 import { FormValues, routeParam } from "@macavitymadcap/hyper-dank-transport";
 import { Hono } from "hono";
 import { discoveryList, itemList } from "./gamebook/catalog.ts";
+import {
+  FIVE_ROOM_TEMPLATE,
+  validateFiveRoomTemplate,
+} from "./gamebook/content/five-room-template.ts";
 import { mtGraphnorAdventure } from "./gamebook/content/mt-graphnor.ts";
 import {
   createPassageMap,
@@ -251,6 +255,7 @@ function AuthorPage(props: {
   adventure: Adventure;
 }) {
   const validation = validateAdventure(props.adventure);
+  const templateIssues = validateFiveRoomTemplate(props.adventure);
   const mermaid = exportMermaid(props.adventure);
 
   return (
@@ -298,6 +303,45 @@ function AuthorPage(props: {
                 ? (
                   <ul>
                     {validation.issues.map((issue) => (
+                      <li>
+                        <strong>{issue.code}</strong>: {issue.message}
+                      </li>
+                    ))}
+                  </ul>
+                )
+                : null}
+            </section>
+          </Panel>
+          <Panel labelledBy="author-template-title">
+            <section aria-labelledby="author-template-title">
+              <h2 id="author-template-title">Five-room template</h2>
+              <MetadataList
+                items={[
+                  { label: "Required rooms", value: String(FIVE_ROOM_TEMPLATE.length) },
+                  { label: "Template issues", value: String(templateIssues.length) },
+                ]}
+              />
+              <Notice
+                heading={templateIssues.length === 0
+                  ? "Template coverage passed"
+                  : "Template coverage failed"}
+                tone={templateIssues.length === 0 ? "success" : "danger"}
+              >
+                {templateIssues.length === 0
+                  ? "The adventure covers every room role and required ending for the MVP template."
+                  : "Review the missing room roles or endings before using this as the template adventure."}
+              </Notice>
+              <ul>
+                {FIVE_ROOM_TEMPLATE.map((room) => (
+                  <li>
+                    <strong>{room.tag}</strong>: {room.title}. {room.mechanicalRole}
+                  </li>
+                ))}
+              </ul>
+              {templateIssues.length > 0
+                ? (
+                  <ul>
+                    {templateIssues.map((issue) => (
                       <li>
                         <strong>{issue.code}</strong>: {issue.message}
                       </li>
