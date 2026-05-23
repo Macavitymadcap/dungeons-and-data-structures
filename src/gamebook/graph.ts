@@ -4,6 +4,8 @@ export type GraphIssueCode =
   | "missing-start"
   | "duplicate-passage"
   | "missing-target"
+  | "missing-encounter"
+  | "targetless-choice"
   | "empty-non-ending"
   | "unreachable-passage"
   | "unreachable-ending";
@@ -14,6 +16,7 @@ export interface GraphIssue {
   passageId?: PassageId;
   choiceId?: string;
   targetId?: PassageId;
+  encounterId?: string;
 }
 
 export interface GraphValidation {
@@ -76,6 +79,7 @@ export function getReachablePassageIds(adventure: Adventure): Set<PassageId> {
 export function validateAdventure(adventure: Adventure): GraphValidation {
   const issues: GraphIssue[] = [];
   const passages = createPassageMap(adventure.passages);
+  const encounterIds = new Set((adventure.encounters ?? []).map((encounter) => encounter.id));
   const seen = new Set<PassageId>();
 
   for (const passage of adventure.passages) {
@@ -107,6 +111,25 @@ export function validateAdventure(adventure: Adventure): GraphValidation {
     }
 
     for (const choice of passage.choices) {
+      if (choiceTargets(choice).length === 0) {
+        issues.push({
+          code: "targetless-choice",
+          passageId: passage.id,
+          choiceId: choice.id,
+          message:
+            `Choice "${choice.id}" in passage "${passage.id}" has no target, check, or combat outcome.`,
+        });
+      }
+      if (choice.combat && !encounterIds.has(choice.combat.encounterId)) {
+        issues.push({
+          code: "missing-encounter",
+          passageId: passage.id,
+          choiceId: choice.id,
+          encounterId: choice.combat.encounterId,
+          message:
+            `Choice "${choice.id}" in passage "${passage.id}" references missing encounter "${choice.combat.encounterId}".`,
+        });
+      }
       for (const targetId of choiceTargets(choice)) {
         if (!passages.has(targetId)) {
           issues.push({

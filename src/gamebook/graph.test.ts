@@ -54,6 +54,79 @@ test("validation reports missing choice targets", () => {
   );
 });
 
+test("validation reports targetless choices", () => {
+  const adventure: Adventure = {
+    id: "broken",
+    title: "Broken",
+    startPassageId: "start",
+    attribution: [],
+    passages: [
+      {
+        id: "start",
+        title: "Start",
+        body: "Broken graph.",
+        choices: [{ id: "empty", text: "Go nowhere" }],
+      },
+    ],
+  };
+
+  const result = validateAdventure(adventure);
+
+  expect(result.valid).toBe(false);
+  expect(result.issues.some((issue) => issue.code === "targetless-choice")).toBe(
+    true,
+  );
+});
+
+test("validation reports missing combat encounters", () => {
+  const adventure: Adventure = {
+    id: "broken-combat",
+    title: "Broken Combat",
+    startPassageId: "start",
+    attribution: [],
+    passages: [
+      {
+        id: "start",
+        title: "Start",
+        body: "Broken combat.",
+        choices: [
+          {
+            id: "fight",
+            text: "Fight",
+            combat: {
+              encounterId: "missing-encounter",
+              onVictory: "victory",
+              onDefeat: "failure",
+              onContinue: "start",
+            },
+          },
+        ],
+      },
+      {
+        id: "victory",
+        title: "Victory",
+        body: "Done.",
+        ending: "victory",
+        choices: [],
+      },
+      {
+        id: "failure",
+        title: "Failure",
+        body: "Done.",
+        ending: "failure",
+        choices: [],
+      },
+    ],
+  };
+
+  const result = validateAdventure(adventure);
+
+  expect(result.valid).toBe(false);
+  expect(
+    result.issues.some((issue) => issue.code === "missing-encounter"),
+  ).toBe(true);
+});
+
 test("validation reports unreachable passages", () => {
   const adventure: Adventure = {
     id: "unreachable",

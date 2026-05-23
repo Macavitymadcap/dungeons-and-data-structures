@@ -25,7 +25,11 @@ import {
 } from "./gamebook/model.ts";
 import { resolveChoice } from "./gamebook/play.ts";
 import { createCharacter } from "./gamebook/rules/character.ts";
-import { createInitialState, isChoiceAvailable } from "./gamebook/state.ts";
+import {
+  createInitialState,
+  isChoiceAvailable,
+  parseGame,
+} from "./gamebook/state.ts";
 
 export interface AppDependencies {
   adventure?: Adventure;
@@ -78,7 +82,10 @@ export function createApp(dependencies: AppDependencies = {}) {
       adventure,
       now(),
     );
-    const passage = passages.get(loadedState.currentPassageId);
+    if (!loadedState.ok) {
+      return context.html(<Notice tone="danger">{loadedState.error}</Notice>, 400);
+    }
+    const passage = passages.get(loadedState.state.currentPassageId);
     if (!passage) {
       return context.html(
         <Notice tone="danger">Current passage could not be found.</Notice>,
@@ -93,7 +100,7 @@ export function createApp(dependencies: AppDependencies = {}) {
       return context.html(<Notice tone="danger">Choice not found.</Notice>, 404);
     }
 
-    const result = resolveChoice(loadedState, choice, {
+    const result = resolveChoice(loadedState.state, choice, {
       adventure,
       now,
       random,
@@ -128,16 +135,18 @@ function parseSubmittedState(
   raw: string | undefined,
   adventure: Adventure,
   now: Date,
-): GameState {
+): { ok: true; state: GameState } | { ok: false; error: string } {
   if (typeof raw !== "string") {
-    return createInitialState(
-      adventure,
-      createCharacter("hero-1", "Adventurer", "fighter"),
-      now,
-    );
+    return {
+      ok: true,
+      state: createInitialState(
+        adventure,
+        createCharacter("hero-1", "Adventurer", "fighter"),
+        now,
+      ),
+    };
   }
-  const parsed = JSON.parse(raw) as GameState;
-  return parsed;
+  return parseGame(raw, adventure);
 }
 
 function normaliseCharacterClass(value: string | undefined): Character["class"] {

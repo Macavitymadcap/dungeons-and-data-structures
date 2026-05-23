@@ -122,6 +122,51 @@ describe("createApp", () => {
     );
   });
 
+  test("choice post rejects invalid submitted state", async () => {
+    const app = createApp();
+    const body = new URLSearchParams({
+      state: "{nope",
+    });
+
+    const response = await app.request("/gamebook/choices/fight-guard", {
+      method: "POST",
+      body,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+
+    expect(response.status).toBe(400);
+    expect(await response.text()).toContain("Saved game is not valid JSON.");
+  });
+
+  test("choice post rejects submitted state for a missing passage", async () => {
+    const app = createApp();
+    const state = {
+      ...createInitialState(
+        mtGraphnorAdventure,
+        createCharacter("hero-1", "Adventurer", "fighter"),
+      ),
+      currentPassageId: "missing-room",
+    };
+    const body = new URLSearchParams({
+      state: JSON.stringify(state),
+    });
+
+    const response = await app.request("/gamebook/choices/fight-guard", {
+      method: "POST",
+      body,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+
+    expect(response.status).toBe(400);
+    expect(await response.text()).toContain(
+      "Saved game passage is not valid for this adventure.",
+    );
+  });
+
   test("class inventory can unlock a puzzle route", async () => {
     const app = createApp({
       now: () => new Date("2026-05-23T12:00:00.000Z"),

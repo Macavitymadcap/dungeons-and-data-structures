@@ -216,6 +216,15 @@ function validateGameState(value: unknown, adventure?: Adventure): LoadResult {
   ) {
     return { ok: false, error: "Saved game is missing required fields." };
   }
+  if (
+    adventure &&
+    !adventure.passages.some((passage) => passage.id === value.currentPassageId)
+  ) {
+    return {
+      ok: false,
+      error: "Saved game passage is not valid for this adventure.",
+    };
+  }
 
   const character = upgradeCharacter(value.character);
   if (!character) {

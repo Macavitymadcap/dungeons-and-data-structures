@@ -130,6 +130,23 @@ test("parse validates imported save JSON", () => {
   }
 });
 
+test("parse rejects saves whose current passage is not in the adventure", () => {
+  const character = createCharacter("hero-1", "Ash", "wizard");
+  const state = {
+    ...createInitialState(mtGraphnorAdventure, character),
+    currentPassageId: "missing-room",
+  };
+
+  const result = parseGame(JSON.stringify(state), mtGraphnorAdventure);
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) {
+    expect(result.error).toBe(
+      "Saved game passage is not valid for this adventure.",
+    );
+  }
+});
+
 test("load rejects saves with invalid character classes", () => {
   const storage = new MemoryStorage();
   const character = createCharacter("hero-1", "Ash", "cleric");
