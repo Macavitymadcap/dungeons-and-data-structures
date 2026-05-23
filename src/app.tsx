@@ -1,6 +1,7 @@
 import {
   AppShell,
   Button,
+  CodeBlock,
   HxForm,
   MetadataList,
   Notice,
@@ -14,7 +15,11 @@ import { FormValues, routeParam } from "@macavitymadcap/hyper-dank-transport";
 import { Hono } from "hono";
 import { discoveryList, itemList } from "./gamebook/catalog.ts";
 import { mtGraphnorAdventure } from "./gamebook/content/mt-graphnor.ts";
-import { createPassageMap } from "./gamebook/graph.ts";
+import {
+  createPassageMap,
+  exportMermaid,
+  validateAdventure,
+} from "./gamebook/graph.ts";
 import {
   Adventure,
   Character,
@@ -75,6 +80,15 @@ export function createApp(dependencies: AppDependencies = {}) {
     );
   });
 
+  app.get("/gamebook/author", (context) =>
+    context.html(
+      <AuthorPage
+        appName={appName}
+        adventure={adventure}
+      />,
+    )
+  );
+
   app.post("/gamebook/choices/:choiceId", async (context) => {
     const form = await FormValues.from(context);
     const loadedState = parseSubmittedState(
@@ -129,6 +143,79 @@ export function createApp(dependencies: AppDependencies = {}) {
   });
 
   return app;
+}
+
+function AuthorPage(props: {
+  appName: string;
+  adventure: Adventure;
+}) {
+  const validation = validateAdventure(props.adventure);
+  const mermaid = exportMermaid(props.adventure);
+
+  return (
+    <html lang="en-GB">
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Author Tools | {props.appName}</title>
+        <link rel="stylesheet" href="/assets/hyper-dank-ui.css" />
+      </head>
+      <body>
+        <AppShell
+          header={
+            <PageHeader
+              eyebrow={props.appName}
+              id="author-header"
+              title="Author Tools"
+              description="Static validation and graph exports for the gamebook draft."
+            />
+          }
+        >
+          <Panel labelledBy="author-validation-title">
+            <section aria-labelledby="author-validation-title">
+              <h2 id="author-validation-title">Graph validation</h2>
+              <MetadataList
+                items={[
+                  { label: "Adventure", value: props.adventure.title },
+                  { label: "Passages", value: String(props.adventure.passages.length) },
+                  {
+                    label: "Reachable passages",
+                    value: String(validation.reachablePassageIds.size),
+                  },
+                  { label: "Issues", value: String(validation.issues.length) },
+                ]}
+              />
+              <Notice
+                heading={validation.valid ? "Validation passed" : "Validation failed"}
+                tone={validation.valid ? "success" : "danger"}
+              >
+                {validation.valid
+                  ? "All passages and endings are currently reachable."
+                  : "Review the issue list before publishing this adventure."}
+              </Notice>
+              {validation.issues.length > 0
+                ? (
+                  <ul>
+                    {validation.issues.map((issue) => (
+                      <li>
+                        <strong>{issue.code}</strong>: {issue.message}
+                      </li>
+                    ))}
+                  </ul>
+                )
+                : null}
+            </section>
+          </Panel>
+          <Panel labelledBy="author-mermaid-title">
+            <section aria-labelledby="author-mermaid-title">
+              <h2 id="author-mermaid-title">Mermaid passage graph</h2>
+              <CodeBlock code={mermaid} language="mermaid" />
+            </section>
+          </Panel>
+        </AppShell>
+      </body>
+    </html>
+  );
 }
 
 function parseSubmittedState(

@@ -24,6 +24,16 @@ const checked = await smokeStaticSite({
       includes: ["Slip past the guard", "Dungeons &amp; Data Structures"],
     },
     {
+      path: "gamebook/author/index.html",
+      includes: [
+        "Author Tools",
+        "Graph validation",
+        "Validation passed",
+        "flowchart TD",
+        "p_guardian_clash",
+      ],
+    },
+    {
       path: "assets/hyper-dank-ui.css",
       includes: ".app-shell",
     },

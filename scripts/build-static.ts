@@ -7,6 +7,7 @@ const app = createApp();
 await rm(outDir, { force: true, recursive: true });
 await mkdir(`${outDir}/assets`, { recursive: true });
 await mkdir(`${outDir}/gamebook`, { recursive: true });
+await mkdir(`${outDir}/gamebook/author`, { recursive: true });
 
 await cp(
   "node_modules/@macavitymadcap/hyper-dank-ui/src/styles.css",
@@ -21,8 +22,11 @@ await Bun.build({
 
 const gamebookResponse = await app.request("/gamebook");
 const gamebookHtml = await gamebookResponse.text();
+const authorResponse = await app.request("/gamebook/author");
+const authorHtml = await authorResponse.text();
 
 await writeFile(`${outDir}/index.html`, gamebookHtml);
 await writeFile(`${outDir}/gamebook/index.html`, gamebookHtml);
+await writeFile(`${outDir}/gamebook/author/index.html`, authorHtml);
 
 console.log(`Built static gamebook to ${outDir}/`);

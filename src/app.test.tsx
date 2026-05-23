@@ -33,6 +33,19 @@ describe("createApp", () => {
     expect(html).toContain("gamebook-save-json");
   });
 
+  test("author page renders validation summary and Mermaid graph", async () => {
+    const app = createApp();
+    const response = await app.request("/gamebook/author");
+    const html = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(html).toContain("Author Tools");
+    expect(html).toContain("Graph validation");
+    expect(html).toContain("Validation passed");
+    expect(html).toContain("flowchart TD");
+    expect(html).toContain("p_guardian_clash");
+  });
+
   test("choice post returns the next passage fragment", async () => {
     const app = createApp({
       now: () => new Date("2026-05-23T12:00:00.000Z"),

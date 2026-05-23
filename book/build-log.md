@@ -23,3 +23,5 @@ Use this log to record major planning, research, manuscript, and gamebook implem
 - Added save-load migration for earlier localStorage saves, deeper character validation, and defeated-encounter handling so the combat layer can evolve without silently discarding progress.
 - Added explicit save JSON export/import controls to support local-first persistence testing and the future save-document chapter.
 - Added item/discovery metadata, labelled inventory and discovery summaries, a thieves' tools puzzle route, and graph validation for combat outcome targets.
+- Tightened save and authoring validation for submitted state, missing passages, missing combat encounters, and targetless choices.
+- Added a static author tools page with graph validation status and Mermaid passage graph export.
