@@ -27,6 +27,10 @@ export type LoadResult =
   | { ok: true; state: GameState }
   | { ok: false; error: string };
 
+export interface ParseGameOptions {
+  validateCurrentPassage?: boolean;
+}
+
 export function createInitialState(
   adventure: Adventure,
   character: Character,
@@ -150,10 +154,14 @@ export function loadGame(
   }
 }
 
-export function parseGame(raw: string, adventure?: Adventure): LoadResult {
+export function parseGame(
+  raw: string,
+  adventure?: Adventure,
+  options: ParseGameOptions = {},
+): LoadResult {
   try {
     const parsed = JSON.parse(raw);
-    return validateGameState(parsed, adventure);
+    return validateGameState(parsed, adventure, options);
   } catch {
     return { ok: false, error: "Saved game is not valid JSON." };
   }
@@ -198,7 +206,11 @@ function createLogEntry(message: string, now: Date): GameLogEntry {
   };
 }
 
-function validateGameState(value: unknown, adventure?: Adventure): LoadResult {
+function validateGameState(
+  value: unknown,
+  adventure?: Adventure,
+  options: ParseGameOptions = {},
+): LoadResult {
   if (!isRecord(value)) {
     return { ok: false, error: "Saved game must be an object." };
   }
@@ -226,6 +238,7 @@ function validateGameState(value: unknown, adventure?: Adventure): LoadResult {
   }
   if (
     adventure &&
+    options.validateCurrentPassage !== false &&
     !adventure.passages.some((passage) => passage.id === value.currentPassageId)
   ) {
     return {

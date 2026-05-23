@@ -195,6 +195,39 @@ describe("createApp", () => {
     expect(html).toContain("Forced passage to keyboard-room.");
   });
 
+  test("author mode can force navigation from a stale passage id", async () => {
+    const app = createApp({
+      now: () => new Date("2026-05-23T12:00:00.000Z"),
+    });
+    const state = {
+      ...createInitialState(
+        mtGraphnorAdventure,
+        createCharacter("hero-1", "Adventurer", "fighter"),
+        new Date("2026-05-23T12:00:00.000Z"),
+      ),
+      currentPassageId: "renamed-during-drafting",
+    };
+    const body = new URLSearchParams({
+      authorMode: "1",
+      passageId: "keyboard-room",
+      state: JSON.stringify(state),
+    });
+
+    const response = await app.request("/gamebook/passages", {
+      method: "POST",
+      body,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    const html = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(html).toContain("Keyboard Room");
+    expect(html).toContain("<dd>keyboard-room</dd>");
+    expect(html).toContain("Forced passage to keyboard-room.");
+  });
+
   test("force navigation is rejected outside author mode", async () => {
     const app = createApp();
     const state = createInitialState(

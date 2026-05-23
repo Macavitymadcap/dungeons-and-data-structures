@@ -160,6 +160,7 @@ export function createApp(dependencies: AppDependencies = {}) {
       form.optionalString("state"),
       adventure,
       now(),
+      { validateCurrentPassage: false },
     );
     if (!loadedState.ok) {
       return context.html(<Notice tone="danger">{loadedState.error}</Notice>, 400);
@@ -267,6 +268,7 @@ function parseSubmittedState(
   raw: string | undefined,
   adventure: Adventure,
   now: Date,
+  options: { validateCurrentPassage?: boolean } = {},
 ): { ok: true; state: GameState } | { ok: false; error: string } {
   if (typeof raw !== "string") {
     return {
@@ -278,7 +280,7 @@ function parseSubmittedState(
       ),
     };
   }
-  return parseGame(raw, adventure);
+  return parseGame(raw, adventure, options);
 }
 
 function normaliseCharacterClass(value: string | undefined): Character["class"] {

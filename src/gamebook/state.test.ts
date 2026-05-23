@@ -199,6 +199,23 @@ test("parse rejects saves whose current passage is not in the adventure", () => 
   }
 });
 
+test("parse can skip current passage validation for author recovery", () => {
+  const character = createCharacter("hero-1", "Ash", "wizard");
+  const state = {
+    ...createInitialState(mtGraphnorAdventure, character),
+    currentPassageId: "missing-room",
+  };
+
+  const result = parseGame(JSON.stringify(state), mtGraphnorAdventure, {
+    validateCurrentPassage: false,
+  });
+
+  expect(result.ok).toBe(true);
+  if (result.ok) {
+    expect(result.state.currentPassageId).toBe("missing-room");
+  }
+});
+
 test("load rejects saves with invalid character classes", () => {
   const storage = new MemoryStorage();
   const character = createCharacter("hero-1", "Ash", "cleric");
