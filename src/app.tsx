@@ -67,6 +67,7 @@ export function createApp(dependencies: AppDependencies = {}) {
       context.req.query("class"),
     );
     const race = normaliseCharacterRace(context.req.query("race"));
+    const authorMode = context.req.query("debug") === "1";
     const character = createCharacter("hero-1", "Adventurer", characterClass, race);
     const state = createInitialState(adventure, character, now());
 
@@ -76,6 +77,7 @@ export function createApp(dependencies: AppDependencies = {}) {
         adventure={adventure}
         passage={passages.get(state.currentPassageId)!}
         state={state}
+        authorMode={authorMode}
       />,
     );
   });
@@ -138,6 +140,7 @@ export function createApp(dependencies: AppDependencies = {}) {
         state={result.state}
         roll={result.roll}
         combat={result.combat}
+        authorMode={form.optionalString("authorMode") === "1"}
       />,
     );
   });
@@ -261,6 +264,7 @@ function GamebookPage(props: {
   adventure: Adventure;
   passage: Passage;
   state: GameState;
+  authorMode: boolean;
 }) {
   return (
     <html lang="en-GB">
@@ -290,6 +294,7 @@ function GamebookPage(props: {
             dangerouslySetInnerHTML={{
               __html: JSON.stringify({
                 adventure: props.adventure,
+                authorMode: props.authorMode,
                 state: props.state,
               }),
             }}
@@ -303,6 +308,7 @@ function GamebookPage(props: {
               adventure={props.adventure}
               passage={props.passage}
               state={props.state}
+              authorMode={props.authorMode}
             />
           </div>
         </AppShell>
@@ -398,6 +404,7 @@ function PassagePanel(props: {
   state: GameState;
   roll?: RollResult;
   combat?: CombatRoundResult;
+  authorMode?: boolean;
 }) {
   const availableChoices = props.passage.choices.filter((choice) =>
     isChoiceAvailable(choice, props.state)
@@ -411,6 +418,7 @@ function PassagePanel(props: {
         <StateSummary adventure={props.adventure} state={props.state} />
         {props.roll ? <RollSummary roll={props.roll} /> : null}
         {props.combat ? <CombatSummary combat={props.combat} /> : null}
+        {props.authorMode ? <DebugPanel state={props.state} /> : null}
         {props.passage.ending
           ? <p data-ending={props.passage.ending}>Ending: {props.passage.ending}</p>
           : (
@@ -433,6 +441,9 @@ function PassagePanel(props: {
                       value={JSON.stringify(props.state)}
                     />
                     <input type="hidden" name="choiceId" value={choice.id} />
+                    {props.authorMode
+                      ? <input type="hidden" name="authorMode" value="1" />
+                      : null}
                     <Button type="submit" variant="outline">{choice.text}</Button>
                   </HxForm>
                 </li>
@@ -442,6 +453,31 @@ function PassagePanel(props: {
       </article>
     </Panel>
   );
+}
+
+function DebugPanel(props: { state: GameState }) {
+  return (
+    <Panel labelledBy="debug-state-title">
+      <section data-author-debug="true" aria-labelledby="debug-state-title">
+        <h2 id="debug-state-title">Debug state</h2>
+        <MetadataList
+          items={[
+            { label: "Passage ID", value: props.state.currentPassageId },
+            { label: "Flag IDs", value: props.state.flags.join(", ") || "None" },
+            { label: "Item IDs", value: props.state.inventory.join(", ") || "Empty" },
+            { label: "Encounter state", value: encounterDebugText(props.state) },
+            { label: "Log entries", value: String(props.state.log.length) },
+          ]}
+        />
+      </section>
+    </Panel>
+  );
+}
+
+function encounterDebugText(state: GameState): string {
+  return Object.entries(state.encounters).map(([id, encounter]) =>
+    `${id}: ${encounter.hitPoints} HP${encounter.defeated ? ", defeated" : ""}`
+  ).join("; ") || "None";
 }
 
 function CombatSummary(props: { combat: CombatRoundResult }) {

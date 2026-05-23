@@ -24,6 +24,15 @@ const checked = await smokeStaticSite({
       includes: ["Slip past the guard", "Dungeons &amp; Data Structures"],
     },
     {
+      path: "gamebook/debug/index.html",
+      includes: [
+        "Debug state",
+        "Passage ID",
+        "Encounter state",
+        "authorMode",
+      ],
+    },
+    {
       path: "gamebook/author/index.html",
       includes: [
         "Author Tools",

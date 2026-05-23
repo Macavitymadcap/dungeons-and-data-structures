@@ -19,6 +19,7 @@ import {
 
 interface BootData {
   adventure: Adventure;
+  authorMode?: boolean;
   state: GameState;
 }
 
@@ -180,7 +181,13 @@ function renderCurrentState(
   roll?: Parameters<typeof renderPassage>[2],
   combat?: Parameters<typeof renderPassage>[3],
 ): void {
-  target.innerHTML = renderPassage(adventure, state, roll, combat);
+  target.innerHTML = renderPassage(
+    adventure,
+    state,
+    roll,
+    combat,
+    bootData?.authorMode ?? false,
+  );
   if (saveStatus) {
     setStatus(status);
   }

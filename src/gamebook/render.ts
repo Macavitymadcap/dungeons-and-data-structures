@@ -14,13 +14,14 @@ export function renderPassage(
   state: GameState,
   roll?: RollResult,
   combat?: CombatRoundResult,
+  authorMode = false,
 ): string {
   const passage = createPassageMap(adventure.passages).get(state.currentPassageId);
   if (!passage) {
     return `<section class="notice" data-tone="danger" role="alert"><div class="notice-body">Current passage could not be found.</div></section>`;
   }
 
-  return renderPassagePanel(adventure, passage, state, roll, combat);
+  return renderPassagePanel(adventure, passage, state, roll, combat, authorMode);
 }
 
 function renderPassagePanel(
@@ -29,6 +30,7 @@ function renderPassagePanel(
   state: GameState,
   roll?: RollResult,
   combat?: CombatRoundResult,
+  authorMode = false,
 ): string {
   const availableChoices = passage.choices.filter((choice) =>
     isChoiceAvailable(choice, state)
@@ -47,6 +49,7 @@ function renderPassagePanel(
           }" hx-target="#gamebook-passage" hx-swap="innerHTML">
             <input type="hidden" name="state" value="${escapeHtml(JSON.stringify(state))}" />
             <input type="hidden" name="choiceId" value="${escapeHtml(choice.id)}" />
+            ${authorMode ? `<input type="hidden" name="authorMode" value="1" />` : ""}
             <button class="button" type="submit" data-size="default" data-variant="outline">${
               escapeHtml(choice.text)
             }</button>
@@ -64,9 +67,30 @@ function renderPassagePanel(
       ${renderStateSummary(adventure, state)}
       ${roll ? renderRollSummary(roll) : ""}
       ${combat ? renderCombatSummary(combat) : ""}
+      ${authorMode ? renderDebugPanel(state) : ""}
       ${choices}
     </article>
   </section>`;
+}
+
+function renderDebugPanel(state: GameState): string {
+  return `<section class="panel" data-width="default" data-author-debug="true" aria-labelledby="debug-state-title">
+    <h2 id="debug-state-title">Debug state</h2>
+    <dl class="metadata-list">
+      <div class="metadata-list-row"><dt>Passage ID</dt><dd>${escapeHtml(state.currentPassageId)}</dd></div>
+      <div class="metadata-list-row"><dt>Flag IDs</dt><dd>${escapeHtml(state.flags.join(", ") || "None")}</dd></div>
+      <div class="metadata-list-row"><dt>Item IDs</dt><dd>${escapeHtml(state.inventory.join(", ") || "Empty")}</dd></div>
+      <div class="metadata-list-row"><dt>Encounter state</dt><dd>${escapeHtml(encounterDebugText(state))}</dd></div>
+      <div class="metadata-list-row"><dt>Log entries</dt><dd>${String(state.log.length)}</dd></div>
+    </dl>
+  </section>`;
+}
+
+function encounterDebugText(state: GameState): string {
+  const entries = Object.entries(state.encounters).map(([id, encounter]) =>
+    `${id}: ${encounter.hitPoints} HP${encounter.defeated ? ", defeated" : ""}`
+  );
+  return entries.join("; ") || "None";
 }
 
 function renderCombatSummary(combat: CombatRoundResult): string {

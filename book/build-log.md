@@ -25,3 +25,4 @@ Use this log to record major planning, research, manuscript, and gamebook implem
 - Added item/discovery metadata, labelled inventory and discovery summaries, a thieves' tools puzzle route, and graph validation for combat outcome targets.
 - Tightened save and authoring validation for submitted state, missing passages, missing combat encounters, and targetless choices.
 - Added a static author tools page with graph validation status and Mermaid passage graph export.
+- Added a debug gamebook variant with live passage, item, flag, encounter, and log state for author-mode testing.

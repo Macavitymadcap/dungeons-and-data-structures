@@ -78,6 +78,15 @@ try {
   await expectText(page.locator("#gamebook-save-status"), "Imported saved game.");
   await expectStorage(page, "currentPassageId", "keyboard-room-clue");
   await expectEncounterDefeated(page, "door-guardian");
+
+  const debugPage = await browser.newPage();
+  await debugPage.goto(`${server.url}/gamebook/debug/`);
+  await debugPage.evaluate(() => localStorage.clear());
+  await debugPage.reload();
+  await expectText(debugPage.locator("[data-author-debug=true] h2"), "Debug state");
+  await debugPage.getByRole("button", { name: "Force a way through" }).click();
+  await expectText(debugPage.locator("[data-passage-id] > h2"), "Guardian Clash");
+  await expectText(debugPage.locator("[data-author-debug=true] dd").first(), "guardian-clash");
 } finally {
   await browser.close();
   server.server.stop(true);

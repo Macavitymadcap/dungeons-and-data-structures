@@ -33,6 +33,21 @@ describe("createApp", () => {
     expect(html).toContain("gamebook-save-json");
   });
 
+  test("debug gamebook page renders live state details", async () => {
+    const app = createApp({
+      now: () => new Date("2026-05-23T12:00:00.000Z"),
+    });
+    const response = await app.request("/gamebook?debug=1");
+    const html = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(html).toContain("Debug state");
+    expect(html).toContain("<dt>Passage ID</dt>");
+    expect(html).toContain("<dd>entrance</dd>");
+    expect(html).toContain("door-guardian: 6 HP");
+    expect(html).toContain('name="authorMode" value="1"');
+  });
+
   test("author page renders validation summary and Mermaid graph", async () => {
     const app = createApp();
     const response = await app.request("/gamebook/author");
@@ -71,6 +86,35 @@ describe("createApp", () => {
     expect(response.status).toBe(200);
     expect(html).toContain("Guardian Clash");
     expect(html).toContain("Trade blows with the guardian");
+  });
+
+  test("choice post preserves author debug mode", async () => {
+    const app = createApp({
+      now: () => new Date("2026-05-23T12:00:00.000Z"),
+    });
+    const state = createInitialState(
+      mtGraphnorAdventure,
+      createCharacter("hero-1", "Adventurer", "fighter"),
+      new Date("2026-05-23T12:00:00.000Z"),
+    );
+    const body = new URLSearchParams({
+      authorMode: "1",
+      state: JSON.stringify(state),
+    });
+
+    const response = await app.request("/gamebook/choices/fight-guard", {
+      method: "POST",
+      body,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    const html = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(html).toContain("Guardian Clash");
+    expect(html).toContain("Debug state");
+    expect(html).toContain("<dd>guardian-clash</dd>");
   });
 
   test("combat choice returns combat summary and updates encounter state", async () => {
