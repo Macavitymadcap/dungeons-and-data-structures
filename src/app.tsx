@@ -66,6 +66,12 @@ export function createApp(dependencies: AppDependencies = {}) {
     })
   );
 
+  app.get("/assets/client.js", async () =>
+    new Response(await browserClientBundle(authorToolsEnabled), {
+      headers: { "Content-Type": "text/javascript; charset=utf-8" },
+    })
+  );
+
   app.get("/gamebook", (context) => {
     const characterClass = normaliseCharacterClass(
       context.req.query("class"),
@@ -199,6 +205,32 @@ export function createApp(dependencies: AppDependencies = {}) {
   });
 
   return app;
+}
+
+const clientBundleCache = new Map<string, Promise<string>>();
+
+function browserClientBundle(authorToolsEnabled: boolean): Promise<string> {
+  const entrypoint = authorToolsEnabled
+    ? "src/gamebook/client.ts"
+    : "src/gamebook/player-client.ts";
+  const cached = clientBundleCache.get(entrypoint);
+  if (cached) {
+    return cached;
+  }
+
+  const bundle = Bun.build({
+    entrypoints: [entrypoint],
+    minify: true,
+    target: "browser",
+  }).then((result) => {
+    if (!result.success || result.outputs.length === 0) {
+      throw new Error(`Could not build browser client bundle for ${entrypoint}.`);
+    }
+    return result.outputs[0].text();
+  });
+
+  clientBundleCache.set(entrypoint, bundle);
+  return bundle;
 }
 
 function AuthorPage(props: {

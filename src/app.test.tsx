@@ -33,6 +33,17 @@ describe("createApp", () => {
     expect(html).toContain("gamebook-save-json");
   });
 
+  test("serves author-capable browser client when author tools are enabled", async () => {
+    const app = createApp();
+    const response = await app.request("/assets/client.js");
+    const script = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toContain("text/javascript");
+    expect(script).toContain("gamebook-force-passage");
+    expect(script).toContain("Debug state");
+  });
+
   test("debug gamebook page renders live state details", async () => {
     const app = createApp({
       now: () => new Date("2026-05-23T12:00:00.000Z"),
@@ -67,6 +78,18 @@ describe("createApp", () => {
 
     const authorResponse = await app.request("/gamebook/author");
     expect(authorResponse.status).toBe(404);
+  });
+
+  test("serves player-only browser client when author tools are disabled", async () => {
+    const app = createApp({ authorToolsEnabled: false });
+    const response = await app.request("/assets/client.js");
+    const script = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toContain("text/javascript");
+    expect(script).not.toContain("gamebook-force-passage");
+    expect(script).not.toContain("Debug state");
+    expect(script).not.toContain("authorMode");
   });
 
   test("author page renders validation summary and Mermaid graph", async () => {
