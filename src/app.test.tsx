@@ -26,6 +26,8 @@ describe("createApp", () => {
     expect(html).toContain("Slip past the guard");
     expect(html).toContain("<dd>rogue</dd>");
     expect(html).toContain("<dd>elf</dd>");
+    expect(html).toContain("gamebook-save-import");
+    expect(html).toContain("gamebook-save-json");
   });
 
   test("choice post returns the next passage fragment", async () => {

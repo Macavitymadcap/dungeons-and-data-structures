@@ -141,6 +141,14 @@ export function loadGame(
   }
 
   try {
+    return parseGame(raw, adventure);
+  } catch {
+    return { ok: false, error: "Saved game is not valid JSON." };
+  }
+}
+
+export function parseGame(raw: string, adventure?: Adventure): LoadResult {
+  try {
     const parsed = JSON.parse(raw);
     return validateGameState(parsed, adventure);
   } catch {

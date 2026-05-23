@@ -6,6 +6,7 @@ import {
   createInitialState,
   isChoiceAvailable,
   loadGame,
+  parseGame,
   resetGame,
   saveGame,
   StorageAdapter,
@@ -113,6 +114,19 @@ test("load upgrades earlier saves with missing ancestry and encounter state", ()
       hitPoints: 6,
       defeated: false,
     });
+  }
+});
+
+test("parse validates imported save JSON", () => {
+  const character = createCharacter("hero-1", "Ash", "wizard", "elf");
+  const state = createInitialState(mtGraphnorAdventure, character);
+
+  const result = parseGame(JSON.stringify(state), mtGraphnorAdventure);
+
+  expect(result.ok).toBe(true);
+  if (result.ok) {
+    expect(result.state.character.race).toBe("elf");
+    expect(result.state.character.attack.name).toBe("Staff");
   }
 });
 

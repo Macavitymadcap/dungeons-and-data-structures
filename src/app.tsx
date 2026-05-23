@@ -7,6 +7,7 @@ import {
   PageHeader,
   Panel,
   SelectField,
+  TextareaField,
   Toolbar,
 } from "@macavitymadcap/hyper-dank-ui";
 import { FormValues, routeParam } from "@macavitymadcap/hyper-dank-transport";
@@ -258,6 +259,29 @@ function GameControls(props: {
             Reset
           </Button>
         </Toolbar>
+        <HxForm
+          action="/gamebook"
+          className="gamebook-save-import"
+          method="post"
+        >
+          <TextareaField
+            id="gamebook-save-json"
+            label="Save JSON"
+            name="save"
+            rows={5}
+          />
+          <Toolbar ariaLabel="Save import and export controls">
+            <Button
+              type="button"
+              variant="outline"
+              {...{ "hx-disable": "true" }}
+              id="gamebook-export"
+            >
+              Export save
+            </Button>
+            <Button type="submit" variant="outline">Import save</Button>
+          </Toolbar>
+        </HxForm>
         <p id="gamebook-save-status" role="status">
           Saved progress continues automatically in this browser.
         </p>

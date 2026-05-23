@@ -54,12 +54,25 @@ try {
   await expectStorage(page, "currentPassageId", "keyboard-room");
   await expectEncounterDefeated(page, "door-guardian");
 
+  await page.getByRole("button", { name: "Export save" }).click();
+  const exportedSave = await page.locator("#gamebook-save-json").inputValue();
+  if (!exportedSave.includes('"currentPassageId": "keyboard-room"')) {
+    throw new Error("Expected exported save JSON to include the current passage.");
+  }
+  await expectText(page.locator("#gamebook-save-status"), "Exported current save JSON.");
+
   await page.getByRole("button", { name: "Reset" }).click();
   await expectText(page.locator("[data-passage-id] > h2"), "Entrance And Guardian");
   const saved = await page.evaluate(() => localStorage.getItem("dads-gamebook-save"));
   if (saved !== null) {
     throw new Error("Expected reset to clear localStorage save.");
   }
+
+  await page.getByRole("button", { name: "Import save" }).click();
+  await expectText(page.locator("[data-passage-id] > h2"), "Keyboard Room");
+  await expectText(page.locator("#gamebook-save-status"), "Imported saved game.");
+  await expectStorage(page, "currentPassageId", "keyboard-room");
+  await expectEncounterDefeated(page, "door-guardian");
 } finally {
   await browser.close();
   server.server.stop(true);

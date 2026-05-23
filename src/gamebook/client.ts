@@ -11,6 +11,7 @@ import { createCharacter } from "./rules/character.ts";
 import {
   createInitialState,
   loadGame,
+  parseGame,
   resetGame,
   saveGame,
   SAVE_KEY,
@@ -25,6 +26,7 @@ const storage = window.localStorage;
 const bootData = readBootData();
 const passageRoot = document.querySelector<HTMLElement>("#gamebook-passage");
 const saveStatus = document.querySelector<HTMLElement>("#gamebook-save-status");
+const saveJson = document.querySelector<HTMLTextAreaElement>("#gamebook-save-json");
 
 if (bootData && passageRoot) {
   const loaded = loadGame(storage, SAVE_KEY, bootData.adventure);
@@ -61,6 +63,36 @@ if (bootData && passageRoot) {
         state,
         passageRoot,
         `Started a new ${race} ${characterClass} game.`,
+      );
+      return;
+    }
+
+    if (form.classList.contains("gamebook-save-import")) {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const rawSave = formData.get("save");
+      if (typeof rawSave !== "string" || rawSave.trim() === "") {
+        setStatus("Paste exported save JSON before importing.");
+        return;
+      }
+
+      const imported = parseGame(rawSave, bootData.adventure);
+      if (!imported.ok) {
+        setStatus(`Import failed: ${imported.error}`);
+        return;
+      }
+      if (imported.state.adventureId !== bootData.adventure.id) {
+        setStatus("Import failed: save belongs to a different adventure.");
+        return;
+      }
+
+      state = imported.state;
+      saveGame(storage, state);
+      renderCurrentState(
+        bootData.adventure,
+        state,
+        passageRoot,
+        "Imported saved game.",
       );
       return;
     }
@@ -111,6 +143,14 @@ if (bootData && passageRoot) {
       "Saved game reset.",
     );
   });
+
+  document.querySelector("#gamebook-export")?.addEventListener("click", () => {
+    if (saveJson) {
+      saveJson.value = JSON.stringify(state, null, 2);
+      saveJson.focus();
+    }
+    setStatus("Exported current save JSON.");
+  });
 }
 
 function normaliseCharacterRace(value: FormDataEntryValue | null): CharacterRace {
@@ -141,6 +181,12 @@ function renderCurrentState(
   combat?: Parameters<typeof renderPassage>[3],
 ): void {
   target.innerHTML = renderPassage(adventure, state, roll, combat);
+  if (saveStatus) {
+    setStatus(status);
+  }
+}
+
+function setStatus(status: string): void {
   if (saveStatus) {
     saveStatus.textContent = status;
   }

@@ -14,6 +14,8 @@ const checked = await smokeStaticSite({
         "gamebook-new-game",
         "gamebook-reset",
         "gamebook-race",
+        "gamebook-save-import",
+        "gamebook-save-json",
       ],
     },
     {
