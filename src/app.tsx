@@ -478,6 +478,10 @@ function DebugPanel(props: { state: GameState }) {
             { label: "Log entries", value: String(props.state.log.length) },
           ]}
         />
+        <h3>Recent log</h3>
+        <ol data-debug-log="recent">
+          {props.state.log.slice(-5).map((entry) => <li>{entry.message}</li>)}
+        </ol>
       </section>
     </Panel>
   );

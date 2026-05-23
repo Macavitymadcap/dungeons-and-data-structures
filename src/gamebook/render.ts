@@ -84,6 +84,10 @@ function renderDebugPanel(state: GameState): string {
       <div class="metadata-list-row"><dt>Encounter state</dt><dd>${escapeHtml(encounterDebugText(state))}</dd></div>
       <div class="metadata-list-row"><dt>Log entries</dt><dd>${String(state.log.length)}</dd></div>
     </dl>
+    <h3>Recent log</h3>
+    <ol data-debug-log="recent">
+      ${state.log.slice(-5).map((entry) => `<li>${escapeHtml(entry.message)}</li>`).join("")}
+    </ol>
   </section>`;
 }
 

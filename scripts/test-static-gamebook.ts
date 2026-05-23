@@ -87,6 +87,7 @@ try {
   await debugPage.getByRole("button", { name: "Force a way through" }).click();
   await expectText(debugPage.locator("[data-passage-id] > h2"), "Guardian Clash");
   await expectText(debugPage.locator("[data-author-debug=true] dd").first(), "guardian-clash");
+  await expectText(debugPage.locator("[data-debug-log=recent] li").last(), "Noted challenged-guardian.");
 } finally {
   await browser.close();
   server.server.stop(true);

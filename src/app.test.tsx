@@ -45,6 +45,8 @@ describe("createApp", () => {
     expect(html).toContain("<dt>Passage ID</dt>");
     expect(html).toContain("<dd>entrance</dd>");
     expect(html).toContain("door-guardian: 6 HP");
+    expect(html).toContain("Recent log");
+    expect(html).toContain("Game started.");
     expect(html).toContain('name="authorMode" value="1"');
   });
 
