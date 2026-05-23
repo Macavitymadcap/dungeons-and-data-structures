@@ -30,6 +30,43 @@ test("Mt. Graphnor includes victory, failure, retreat, and cliffhanger endings",
   expect(endings.has("cliffhanger")).toBe(true);
 });
 
+test("Mt. Graphnor follows the five-room MVP template", () => {
+  const tags = new Set(
+    mtGraphnorAdventure.passages.flatMap((passage) => passage.tags ?? []),
+  );
+
+  expect(tags.has("room-1")).toBe(true);
+  expect(tags.has("room-2")).toBe(true);
+  expect(tags.has("room-3")).toBe(true);
+  expect(tags.has("room-4")).toBe(true);
+  expect(tags.has("room-5")).toBe(true);
+
+  expect(choiceIds("entrance")).toEqual([
+    "fight-guard",
+    "sneak-guard",
+    "parley-guard",
+  ]);
+  expect(choiceIds("keyboard-room")).toContain("answer-puzzle");
+  expect(choiceIds("keyboard-room")).toContain("investigate-puzzle");
+  expect(choiceIds("keyboard-room")).toContain("force-puzzle");
+  expect(choiceIds("trap-hall")).toContain("dodge-trap");
+  expect(choiceIds("trap-hall")).toContain("use-key");
+  expect(choiceIds("climax")).toContain("fight-climax");
+  expect(choiceIds("climax")).toContain("retreat-climax");
+  expect(choiceIds("reward")).toEqual(["claim-reward", "leave-hook"]);
+});
+
+test("Mt. Graphnor content is ready as an MVP rather than placeholder copy", () => {
+  const prototypeOnlyTerms = ["placeholder", "prototype", "mechanics testing"];
+
+  for (const passage of mtGraphnorAdventure.passages) {
+    const body = passage.body.toLowerCase();
+    for (const term of prototypeOnlyTerms) {
+      expect(body.includes(term)).toBe(false);
+    }
+  }
+});
+
 test("validation reports missing choice targets", () => {
   const adventure: Adventure = {
     id: "broken",
@@ -53,6 +90,15 @@ test("validation reports missing choice targets", () => {
     true,
   );
 });
+
+function choiceIds(passageId: string): string[] {
+  const passage = mtGraphnorAdventure.passages.find((item) => item.id === passageId);
+  if (!passage) {
+    throw new Error(`Missing passage ${passageId}`);
+  }
+
+  return passage.choices.map((choice) => choice.id);
+}
 
 test("validation reports targetless choices", () => {
   const adventure: Adventure = {

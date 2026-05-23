@@ -385,7 +385,7 @@ function GamebookPage(props: {
               eyebrow={props.appName}
               id="gamebook-header"
               title={props.adventure.title}
-              description="A mechanics-first static gamebook prototype."
+              description="A five-room static gamebook demo."
             />
           }
         >

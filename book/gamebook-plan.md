@@ -11,7 +11,7 @@ The gamebook should be:
 - Static TypeScript and HTML.
 - Local-storage-backed.
 - Inspired by gamebook form without copying Fighting Fantasy text, maps, encounters, or trade dress.
-- Built around original mechanics and placeholder room concepts from the book seed chapters.
+- Built around original mechanics and working room concepts from the book seed chapters.
 - Mechanically compatible with D&D 5e SRD 5.1 where useful.
 - Framework-light in the domain layer so a later Deno-to-Hyper-Dank/Bun migration can preserve the core code.
 
@@ -244,6 +244,28 @@ Concept payoff:
 - Replay paths.
 - Persistent choices.
 
+## Mt. Graphnor MVP Completion
+
+Before expanding the engine or drafting the final adventure setting, finish Mt. Graphnor as a short, playable MVP and reusable Five Room Dungeon template.
+
+The MVP should:
+
+- Replace obvious placeholder passage and ending prose with concise original adventure copy.
+- Keep the prose light and functional rather than final; this is still a template and testbed, not the finished literary pass.
+- Preserve the five-room structure with explicit `room-1` through `room-5` tags.
+- Keep each room mechanically distinct: guardian branch, puzzle gate, setback/trap, climax encounter, reward/twist.
+- Include victory, failure, retreat, and cliffhanger endings.
+- Document through data and tests what each room demonstrates.
+- Stay SRD-safe and avoid protected gamebook text, maps, trade dress, named encounters, or setting detail.
+
+Completion tests should assert:
+
+- Every room tag from `room-1` through `room-5` appears in the adventure.
+- The expected template passages exist for entrance, puzzle, trap, climax, reward, and endings.
+- The content no longer contains obvious placeholder or prototype-only body text.
+- The ending set covers victory, failure, retreat, and cliffhanger.
+- The graph still validates and every ending remains reachable.
+
 ## Suggested Source Shape
 
 Use this future structure:
@@ -327,7 +349,7 @@ The gamebook should eventually become its own fantasy narrative, not a thinly di
 
 For the mechanical prototype:
 
-- Use placeholder names freely.
+- Use working names freely.
 - Prefer clear mechanical coverage over polished prose.
 - Avoid finalising the setting too early.
 - Avoid jokes or names that make the adventure feel like a lecture unless they are clearly temporary.

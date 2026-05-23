@@ -61,7 +61,7 @@ export const mtGraphnorAdventure: Adventure = {
       id: "entrance",
       title: "Entrance And Guardian",
       body:
-        "The prototype begins at a sealed mountain door watched by a nervous guard. This prose is placeholder copy for mechanics testing.",
+        "A rain-dark path ends at a mountain door carved with five interlocking circles. A wary guard grips a cudgel under the lintel, more frightened than fierce, and blocks the way inside.",
       tags: ["start", "room-1"],
       choices: [
         {
@@ -100,7 +100,7 @@ export const mtGraphnorAdventure: Adventure = {
       id: "guardian-clash",
       title: "Guardian Clash",
       body:
-        "A short blocker encounter records combat intent without requiring the full combat loop yet.",
+        "The guard loses nerve and swings first. Pebbles jump beneath your boots as the sealed door hums behind the scuffle.",
       tags: ["room-1", "combat"],
       encounterId: "door-guardian",
       choices: [
@@ -132,7 +132,7 @@ export const mtGraphnorAdventure: Adventure = {
       id: "keyboard-room",
       title: "Keyboard Room",
       body:
-        "A puzzle mechanism waits in a chamber of labelled keys. The final riddle text belongs in the later narrative pass.",
+        "Beyond the door waits a low chamber lined with stone keys, each marked by a different angular rune. A brass plate reads: press the sign that opens a path without becoming one.",
       tags: ["room-2", "puzzle"],
       choices: [
         {
@@ -172,7 +172,7 @@ export const mtGraphnorAdventure: Adventure = {
       id: "keyboard-room-clue",
       title: "Keyboard Room Clue",
       body:
-        "The search path teaches that a puzzle can have more than one route through the graph.",
+        "Dust around the keys has been disturbed in a neat little trail. The safest rune is not the brightest one, but the one worn smooth by earlier careful hands.",
       tags: ["room-2", "puzzle"],
       choices: [
         {
@@ -187,7 +187,7 @@ export const mtGraphnorAdventure: Adventure = {
       id: "trap-hall",
       title: "Closing Wall",
       body:
-        "The setback room applies damage, flags, or an item solution before allowing the route to continue.",
+        "The next passage narrows to a throat of black stone. Halfway through, hidden gears grind awake and the walls begin to close.",
       tags: ["room-3", "trap"],
       choices: [
         {
@@ -220,7 +220,7 @@ export const mtGraphnorAdventure: Adventure = {
       id: "trap-hit",
       title: "Trap Consequence",
       body:
-        "The failed save route keeps the adventure moving while preserving consequences in state.",
+        "Stone clips your shoulder and drives the breath from you. There is still a gap ahead, but panic is now as dangerous as the wall.",
       tags: ["room-3", "trap"],
       choices: [
         {
@@ -240,7 +240,7 @@ export const mtGraphnorAdventure: Adventure = {
       id: "climax",
       title: "Climax Guardian",
       body:
-        "The final obstacle is scaled for a level-one prototype: dangerous enough to test combat, not a full dragon fight.",
+        "A squat statue waits in the last vault, its stone jaws glowing with banked embers. When you cross the threshold, ash falls from its wings and its eyes open.",
       tags: ["room-4", "combat"],
       encounterId: "ember-statue",
       choices: [
@@ -279,7 +279,7 @@ export const mtGraphnorAdventure: Adventure = {
       id: "reward",
       title: "Reward And Twist",
       body:
-        "The reward room records a victory and leaves a hook for the final narrative pass.",
+        "The statue's alcove opens onto a dry chamber of old offerings. Among the coins lies a folded map of Mt. Graphnor, showing rooms that should not fit inside the mountain.",
       tags: ["room-5", "reward"],
       choices: [
         {
@@ -299,28 +299,32 @@ export const mtGraphnorAdventure: Adventure = {
     {
       id: "ending-victory",
       title: "Victory",
-      body: "Victory ending placeholder.",
+      body:
+        "You leave Mt. Graphnor with the strange map, a pocket of treasure, and the useful knowledge that the mountain can be survived. For now, that is victory enough.",
       ending: "victory",
       choices: [],
     },
     {
       id: "ending-failure",
       title: "Failure",
-      body: "Failure ending placeholder.",
+      body:
+        "The dungeon does not kill you cleanly; it turns you around, empties your courage, and sends you stumbling back into the rain with nothing but bruises.",
       ending: "failure",
       choices: [],
     },
     {
       id: "ending-retreat",
       title: "Retreat",
-      body: "Retreat or partial-success ending placeholder.",
+      body:
+        "You withdraw before the mountain can demand more. The door closes behind you, but you carry enough hard-won knowledge to return with a better plan.",
       ending: "retreat",
       choices: [],
     },
     {
       id: "ending-cliffhanger",
       title: "Cliffhanger",
-      body: "Cliffhanger ending placeholder.",
+      body:
+        "You take only the map and leave the treasure untouched. By moonrise, one inked passage has moved, pointing toward a deeper door beneath the hill.",
       ending: "cliffhanger",
       choices: [],
     },
