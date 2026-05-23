@@ -46,6 +46,23 @@ test("choice requirements can gate by inventory and flags", () => {
   expect(isChoiceAvailable(choice, updated)).toBe(true);
 });
 
+test("choice requirements can gate by missing hit points", () => {
+  const character = createCharacter("hero-1", "Ash", "fighter");
+  const state = createInitialState(mtGraphnorAdventure, character);
+  const choice = {
+    id: "heal",
+    text: "Heal",
+    targetId: "next",
+    requires: {
+      hitPointsBelowMax: true,
+    },
+  };
+
+  expect(isChoiceAvailable(choice, state)).toBe(false);
+  expect(isChoiceAvailable(choice, { ...state, hitPoints: character.maxHitPoints - 1 }))
+    .toBe(true);
+});
+
 test("choice effects update inventory, flags, hit points, and timestamp", () => {
   const now = new Date("2026-05-23T12:00:00.000Z");
   const character = createCharacter("hero-1", "Ash", "rogue");

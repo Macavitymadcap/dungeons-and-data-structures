@@ -167,6 +167,8 @@ function requirementsMet(
   return allIncluded(state.flags, requirements.flagsAll) &&
     noneIncluded(state.flags, requirements.flagsNone) &&
     allIncluded(state.inventory, requirements.itemsAll) &&
+    (requirements.hitPointsBelowMax !== true ||
+      state.hitPoints < state.character.maxHitPoints) &&
     (requirements.minHitPoints === undefined ||
       state.hitPoints >= requirements.minHitPoints);
 }

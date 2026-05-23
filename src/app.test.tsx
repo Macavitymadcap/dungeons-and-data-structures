@@ -184,7 +184,7 @@ describe("createApp", () => {
     expect(html).toContain("Encounter status");
     expect(html).toContain("Door Guardian: 6/6 HP, round 1.");
     expect(html).toContain("Round 1:");
-    expect(html).toContain("Use a ration and catch your breath");
+    expect(html).not.toContain("Use a ration and catch your breath");
   });
 
   test("combat recovery consumes a ration and heals", async () => {

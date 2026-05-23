@@ -103,6 +103,7 @@ export interface CheckDefinition {
 export interface ChoiceRequirement {
   flagsAll?: string[];
   flagsNone?: string[];
+  hitPointsBelowMax?: boolean;
   itemsAll?: string[];
   minHitPoints?: number;
 }
