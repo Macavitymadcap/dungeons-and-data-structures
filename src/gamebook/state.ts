@@ -194,12 +194,17 @@ export function applyDamage(
   temporaryHitPoints: number,
   damage: number,
 ): { hitPoints: number; temporaryHitPoints: number } {
+  const currentHitPoints = Math.max(0, hitPoints);
+  const currentTemporaryHitPoints = Math.max(0, temporaryHitPoints);
   const incomingDamage = Math.max(0, damage);
-  const remainingTemporaryHitPoints = Math.max(0, temporaryHitPoints - incomingDamage);
-  const overflowDamage = Math.max(0, incomingDamage - temporaryHitPoints);
+  const remainingTemporaryHitPoints = Math.max(
+    0,
+    currentTemporaryHitPoints - incomingDamage,
+  );
+  const overflowDamage = Math.max(0, incomingDamage - currentTemporaryHitPoints);
 
   return {
-    hitPoints: Math.max(0, hitPoints - overflowDamage),
+    hitPoints: Math.max(0, currentHitPoints - overflowDamage),
     temporaryHitPoints: remainingTemporaryHitPoints,
   };
 }
@@ -263,6 +268,7 @@ function validateGameState(
     typeof value.currentPassageId !== "string" ||
     typeof value.hitPoints !== "number" ||
     typeof value.temporaryHitPoints !== "number" ||
+    value.temporaryHitPoints < 0 ||
     !isStringArray(value.conditions) ||
     !isStringArray(value.inventory) ||
     !isStringArray(value.flags) ||

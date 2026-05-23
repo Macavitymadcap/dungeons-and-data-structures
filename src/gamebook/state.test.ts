@@ -159,6 +159,17 @@ test("applyDamage subtracts temporary hit points before hit points", () => {
   });
 });
 
+test("applyDamage clamps negative inputs before calculating overflow", () => {
+  expect(applyDamage(10, -4, 0)).toEqual({
+    hitPoints: 10,
+    temporaryHitPoints: 0,
+  });
+  expect(applyDamage(-1, 4, 7)).toEqual({
+    hitPoints: 0,
+    temporaryHitPoints: 0,
+  });
+});
+
 test("save and load round-trip through a storage adapter", () => {
   const storage = new MemoryStorage();
   const character = createCharacter("hero-1", "Ash", "cleric");
@@ -243,6 +254,21 @@ test("parse rejects unsupported future save versions", () => {
   expect(result.ok).toBe(false);
   if (!result.ok) {
     expect(result.error).toBe("Saved game version is not supported.");
+  }
+});
+
+test("parse rejects negative temporary hit points", () => {
+  const character = createCharacter("hero-1", "Ash", "fighter");
+  const state = {
+    ...createInitialState(mtGraphnorAdventure, character),
+    temporaryHitPoints: -1,
+  };
+
+  const result = parseGame(JSON.stringify(state), mtGraphnorAdventure);
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) {
+    expect(result.error).toBe("Saved game is missing required fields.");
   }
 });
 
