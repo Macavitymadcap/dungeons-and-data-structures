@@ -45,10 +45,7 @@ export function resolveChoice(
 
   let nextPassageId = choice.targetId;
   let nextState = applyChoiceEffects(state, choice.effects, now());
-  nextState = describeChoiceEffects(state, nextState, choice).reduce(
-    (currentState, message) => appendLog(currentState, message, now()),
-    nextState,
-  );
+  const effectMessages = describeChoiceEffects(state, nextState, choice);
   let roll: RollResult | undefined;
   let combat: CombatRoundResult | undefined;
 
@@ -104,6 +101,10 @@ export function resolveChoice(
   } else {
     nextState = appendLog(nextState, choice.text, now());
   }
+  nextState = effectMessages.reduce(
+    (currentState, message) => appendLog(currentState, message, now()),
+    nextState,
+  );
 
   if (!nextPassageId) {
     return { state, error: "Choice has no target passage." };

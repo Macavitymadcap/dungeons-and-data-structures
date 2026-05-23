@@ -64,4 +64,10 @@ test("choice effects append readable state-transition log entries", () => {
   expect(messages).toContain("Recovered 2 hit points.");
   expect(messages).toContain("Used ration.");
   expect(messages).toContain("Use a ration and catch your breath");
+  expect(messages.indexOf("Use a ration and catch your breath")).toBeLessThan(
+    messages.indexOf("Recovered 2 hit points."),
+  );
+  expect(messages.indexOf("Use a ration and catch your breath")).toBeLessThan(
+    messages.indexOf("Used ration."),
+  );
 });
