@@ -1,4 +1,11 @@
-import { Ability, RollMode, RollResult, Skill } from "../model.ts";
+import {
+  Ability,
+  DamageRoll,
+  DamageRollResult,
+  RollMode,
+  RollResult,
+  Skill,
+} from "../model.ts";
 
 export type RandomSource = () => number;
 
@@ -8,6 +15,22 @@ export interface D20CheckInput {
   mode?: RollMode;
   reason?: string;
   rng?: RandomSource;
+}
+
+export function rollDamage(
+  damage: DamageRoll,
+  rng: RandomSource = Math.random,
+): DamageRollResult {
+  const rolls = Array.from({ length: damage.dice }, () => rollDie(damage.sides, rng));
+  const total = Math.max(0, rolls.reduce((sum, roll) => sum + roll, 0) + damage.modifier);
+
+  return {
+    notation: `${damage.dice}d${damage.sides}${damage.modifier >= 0 ? "+" : ""}${damage.modifier}`,
+    rolls,
+    modifier: damage.modifier,
+    total,
+    type: damage.type,
+  };
 }
 
 export interface AbilityCheckInput extends D20CheckInput {

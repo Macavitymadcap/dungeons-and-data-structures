@@ -13,6 +13,7 @@ const checked = await smokeStaticSite({
         "assets/client.js",
         "gamebook-new-game",
         "gamebook-reset",
+        "gamebook-race",
       ],
     },
     {

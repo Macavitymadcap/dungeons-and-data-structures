@@ -28,20 +28,34 @@ try {
   await page.reload();
 
   await expectText(page.locator("h1"), "Mt. Graphnor");
-  await expectText(page.locator("[data-passage-id] h2"), "Entrance And Guardian");
+  await expectText(page.locator("[data-passage-id] > h2"), "Entrance And Guardian");
   await expectText(page.locator("#gamebook-save-status"), "Started a new game.");
 
   await page.selectOption("#gamebook-class", "rogue");
+  await page.selectOption("#gamebook-race", "elf");
   await page.getByRole("button", { name: "New game" }).click();
   await expectText(page.locator(".metadata-list dd").first(), "rogue");
+  await expectText(page.locator(".metadata-list dd").nth(1), "elf");
   await expectStorage(page, "character.class", "rogue");
+  await expectStorage(page, "character.race", "elf");
 
   await page.getByRole("button", { name: "Force a way through" }).click();
-  await expectText(page.locator("[data-passage-id] h2"), "Guardian Clash");
+  await expectText(page.locator("[data-passage-id] > h2"), "Guardian Clash");
   await expectStorage(page, "currentPassageId", "guardian-clash");
 
+  const fixedRolls = [0.95, 0.5];
+  await page.evaluate((rolls) => {
+    let index = 0;
+    Math.random = () => rolls[index++] ?? 0;
+  }, fixedRolls);
+  await page.getByRole("button", { name: "Trade blows with the guardian" }).click();
+  await expectText(page.locator("[data-passage-id] > h2"), "Keyboard Room");
+  await expectText(page.locator(".notice h2"), "Combat round");
+  await expectStorage(page, "currentPassageId", "keyboard-room");
+  await expectEncounterDefeated(page, "door-guardian");
+
   await page.getByRole("button", { name: "Reset" }).click();
-  await expectText(page.locator("[data-passage-id] h2"), "Entrance And Guardian");
+  await expectText(page.locator("[data-passage-id] > h2"), "Entrance And Guardian");
   const saved = await page.evaluate(() => localStorage.getItem("dads-gamebook-save"));
   if (saved !== null) {
     throw new Error("Expected reset to clear localStorage save.");
@@ -81,17 +95,35 @@ async function expectText(locator: import("@playwright/test").Locator, text: str
 
 async function expectStorage(
   page: import("@playwright/test").Page,
-  keyPath: "character.class" | "currentPassageId",
+  keyPath: "character.class" | "character.race" | "currentPassageId",
   expected: string,
 ) {
   const actual = await page.evaluate((path) => {
     const raw = localStorage.getItem("dads-gamebook-save");
     if (!raw) return null;
     const save = JSON.parse(raw);
-    return path === "character.class" ? save.character.class : save.currentPassageId;
+    if (path === "character.class") return save.character.class;
+    if (path === "character.race") return save.character.race;
+    return save.currentPassageId;
   }, keyPath);
 
   if (actual !== expected) {
     throw new Error(`Expected ${keyPath} ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}.`);
+  }
+}
+
+async function expectEncounterDefeated(
+  page: import("@playwright/test").Page,
+  encounterId: string,
+) {
+  const defeated = await page.evaluate((id) => {
+    const raw = localStorage.getItem("dads-gamebook-save");
+    if (!raw) return null;
+    const save = JSON.parse(raw);
+    return save.encounters[id]?.defeated;
+  }, encounterId);
+
+  if (defeated !== true) {
+    throw new Error(`Expected encounter ${encounterId} to be defeated.`);
   }
 }

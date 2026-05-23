@@ -8,6 +8,30 @@ export const mtGraphnorAdventure: Adventure = {
     "Uses original adventure content and SRD 5.1-compatible mechanics concepts.",
     "Dungeons & Dragons System Reference Document 5.1 is licensed under Creative Commons Attribution 4.0 International.",
   ],
+  encounters: [
+    {
+      id: "door-guardian",
+      name: "Door Guardian",
+      armourClass: 12,
+      hitPoints: 6,
+      attack: {
+        name: "Club",
+        attackBonus: 3,
+        damage: { dice: 1, sides: 4, modifier: 1, type: "bludgeoning" },
+      },
+    },
+    {
+      id: "ember-statue",
+      name: "Ember Statue",
+      armourClass: 13,
+      hitPoints: 8,
+      attack: {
+        name: "Ember Slam",
+        attackBonus: 4,
+        damage: { dice: 1, sides: 6, modifier: 1, type: "fire" },
+      },
+    },
+  ],
   passages: [
     {
       id: "entrance",
@@ -58,9 +82,13 @@ export const mtGraphnorAdventure: Adventure = {
       choices: [
         {
           id: "win-guardian",
-          text: "Resolve the clash and enter",
-          targetId: "keyboard-room",
-          effects: { setFlags: ["guardian-resolved"], damage: 2 },
+          text: "Trade blows with the guardian",
+          combat: {
+            encounterId: "door-guardian",
+            onVictory: "keyboard-room",
+            onDefeat: "ending-failure",
+            onContinue: "guardian-clash",
+          },
         },
         {
           id: "retreat-early",
@@ -181,8 +209,12 @@ export const mtGraphnorAdventure: Adventure = {
         {
           id: "fight-climax",
           text: "Stand and fight",
-          targetId: "reward",
-          effects: { setFlags: ["climax-defeated"], damage: 3 },
+          combat: {
+            encounterId: "ember-statue",
+            onVictory: "reward",
+            onDefeat: "ending-failure",
+            onContinue: "climax",
+          },
         },
         {
           id: "use-puzzle-knowledge",

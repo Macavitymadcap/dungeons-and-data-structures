@@ -1,12 +1,16 @@
 import {
   Adventure,
   Character,
+  CharacterClass,
+  CharacterRace,
   Choice,
   ChoiceEffect,
   ChoiceRequirement,
+  EncounterState,
   GameLogEntry,
   GameState,
 } from "./model.ts";
+import { createCharacter } from "./rules/character.ts";
 
 export const SAVE_KEY = "dads-gamebook-save";
 
@@ -36,6 +40,12 @@ export function createInitialState(
     conditions: [],
     inventory: [...character.inventory],
     flags: [],
+    encounters: Object.fromEntries(
+      (adventure.encounters ?? []).map((encounter) => [
+        encounter.id,
+        { hitPoints: encounter.hitPoints, defeated: false },
+      ]),
+    ),
     log: [
       createLogEntry("Game started.", now),
     ],
@@ -123,6 +133,7 @@ export function saveGame(
 export function loadGame(
   storage: StorageAdapter,
   key = SAVE_KEY,
+  adventure?: Adventure,
 ): LoadResult {
   const raw = storage.getItem(key);
   if (!raw) {
@@ -131,7 +142,7 @@ export function loadGame(
 
   try {
     const parsed = JSON.parse(raw);
-    return validateGameState(parsed);
+    return validateGameState(parsed, adventure);
   } catch {
     return { ok: false, error: "Saved game is not valid JSON." };
   }
@@ -174,7 +185,7 @@ function createLogEntry(message: string, now: Date): GameLogEntry {
   };
 }
 
-function validateGameState(value: unknown): LoadResult {
+function validateGameState(value: unknown, adventure?: Adventure): LoadResult {
   if (!isRecord(value)) {
     return { ok: false, error: "Saved game must be an object." };
   }
@@ -187,7 +198,6 @@ function validateGameState(value: unknown): LoadResult {
   if (
     typeof value.adventureId !== "string" ||
     typeof value.currentPassageId !== "string" ||
-    !isRecord(value.character) ||
     typeof value.hitPoints !== "number" ||
     typeof value.temporaryHitPoints !== "number" ||
     !isStringArray(value.conditions) ||
@@ -199,7 +209,88 @@ function validateGameState(value: unknown): LoadResult {
     return { ok: false, error: "Saved game is missing required fields." };
   }
 
-  return { ok: true, state: value as unknown as GameState };
+  const character = upgradeCharacter(value.character);
+  if (!character) {
+    return { ok: false, error: "Saved game character is not valid." };
+  }
+
+  const encounters = upgradeEncounters(value.encounters, adventure);
+  if (!encounters) {
+    return { ok: false, error: "Saved game encounters are not valid." };
+  }
+
+  return {
+    ok: true,
+    state: {
+      ...value,
+      character,
+      encounters,
+    } as unknown as GameState,
+  };
+}
+
+function upgradeCharacter(value: unknown): Character | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+  if (
+    typeof value.id !== "string" ||
+    typeof value.name !== "string" ||
+    !isCharacterClass(value.class)
+  ) {
+    return null;
+  }
+
+  const race = isCharacterRace(value.race) ? value.race : "human";
+  const level = typeof value.level === "number" && Number.isInteger(value.level) &&
+      value.level > 0
+    ? value.level
+    : 1;
+
+  return createCharacter(value.id, value.name, value.class, race, level);
+}
+
+function upgradeEncounters(
+  value: unknown,
+  adventure?: Adventure,
+): Record<string, EncounterState> | null {
+  if (!isRecord(value)) {
+    if (!adventure) {
+      return null;
+    }
+    return Object.fromEntries(
+      (adventure.encounters ?? []).map((encounter) => [
+        encounter.id,
+        { hitPoints: encounter.hitPoints, defeated: false },
+      ]),
+    );
+  }
+
+  const encounters: Record<string, EncounterState> = {};
+  for (const [id, encounter] of Object.entries(value)) {
+    if (!isRecord(encounter)) {
+      return null;
+    }
+    if (
+      typeof encounter.hitPoints !== "number" ||
+      typeof encounter.defeated !== "boolean"
+    ) {
+      return null;
+    }
+    encounters[id] = {
+      hitPoints: encounter.hitPoints,
+      defeated: encounter.defeated,
+    };
+  }
+
+  for (const encounter of adventure?.encounters ?? []) {
+    encounters[encounter.id] ??= {
+      hitPoints: encounter.hitPoints,
+      defeated: false,
+    };
+  }
+
+  return encounters;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -209,4 +300,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) &&
     value.every((item) => typeof item === "string");
+}
+
+function isCharacterClass(value: unknown): value is CharacterClass {
+  return value === "fighter" || value === "rogue" || value === "wizard" ||
+    value === "cleric";
+}
+
+function isCharacterRace(value: unknown): value is CharacterRace {
+  return value === "human" || value === "elf" || value === "dwarf" ||
+    value === "halfling";
 }

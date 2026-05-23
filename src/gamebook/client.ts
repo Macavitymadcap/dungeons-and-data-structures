@@ -1,5 +1,10 @@
 import { createPassageMap } from "./graph.ts";
-import { Adventure, CharacterClass, GameState } from "./model.ts";
+import {
+  Adventure,
+  CharacterClass,
+  CharacterRace,
+  GameState,
+} from "./model.ts";
 import { resolveChoice } from "./play.ts";
 import { renderPassage } from "./render.ts";
 import { createCharacter } from "./rules/character.ts";
@@ -22,7 +27,7 @@ const passageRoot = document.querySelector<HTMLElement>("#gamebook-passage");
 const saveStatus = document.querySelector<HTMLElement>("#gamebook-save-status");
 
 if (bootData && passageRoot) {
-  const loaded = loadGame(storage, SAVE_KEY);
+  const loaded = loadGame(storage, SAVE_KEY, bootData.adventure);
   let state = loaded.ok && loaded.state.adventureId === bootData.adventure.id
     ? loaded.state
     : bootData.state;
@@ -45,16 +50,17 @@ if (bootData && passageRoot) {
       event.preventDefault();
       const formData = new FormData(form);
       const characterClass = normaliseCharacterClass(formData.get("class"));
+      const race = normaliseCharacterRace(formData.get("race"));
       state = createInitialState(
         bootData.adventure,
-        createCharacter("hero-1", "Adventurer", characterClass),
+        createCharacter("hero-1", "Adventurer", characterClass, race),
       );
       saveGame(storage, state);
       renderCurrentState(
         bootData.adventure,
         state,
         passageRoot,
-        `Started a new ${characterClass} game.`,
+        `Started a new ${race} ${characterClass} game.`,
       );
       return;
     }
@@ -76,7 +82,7 @@ if (bootData && passageRoot) {
       return;
     }
 
-    const result = resolveChoice(state, choice);
+    const result = resolveChoice(state, choice, { adventure: bootData.adventure });
     if (result.error) {
       passageRoot.innerHTML =
         `<section class="notice" data-tone="danger" role="alert"><div class="notice-body">${result.error}</div></section>`;
@@ -85,7 +91,14 @@ if (bootData && passageRoot) {
 
     state = result.state;
     saveGame(storage, state);
-    renderCurrentState(bootData.adventure, state, passageRoot, "Progress saved.", result.roll);
+    renderCurrentState(
+      bootData.adventure,
+      state,
+      passageRoot,
+      "Progress saved.",
+      result.roll,
+      result.combat,
+    );
   });
 
   document.querySelector("#gamebook-reset")?.addEventListener("click", () => {
@@ -98,6 +111,16 @@ if (bootData && passageRoot) {
       "Saved game reset.",
     );
   });
+}
+
+function normaliseCharacterRace(value: FormDataEntryValue | null): CharacterRace {
+  if (
+    value === "human" || value === "elf" || value === "dwarf" ||
+    value === "halfling"
+  ) {
+    return value;
+  }
+  return "human";
 }
 
 function readBootData(): BootData | null {
@@ -115,8 +138,9 @@ function renderCurrentState(
   target: HTMLElement,
   status: string,
   roll?: Parameters<typeof renderPassage>[2],
+  combat?: Parameters<typeof renderPassage>[3],
 ): void {
-  target.innerHTML = renderPassage(adventure, state, roll);
+  target.innerHTML = renderPassage(adventure, state, roll, combat);
   if (saveStatus) {
     saveStatus.textContent = status;
   }

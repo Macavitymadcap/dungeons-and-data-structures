@@ -16,6 +16,7 @@ import { createPassageMap } from "./gamebook/graph.ts";
 import {
   Adventure,
   Character,
+  CombatRoundResult,
   GameState,
   Passage,
   RollResult,
@@ -54,7 +55,8 @@ export function createApp(dependencies: AppDependencies = {}) {
     const characterClass = normaliseCharacterClass(
       context.req.query("class"),
     );
-    const character = createCharacter("hero-1", "Adventurer", characterClass);
+    const race = normaliseCharacterRace(context.req.query("race"));
+    const character = createCharacter("hero-1", "Adventurer", characterClass, race);
     const state = createInitialState(adventure, character, now());
 
     return context.html(
@@ -90,6 +92,7 @@ export function createApp(dependencies: AppDependencies = {}) {
     }
 
     const result = resolveChoice(loadedState, choice, {
+      adventure,
       now,
       random,
     });
@@ -110,6 +113,7 @@ export function createApp(dependencies: AppDependencies = {}) {
         passage={nextPassage}
         state={result.state}
         roll={result.roll}
+        combat={result.combat}
       />,
     );
   });
@@ -141,6 +145,16 @@ function normaliseCharacterClass(value: string | undefined): Character["class"] 
     return value;
   }
   return "fighter";
+}
+
+function normaliseCharacterRace(value: string | undefined): Character["race"] {
+  if (
+    value === "human" || value === "elf" || value === "dwarf" ||
+    value === "halfling"
+  ) {
+    return value;
+  }
+  return "human";
 }
 
 function GamebookPage(props: {
@@ -181,7 +195,10 @@ function GamebookPage(props: {
               }),
             }}
           />
-          <GameControls characterClass={props.state.character.class} />
+          <GameControls
+            characterClass={props.state.character.class}
+            race={props.state.character.race}
+          />
           <div id="gamebook-passage" aria-live="polite">
             <PassagePanel passage={props.passage} state={props.state} />
           </div>
@@ -191,7 +208,10 @@ function GamebookPage(props: {
   );
 }
 
-function GameControls(props: { characterClass: Character["class"] }) {
+function GameControls(props: {
+  characterClass: Character["class"];
+  race: Character["race"];
+}) {
   return (
     <Panel labelledBy="gamebook-controls-title">
       <section aria-labelledby="gamebook-controls-title">
@@ -212,6 +232,18 @@ function GameControls(props: { characterClass: Character["class"] }) {
                 { label: "Rogue", value: "rogue" },
                 { label: "Wizard", value: "wizard" },
                 { label: "Cleric", value: "cleric" },
+              ]}
+            />
+            <SelectField
+              id="gamebook-race"
+              label="Ancestry"
+              name="race"
+              value={props.race}
+              options={[
+                { label: "Human", value: "human" },
+                { label: "Elf", value: "elf" },
+                { label: "Dwarf", value: "dwarf" },
+                { label: "Halfling", value: "halfling" },
               ]}
             />
             <Button type="submit">New game</Button>
@@ -238,6 +270,7 @@ function PassagePanel(props: {
   passage: Passage;
   state: GameState;
   roll?: RollResult;
+  combat?: CombatRoundResult;
 }) {
   const availableChoices = props.passage.choices.filter((choice) =>
     isChoiceAvailable(choice, props.state)
@@ -250,6 +283,7 @@ function PassagePanel(props: {
         <p>{props.passage.body}</p>
         <StateSummary state={props.state} />
         {props.roll ? <RollSummary roll={props.roll} /> : null}
+        {props.combat ? <CombatSummary combat={props.combat} /> : null}
         {props.passage.ending
           ? <p data-ending={props.passage.ending}>Ending: {props.passage.ending}</p>
           : (
@@ -283,11 +317,20 @@ function PassagePanel(props: {
   );
 }
 
+function CombatSummary(props: { combat: CombatRoundResult }) {
+  return (
+    <Notice heading="Combat round" tone={props.combat.outcome === "victory" ? "success" : "info"}>
+      {props.combat.log.join(" ")}
+    </Notice>
+  );
+}
+
 function StateSummary(props: { state: GameState }) {
   return (
     <MetadataList
       items={[
         { label: "Class", value: props.state.character.class },
+        { label: "Ancestry", value: props.state.character.race },
         {
           label: "HP",
           value: `${props.state.hitPoints}/${props.state.character.maxHitPoints}`,

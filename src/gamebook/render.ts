@@ -1,24 +1,32 @@
 import { createPassageMap } from "./graph.ts";
-import { Adventure, GameState, Passage, RollResult } from "./model.ts";
+import {
+  Adventure,
+  CombatRoundResult,
+  GameState,
+  Passage,
+  RollResult,
+} from "./model.ts";
 import { isChoiceAvailable } from "./state.ts";
 
 export function renderPassage(
   adventure: Adventure,
   state: GameState,
   roll?: RollResult,
+  combat?: CombatRoundResult,
 ): string {
   const passage = createPassageMap(adventure.passages).get(state.currentPassageId);
   if (!passage) {
     return `<section class="notice" data-tone="danger" role="alert"><div class="notice-body">Current passage could not be found.</div></section>`;
   }
 
-  return renderPassagePanel(passage, state, roll);
+  return renderPassagePanel(passage, state, roll, combat);
 }
 
 function renderPassagePanel(
   passage: Passage,
   state: GameState,
   roll?: RollResult,
+  combat?: CombatRoundResult,
 ): string {
   const availableChoices = passage.choices.filter((choice) =>
     isChoiceAvailable(choice, state)
@@ -53,14 +61,24 @@ function renderPassagePanel(
       <p>${escapeHtml(passage.body)}</p>
       ${renderStateSummary(state)}
       ${roll ? renderRollSummary(roll) : ""}
+      ${combat ? renderCombatSummary(combat) : ""}
       ${choices}
     </article>
+  </section>`;
+}
+
+function renderCombatSummary(combat: CombatRoundResult): string {
+  const tone = combat.outcome === "victory" ? "success" : "info";
+  return `<section class="notice" data-tone="${tone}" role="status">
+    <h2>Combat round</h2>
+    <div class="notice-body">${escapeHtml(combat.log.join(" "))}</div>
   </section>`;
 }
 
 function renderStateSummary(state: GameState): string {
   return `<dl class="metadata-list">
     <div class="metadata-list-row"><dt>Class</dt><dd>${escapeHtml(state.character.class)}</dd></div>
+    <div class="metadata-list-row"><dt>Ancestry</dt><dd>${escapeHtml(state.character.race)}</dd></div>
     <div class="metadata-list-row"><dt>HP</dt><dd>${state.hitPoints}/${
     state.character.maxHitPoints
   }</dd></div>
@@ -95,4 +113,3 @@ function escapeHtml(value: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 }
-

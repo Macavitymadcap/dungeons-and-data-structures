@@ -17,3 +17,7 @@ Use this log to record major planning, research, manuscript, and gamebook implem
 - Added a static build that outputs `dist/index.html`, `dist/gamebook/index.html`, `dist/assets/client.js`, and `dist/assets/hyper-dank-ui.css`.
 - Added a browser client for the static build that continues saved localStorage games, starts a new game with a visible class selector, resets saved progress, applies choices, and re-renders passages with the shared gamebook mechanics.
 - Replaced the ad hoc verifier with Hyper-Dank automation gates: TypeScript typecheck, Bun unit tests, static build, static artifact smoke checks, and Playwright static browser smoke.
+- Added the first combat layer: encounter definitions, character attack profiles, damage rolls, one-round combat resolution, encounter state updates, combat summaries, and combat wiring for the door guardian and ember statue passages.
+- Extended verification so unit, route, and static browser tests cover the combat path through the door guardian.
+- Added SRD-safe ancestry/race selection to character creation with Human, Elf, Dwarf, and Halfling options, including small ability, skill, inventory, and hit point effects.
+- Added save-load migration for earlier localStorage saves, deeper character validation, and defeated-encounter handling so the combat layer can evolve without silently discarding progress.

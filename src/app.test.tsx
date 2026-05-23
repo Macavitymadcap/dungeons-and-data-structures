@@ -17,7 +17,7 @@ describe("createApp", () => {
     const app = createApp({
       now: () => new Date("2026-05-23T12:00:00.000Z"),
     });
-    const response = await app.request("/gamebook?class=rogue");
+    const response = await app.request("/gamebook?class=rogue&race=elf");
     const html = await response.text();
 
     expect(response.status).toBe(200);
@@ -25,6 +25,7 @@ describe("createApp", () => {
     expect(html).toContain("Entrance And Guardian");
     expect(html).toContain("Slip past the guard");
     expect(html).toContain("<dd>rogue</dd>");
+    expect(html).toContain("<dd>elf</dd>");
   });
 
   test("choice post returns the next passage fragment", async () => {
@@ -51,7 +52,41 @@ describe("createApp", () => {
 
     expect(response.status).toBe(200);
     expect(html).toContain("Guardian Clash");
-    expect(html).toContain("Resolve the clash and enter");
+    expect(html).toContain("Trade blows with the guardian");
+  });
+
+  test("combat choice returns combat summary and updates encounter state", async () => {
+    const app = createApp({
+      now: () => new Date("2026-05-23T12:00:00.000Z"),
+      random: sequence([0.95, 0.5]),
+    });
+    const character = createCharacter("hero-1", "Adventurer", "fighter");
+    const state = {
+      ...createInitialState(
+        mtGraphnorAdventure,
+        character,
+        new Date("2026-05-23T12:00:00.000Z"),
+      ),
+      currentPassageId: "guardian-clash",
+    };
+    const body = new URLSearchParams({
+      state: JSON.stringify(state),
+    });
+
+    const response = await app.request("/gamebook/choices/win-guardian", {
+      method: "POST",
+      body,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    const html = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(html).toContain("Keyboard Room");
+    expect(html).toContain("Combat round");
+    expect(html).toContain("Door Guardian is defeated.");
+    expect(html).toContain("&quot;defeated&quot;:true");
   });
 
   test("gated choices are rejected when requirements are missing", async () => {
@@ -83,3 +118,6 @@ describe("createApp", () => {
   });
 });
 
+function sequence(values: number[]) {
+  return () => values.shift() ?? 0;
+}

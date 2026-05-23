@@ -23,6 +23,8 @@ export type Skill =
 
 export type CharacterClass = "fighter" | "rogue" | "wizard" | "cleric";
 
+export type CharacterRace = "human" | "elf" | "dwarf" | "halfling";
+
 export type EndingKind = "victory" | "failure" | "retreat" | "cliffhanger";
 
 export type PassageTag =
@@ -44,6 +46,7 @@ export interface Adventure {
   title: string;
   startPassageId: PassageId;
   passages: Passage[];
+  encounters?: Encounter[];
   attribution: string[];
 }
 
@@ -62,8 +65,16 @@ export interface Choice {
   text: string;
   targetId?: PassageId;
   check?: CheckDefinition;
+  combat?: CombatChoiceDefinition;
   requires?: ChoiceRequirement;
   effects?: ChoiceEffect;
+}
+
+export interface CombatChoiceDefinition {
+  encounterId: string;
+  onVictory: PassageId;
+  onDefeat: PassageId;
+  onContinue: PassageId;
 }
 
 export interface CheckDefinition {
@@ -95,6 +106,7 @@ export interface Character {
   id: string;
   name: string;
   class: CharacterClass;
+  race: CharacterRace;
   level: number;
   abilityScores: Record<Ability, number>;
   maxHitPoints: number;
@@ -102,6 +114,28 @@ export interface Character {
   proficiencyBonus: number;
   skillProficiencies: Skill[];
   inventory: string[];
+  attack: AttackProfile;
+}
+
+export interface AttackProfile {
+  name: string;
+  attackBonus: number;
+  damage: DamageRoll;
+}
+
+export interface DamageRoll {
+  dice: number;
+  sides: number;
+  modifier: number;
+  type: string;
+}
+
+export interface Encounter {
+  id: string;
+  name: string;
+  armourClass: number;
+  hitPoints: number;
+  attack: AttackProfile;
 }
 
 export interface GameState {
@@ -116,7 +150,13 @@ export interface GameState {
   inventory: string[];
   flags: string[];
   log: GameLogEntry[];
+  encounters: Record<string, EncounterState>;
   updatedAt: string;
+}
+
+export interface EncounterState {
+  hitPoints: number;
+  defeated: boolean;
 }
 
 export interface GameLogEntry {
@@ -135,4 +175,24 @@ export interface RollResult {
   success?: boolean;
   mode: RollMode;
   reason?: string;
+}
+
+export interface DamageRollResult {
+  notation: string;
+  rolls: number[];
+  modifier: number;
+  total: number;
+  type: string;
+}
+
+export interface CombatRoundResult {
+  encounterId: string;
+  playerAttack: RollResult;
+  playerDamage?: DamageRollResult;
+  monsterAttack?: RollResult;
+  monsterDamage?: DamageRollResult;
+  monsterHitPoints: number;
+  playerHitPoints: number;
+  outcome: "victory" | "defeat" | "continue";
+  log: string[];
 }

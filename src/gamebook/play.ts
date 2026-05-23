@@ -3,15 +3,23 @@ import {
   skillModifier,
 } from "./rules/character.ts";
 import { rollD20Check } from "./rules/dice.ts";
+import { applyCombatRound, resolveCombatRound } from "./rules/combat.ts";
 import {
   appendLog,
   applyChoiceEffects,
   isChoiceAvailable,
   moveToPassage,
 } from "./state.ts";
-import { Choice, GameState, RollResult } from "./model.ts";
+import {
+  Adventure,
+  Choice,
+  CombatRoundResult,
+  GameState,
+  RollResult,
+} from "./model.ts";
 
 export interface ResolveChoiceOptions {
+  adventure?: Adventure;
   now?: () => Date;
   random?: () => number;
 }
@@ -19,6 +27,7 @@ export interface ResolveChoiceOptions {
 export interface ResolveChoiceResult {
   state: GameState;
   roll?: RollResult;
+  combat?: CombatRoundResult;
   error?: string;
 }
 
@@ -37,8 +46,39 @@ export function resolveChoice(
   let nextPassageId = choice.targetId;
   let nextState = applyChoiceEffects(state, choice.effects, now());
   let roll: RollResult | undefined;
+  let combat: CombatRoundResult | undefined;
 
-  if (choice.check) {
+  if (choice.combat) {
+    const encounter = options.adventure?.encounters?.find((item) =>
+      item.id === choice.combat?.encounterId
+    );
+    if (!encounter) {
+      return { state, error: `Encounter ${choice.combat.encounterId} was not found.` };
+    }
+    if (nextState.encounters[encounter.id]?.defeated) {
+      nextState = appendLog(nextState, `${encounter.name} has already been defeated.`, now());
+      nextPassageId = choice.combat.onVictory;
+      return {
+        state: moveToPassage(nextState, nextPassageId, now()),
+      };
+    }
+
+    combat = resolveCombatRound({
+      encounter,
+      state: nextState,
+      rng: random,
+    });
+    nextState = applyCombatRound(nextState, combat);
+    nextState = combat.log.reduce(
+      (currentState, message) => appendLog(currentState, message, now()),
+      nextState,
+    );
+    nextPassageId = combat.outcome === "victory"
+      ? choice.combat.onVictory
+      : combat.outcome === "defeat"
+      ? choice.combat.onDefeat
+      : choice.combat.onContinue;
+  } else if (choice.check) {
     const modifier = choice.check.skill
       ? skillModifier(nextState.character, choice.check.ability, choice.check.skill)
       : abilityModifier(nextState.character.abilityScores[choice.check.ability]);
@@ -68,6 +108,6 @@ export function resolveChoice(
   return {
     state: moveToPassage(nextState, nextPassageId, now()),
     roll,
+    combat,
   };
 }
-

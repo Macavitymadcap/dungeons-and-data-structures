@@ -77,6 +77,66 @@ test("save and load round-trip through a storage adapter", () => {
   }
 });
 
+test("load upgrades earlier saves with missing ancestry and encounter state", () => {
+  const storage = new MemoryStorage();
+  const character = createCharacter("hero-1", "Ash", "rogue");
+  const oldSave = createInitialState(mtGraphnorAdventure, character);
+  const { encounters: _encounters, character: _character, ...saveWithoutEncounters } =
+    oldSave;
+
+  storage.setItem(
+    "dads-gamebook-save",
+    JSON.stringify({
+      ...saveWithoutEncounters,
+      character: {
+        id: character.id,
+        name: character.name,
+        class: character.class,
+        level: character.level,
+        abilityScores: character.abilityScores,
+        maxHitPoints: character.maxHitPoints,
+        armourClass: character.armourClass,
+        proficiencyBonus: character.proficiencyBonus,
+        skillProficiencies: character.skillProficiencies,
+        inventory: character.inventory,
+      },
+    }),
+  );
+
+  const result = loadGame(storage, "dads-gamebook-save", mtGraphnorAdventure);
+
+  expect(result.ok).toBe(true);
+  if (result.ok) {
+    expect(result.state.character.race).toBe("human");
+    expect(result.state.character.attack.name).toBe("Shortsword");
+    expect(result.state.encounters["door-guardian"]).toEqual({
+      hitPoints: 6,
+      defeated: false,
+    });
+  }
+});
+
+test("load rejects saves with invalid character classes", () => {
+  const storage = new MemoryStorage();
+  const character = createCharacter("hero-1", "Ash", "cleric");
+  const state = createInitialState(mtGraphnorAdventure, character);
+
+  storage.setItem(
+    "dads-gamebook-save",
+    JSON.stringify({
+      ...state,
+      character: { ...state.character, class: "bard" },
+    }),
+  );
+
+  const result = loadGame(storage, "dads-gamebook-save", mtGraphnorAdventure);
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) {
+    expect(result.error).toBe("Saved game character is not valid.");
+  }
+});
+
 test("invalid save JSON is rejected with a readable error", () => {
   const storage = new MemoryStorage();
   storage.setItem("dads-gamebook-save", "{nope");
@@ -112,4 +172,3 @@ class MemoryStorage implements StorageAdapter {
     this.#values.delete(key);
   }
 }
-
