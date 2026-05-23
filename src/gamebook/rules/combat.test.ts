@@ -53,6 +53,23 @@ test("combat can defeat the player", () => {
   expect(result.playerHitPoints).toBe(0);
 });
 
+test("combat damage consumes temporary hit points first", () => {
+  const state = {
+    ...testState({ hitPoints: 12, monsterHitPoints: 6 }),
+    temporaryHitPoints: 3,
+  };
+  const rolls = sequence([0, 0.95, 0.5]);
+
+  const result = resolveCombatRound({ encounter, state, rng: rolls });
+  const updated = applyCombatRound(state, result);
+
+  expect(result.outcome).toBe("continue");
+  expect(result.playerHitPoints).toBe(11);
+  expect(result.playerTemporaryHitPoints).toBe(0);
+  expect(updated.hitPoints).toBe(11);
+  expect(updated.temporaryHitPoints).toBe(0);
+});
+
 test("combat round updates state encounter and player hit points", () => {
   const state = testState({ hitPoints: 12, monsterHitPoints: 6 });
   const result = resolveCombatRound({

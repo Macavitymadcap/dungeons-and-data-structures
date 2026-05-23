@@ -645,7 +645,7 @@ function StateSummary(props: { adventure: Adventure; state: GameState }) {
         { label: "Ancestry", value: props.state.character.race },
         {
           label: "HP",
-          value: `${props.state.hitPoints}/${props.state.character.maxHitPoints}`,
+          value: hitPointSummary(props.state),
         },
         {
           label: "Conditions",
@@ -659,6 +659,13 @@ function StateSummary(props: { adventure: Adventure; state: GameState }) {
       ]}
     />
   );
+}
+
+function hitPointSummary(state: GameState): string {
+  const summary = `${state.hitPoints}/${state.character.maxHitPoints}`;
+  return state.temporaryHitPoints > 0
+    ? `${summary} (+${state.temporaryHitPoints} temp)`
+    : summary;
 }
 
 function RollSummary(props: { roll: RollResult }) {

@@ -118,6 +118,7 @@ export interface ChoiceEffect {
   removeItems?: string[];
   damage?: number;
   heal?: number;
+  temporaryHitPoints?: number;
 }
 
 export interface Character {
@@ -213,6 +214,7 @@ export interface CombatRoundResult {
   monsterDamage?: DamageRollResult;
   monsterHitPoints: number;
   playerHitPoints: number;
+  playerTemporaryHitPoints?: number;
   outcome: "victory" | "defeat" | "continue";
   log: string[];
 }

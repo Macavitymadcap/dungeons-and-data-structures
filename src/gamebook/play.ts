@@ -129,11 +129,22 @@ function describeChoiceEffects(
 
   const messages: string[] = [];
   const hitPointChange = after.hitPoints - before.hitPoints;
+  const temporaryHitPointChange = after.temporaryHitPoints - before.temporaryHitPoints;
   if (hitPointChange > 0) {
     messages.push(`Recovered ${hitPointChange} ${plural("hit point", hitPointChange)}.`);
   } else if (hitPointChange < 0) {
     const lost = Math.abs(hitPointChange);
     messages.push(`Lost ${lost} ${plural("hit point", lost)}.`);
+  }
+  if (temporaryHitPointChange > 0) {
+    messages.push(
+      `Gained ${temporaryHitPointChange} temporary ${
+        plural("hit point", temporaryHitPointChange)
+      }.`,
+    );
+  } else if (temporaryHitPointChange < 0 && hitPointChange === 0) {
+    const lost = Math.abs(temporaryHitPointChange);
+    messages.push(`Lost ${lost} temporary ${plural("hit point", lost)}.`);
   }
 
   for (const item of effects.removeItems ?? []) {

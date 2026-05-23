@@ -4,6 +4,7 @@ import {
   EncounterState,
   GameState,
 } from "../model.ts";
+import { applyDamage } from "../state.ts";
 import { RandomSource, rollD20Check, rollDamage } from "./dice.ts";
 
 export interface ResolveCombatRoundInput {
@@ -63,10 +64,17 @@ export function resolveCombatRound({
   });
 
   let playerHitPoints = state.hitPoints;
+  let playerTemporaryHitPoints = state.temporaryHitPoints;
   let monsterDamage;
   if (monsterAttack.success) {
     monsterDamage = rollDamage(encounter.attack.damage, rng);
-    playerHitPoints = Math.max(0, playerHitPoints - monsterDamage.total);
+    const damaged = applyDamage(
+      playerHitPoints,
+      playerTemporaryHitPoints,
+      monsterDamage.total,
+    );
+    playerHitPoints = damaged.hitPoints;
+    playerTemporaryHitPoints = damaged.temporaryHitPoints;
     log.push(
       `${encounter.name}'s ${encounter.attack.name} hits for ${monsterDamage.total} ${monsterDamage.type} damage.`,
     );
@@ -82,6 +90,7 @@ export function resolveCombatRound({
     monsterAttack,
     monsterDamage,
     monsterHitPoints,
+    playerTemporaryHitPoints,
     playerHitPoints,
     outcome: playerHitPoints <= 0 ? "defeat" : "continue",
     log,
@@ -95,6 +104,7 @@ export function applyCombatRound(
   return {
     ...state,
     hitPoints: result.playerHitPoints,
+    temporaryHitPoints: result.playerTemporaryHitPoints ?? state.temporaryHitPoints,
     encounters: {
       ...state.encounters,
       [result.encounterId]: {

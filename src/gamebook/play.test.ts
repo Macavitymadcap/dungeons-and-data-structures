@@ -102,3 +102,32 @@ test("condition effects append readable state-transition log entries", () => {
   expect(messages).toContain("Condition gained: focused.");
   expect(messages).toContain("Condition cleared: rattled.");
 });
+
+test("temporary hit point effects append readable state-transition log entries", () => {
+  const character = createCharacter("hero-1", "Ash", "cleric");
+  const state = {
+    ...createInitialState(mtGraphnorAdventure, character),
+    currentPassageId: "trap-hall",
+  };
+  const result = resolveChoice(
+    state,
+    {
+      id: "ward-yourself",
+      text: "Ward yourself",
+      targetId: "trap-hall",
+      effects: {
+        temporaryHitPoints: 3,
+      },
+    },
+    {
+      adventure: mtGraphnorAdventure,
+      now: () => new Date("2026-05-23T12:00:00.000Z"),
+    },
+  );
+
+  expect(result.error).toBeUndefined();
+  expect(result.state.temporaryHitPoints).toBe(3);
+  expect(result.state.log.map((entry) => entry.message)).toContain(
+    "Gained 3 temporary hit points.",
+  );
+});

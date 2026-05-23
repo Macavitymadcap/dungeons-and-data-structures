@@ -3,6 +3,7 @@ import { mtGraphnorAdventure } from "./content/mt-graphnor.ts";
 import { createCharacter } from "./rules/character.ts";
 import {
   applyChoiceEffects,
+  applyDamage,
   createInitialState,
   isChoiceAvailable,
   loadGame,
@@ -106,6 +107,33 @@ test("choice effects update inventory, flags, hit points, and timestamp", () => 
   expect(updated.updatedAt).toBe("2026-05-23T12:01:00.000Z");
 });
 
+test("choice damage consumes temporary hit points first", () => {
+  const character = createCharacter("hero-1", "Ash", "fighter");
+  const state = {
+    ...createInitialState(mtGraphnorAdventure, character),
+    temporaryHitPoints: 3,
+  };
+  const updated = applyChoiceEffects(state, {
+    damage: 5,
+  });
+
+  expect(updated.temporaryHitPoints).toBe(0);
+  expect(updated.hitPoints).toBe(character.maxHitPoints - 2);
+});
+
+test("choice effects keep the larger temporary hit point pool", () => {
+  const character = createCharacter("hero-1", "Ash", "cleric");
+  const state = {
+    ...createInitialState(mtGraphnorAdventure, character),
+    temporaryHitPoints: 4,
+  };
+
+  expect(applyChoiceEffects(state, { temporaryHitPoints: 2 }).temporaryHitPoints)
+    .toBe(4);
+  expect(applyChoiceEffects(state, { temporaryHitPoints: 6 }).temporaryHitPoints)
+    .toBe(6);
+});
+
 test("choice effects add and remove conditions", () => {
   const character = createCharacter("hero-1", "Ash", "cleric");
   const state = {
@@ -118,6 +146,17 @@ test("choice effects add and remove conditions", () => {
   });
 
   expect(updated.conditions).toEqual(["blessed"]);
+});
+
+test("applyDamage subtracts temporary hit points before hit points", () => {
+  expect(applyDamage(10, 4, 3)).toEqual({
+    hitPoints: 10,
+    temporaryHitPoints: 1,
+  });
+  expect(applyDamage(10, 4, 7)).toEqual({
+    hitPoints: 7,
+    temporaryHitPoints: 0,
+  });
 });
 
 test("save and load round-trip through a storage adapter", () => {

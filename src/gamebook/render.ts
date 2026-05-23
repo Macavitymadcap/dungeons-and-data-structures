@@ -142,9 +142,7 @@ function renderStateSummary(adventure: Adventure, state: GameState): string {
   return `<dl class="metadata-list">
     <div class="metadata-list-row"><dt>Class</dt><dd>${escapeHtml(state.character.class)}</dd></div>
     <div class="metadata-list-row"><dt>Ancestry</dt><dd>${escapeHtml(state.character.race)}</dd></div>
-    <div class="metadata-list-row"><dt>HP</dt><dd>${state.hitPoints}/${
-    state.character.maxHitPoints
-  }</dd></div>
+    <div class="metadata-list-row"><dt>HP</dt><dd>${escapeHtml(hitPointSummary(state))}</dd></div>
     <div class="metadata-list-row"><dt>Conditions</dt><dd>${
     escapeHtml(state.conditions.join(", ") || "None")
   }</dd></div>
@@ -155,6 +153,13 @@ function renderStateSummary(adventure: Adventure, state: GameState): string {
     escapeHtml(discoveryList(adventure, state.flags))
   }</dd></div>
   </dl>`;
+}
+
+function hitPointSummary(state: GameState): string {
+  const summary = `${state.hitPoints}/${state.character.maxHitPoints}`;
+  return state.temporaryHitPoints > 0
+    ? `${summary} (+${state.temporaryHitPoints} temp)`
+    : summary;
 }
 
 function renderRollSummary(roll: RollResult): string {

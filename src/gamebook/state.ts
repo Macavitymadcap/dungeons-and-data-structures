@@ -98,15 +98,24 @@ export function applyChoiceEffects(
     conditions.delete(condition);
   }
 
-  const damagedHitPoints = Math.max(0, state.hitPoints - (effects.damage ?? 0));
+  const damaged = applyDamage(
+    state.hitPoints,
+    state.temporaryHitPoints,
+    effects.damage ?? 0,
+  );
   const hitPoints = Math.min(
     state.character.maxHitPoints,
-    damagedHitPoints + (effects.heal ?? 0),
+    damaged.hitPoints + (effects.heal ?? 0),
+  );
+  const temporaryHitPoints = Math.max(
+    damaged.temporaryHitPoints,
+    effects.temporaryHitPoints ?? 0,
   );
 
   return {
     ...state,
     hitPoints,
+    temporaryHitPoints,
     conditions: [...conditions],
     inventory: [...inventory],
     flags: [...flags],
@@ -178,6 +187,21 @@ export function parseGame(
 
 export function resetGame(storage: StorageAdapter, key = SAVE_KEY): void {
   storage.removeItem(key);
+}
+
+export function applyDamage(
+  hitPoints: number,
+  temporaryHitPoints: number,
+  damage: number,
+): { hitPoints: number; temporaryHitPoints: number } {
+  const incomingDamage = Math.max(0, damage);
+  const remainingTemporaryHitPoints = Math.max(0, temporaryHitPoints - incomingDamage);
+  const overflowDamage = Math.max(0, incomingDamage - temporaryHitPoints);
+
+  return {
+    hitPoints: Math.max(0, hitPoints - overflowDamage),
+    temporaryHitPoints: remainingTemporaryHitPoints,
+  };
 }
 
 function requirementsMet(
