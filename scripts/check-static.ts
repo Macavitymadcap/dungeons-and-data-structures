@@ -39,9 +39,15 @@ const checked = await smokeStaticSite({
 });
 
 const gamebookHtml = await readFile("dist/gamebook/index.html", "utf8");
+const clientJs = await readFile("dist/assets/client.js", "utf8");
 for (const forbidden of ["Debug state", "gamebook-force-passage", "authorMode"]) {
-  if (gamebookHtml.includes(forbidden)) {
-    throw new Error(`Published gamebook HTML included development-only text: ${forbidden}`);
+  for (const [label, content] of [
+    ["gamebook HTML", gamebookHtml],
+    ["client bundle", clientJs],
+  ] as const) {
+    if (content.includes(forbidden)) {
+      throw new Error(`Published ${label} included development-only text: ${forbidden}`);
+    }
   }
 }
 

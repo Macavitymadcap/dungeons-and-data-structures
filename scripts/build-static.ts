@@ -13,7 +13,7 @@ await cp(
   `${outDir}/assets/hyper-dank-ui.css`,
 );
 await Bun.build({
-  entrypoints: ["src/gamebook/client.ts"],
+  entrypoints: ["src/gamebook/player-client.ts"],
   minify: true,
   outdir: `${outDir}/assets`,
   target: "browser",
@@ -24,5 +24,10 @@ const gamebookHtml = await gamebookResponse.text();
 
 await writeFile(`${outDir}/index.html`, gamebookHtml);
 await writeFile(`${outDir}/gamebook/index.html`, gamebookHtml);
+await Bun.write(
+  `${outDir}/assets/client.js`,
+  Bun.file(`${outDir}/assets/player-client.js`),
+);
+await rm(`${outDir}/assets/player-client.js`);
 
 console.log(`Built static gamebook to ${outDir}/`);
