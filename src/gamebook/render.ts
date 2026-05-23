@@ -70,28 +70,33 @@ function renderPassagePanel(
     escapeHtml(passage.id)
   }-title">
     <article data-passage-id="${escapeHtml(passage.id)}">
-      <div class="gamebook-passage-kicker">${
+      <div class="gamebook-passage-layout">
+        <section class="gamebook-story-column" aria-labelledby="${escapeHtml(passage.id)}-title">
+          <div class="gamebook-passage-kicker">${
     (passage.tags ?? []).slice(0, 3).map((tag) => `<span class="badge">${escapeHtml(tag)}</span>`)
       .join("")
   }</div>
-      <h2 id="${escapeHtml(passage.id)}-title">${escapeHtml(passage.title)}</h2>
-      <p>${escapeHtml(passage.body)}</p>
-      ${renderStateStrip(state)}
-      ${renderCharacterSheet(adventure, state)}
-      ${passage.encounterId ? renderEncounterStatus(adventure, passage.encounterId, state) : ""}
-      ${roll ? renderRollSummary(roll) : ""}
-      ${combat ? renderCombatSummary(combat) : ""}
-      ${renderActionLog(state)}
-      ${authorMode ? renderDebugPanel(adventure, state) : ""}
-      ${choices}
+          <h2 id="${escapeHtml(passage.id)}-title">${escapeHtml(passage.title)}</h2>
+          <p>${escapeHtml(passage.body)}</p>
+          ${choices}
+        </section>
+        <aside class="gamebook-side-rail" aria-label="Character and play details">
+          ${renderStateStrip(state)}
+          ${renderCharacterSheet(adventure, state)}
+          ${passage.encounterId ? renderEncounterStatus(adventure, passage.encounterId, state) : ""}
+          ${roll || combat ? renderActionDetails(roll, combat) : ""}
+          ${renderActionLog(state)}
+          ${authorMode ? renderDebugPanel(adventure, state) : ""}
+        </aside>
+      </div>
     </article>
   </section>`;
 }
 
 function renderDebugPanel(adventure: Adventure, state: GameState): string {
-  return `<details class="gamebook-popover gamebook-debug-popover" data-author-debug="true">
+  return `<details class="gamebook-details-card gamebook-debug-panel" data-author-debug="true">
     <summary class="button" data-size="compact" data-variant="ghost">Debug</summary>
-    <section class="gamebook-popover-panel" aria-labelledby="debug-state-title">
+    <section class="gamebook-details-body" aria-labelledby="debug-state-title">
     <h2 id="debug-state-title">Debug state</h2>
     <dl class="metadata-list">
       <div class="metadata-list-row"><dt>Passage ID</dt><dd>${escapeHtml(state.currentPassageId)}</dd></div>
@@ -184,9 +189,9 @@ function renderStateStrip(state: GameState): string {
 
 function renderCharacterSheet(adventure: Adventure, state: GameState): string {
   const character = state.character;
-  return `<details class="gamebook-popover">
-    <summary class="button" data-size="compact" data-variant="ghost">Character</summary>
-    <div class="gamebook-popover-panel" role="group" aria-label="Character sheet">
+  return `<details class="gamebook-details-card gamebook-character-sheet">
+    <summary class="button" data-size="compact" data-variant="ghost">${iconMarkup("document")} Character</summary>
+    <div class="gamebook-details-body" role="group" aria-label="Character sheet">
       <div class="gamebook-output-grid">
         ${labelledOutput("Armour class", String(character.armourClass))}
         ${labelledOutput("Level", String(character.level))}
@@ -220,11 +225,22 @@ function renderCharacterSheet(adventure: Adventure, state: GameState): string {
   </details>`;
 }
 
+function renderActionDetails(roll?: RollResult, combat?: CombatRoundResult): string {
+  return `<details class="gamebook-details-card">
+    <summary class="button" data-size="compact" data-variant="ghost">${iconMarkup("dice")} Action details</summary>
+    <div class="gamebook-details-body">
+      ${roll ? renderRollSummary(roll) : ""}
+      ${combat ? renderCombatSummary(combat) : ""}
+    </div>
+  </details>`;
+}
+
 function renderActionLog(state: GameState): string {
   const entries = state.log.slice(-4).reverse();
-  return `<section class="gamebook-action-log" aria-labelledby="gamebook-action-log-title">
-    <h3 id="gamebook-action-log-title">Recent events</h3>
-    <ol class="timeline-list">
+  return `<details class="gamebook-details-card gamebook-action-log">
+    <summary class="button" data-size="compact" data-variant="ghost">${iconMarkup("clock")} Recent events</summary>
+    <div class="gamebook-details-body">
+      <ol class="timeline-list">
       ${
     entries.map((entry) =>
       `<li class="timeline-list-item"><div><time datetime="${escapeHtml(entry.createdAt)}">${
@@ -232,8 +248,9 @@ function renderActionLog(state: GameState): string {
       }</time><strong>${escapeHtml(entry.message)}</strong></div></li>`
     ).join("")
   }
-    </ol>
-  </section>`;
+      </ol>
+    </div>
+  </details>`;
 }
 
 function labelledOutput(label: string, value: string, meta?: string): string {
@@ -251,6 +268,15 @@ function iconMarkup(name: string): string {
 function iconSvg(name: string): string {
   if (name === "book") {
     return `<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M4 5.5c3 0 5 .7 8 2.2 3-1.5 5-2.2 8-2.2v12c-3 0-5 .7-8 2.2-3-1.5-5-2.2-8-2.2z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2"></path></svg>`;
+  }
+  if (name === "clock") {
+    return `<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"></circle><path d="M12 7.5v5l3.5 2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>`;
+  }
+  if (name === "dice") {
+    return `<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"></rect><circle cx="9" cy="9" r="1.2" fill="currentColor"></circle><circle cx="12" cy="12" r="1.2" fill="currentColor"></circle><circle cx="15" cy="15" r="1.2" fill="currentColor"></circle></svg>`;
+  }
+  if (name === "document") {
+    return `<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M7 4.5h7l3 3v12H7z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2"></path><path d="M14 4.5v3h3M9 12h6M9 15h6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>`;
   }
   return `<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.25" fill="none" stroke="currentColor" stroke-width="2.5"></circle></svg>`;
 }

@@ -522,63 +522,70 @@ function PassagePanel(props: {
   return (
     <Card as="section" className="gamebook-passage-card">
       <article data-passage-id={props.passage.id}>
-        <div className="gamebook-passage-kicker">
-          {props.passage.tags?.slice(0, 3).map((tag) => <Badge>{tag}</Badge>)}
+        <div className="gamebook-passage-layout">
+          <section className="gamebook-story-column" aria-labelledby={`${props.passage.id}-title`}>
+            <div className="gamebook-passage-kicker">
+              {props.passage.tags?.slice(0, 3).map((tag) => <Badge>{tag}</Badge>)}
+            </div>
+            <h2 id={`${props.passage.id}-title`}>{props.passage.title}</h2>
+            <p>{props.passage.body}</p>
+            {props.passage.ending
+              ? (
+                <Notice heading="Ending" tone="success">
+                  <span data-ending={props.passage.ending}>{props.passage.ending}</span>
+                </Notice>
+              )
+              : (
+                <ButtonGroup ariaLabel="Choices" className="gamebook-choice-list">
+                  {availableChoices.map((choice) => (
+                    <HxForm
+                      action={`/gamebook/choices/${choice.id}`}
+                      method="post"
+                      className="gamebook-choice"
+                      {...{
+                        "hx-post": `/gamebook/choices/${choice.id}`,
+                        "hx-target": "#gamebook-passage",
+                        "hx-swap": "innerHTML",
+                      }}
+                    >
+                      <input
+                        type="hidden"
+                        name="state"
+                        value={JSON.stringify(props.state)}
+                      />
+                      <input type="hidden" name="choiceId" value={choice.id} />
+                      {props.authorMode
+                        ? <input type="hidden" name="authorMode" value="1" />
+                        : null}
+                      <Button type="submit" variant="outline">
+                        <Icon name="book" /> {choice.text}
+                      </Button>
+                    </HxForm>
+                  ))}
+                </ButtonGroup>
+              )}
+          </section>
+          <aside className="gamebook-side-rail" aria-label="Character and play details">
+            <StateStrip state={props.state} />
+            <CharacterSheet adventure={props.adventure} state={props.state} />
+            {props.passage.encounterId
+              ? (
+                <EncounterStatus
+                  adventure={props.adventure}
+                  encounterId={props.passage.encounterId}
+                  state={props.state}
+                />
+              )
+              : null}
+            {props.roll || props.combat
+              ? <ActionDetails roll={props.roll} combat={props.combat} />
+              : null}
+            <ActionLog state={props.state} />
+            {props.authorMode
+              ? <DebugPanel adventure={props.adventure} state={props.state} />
+              : null}
+          </aside>
         </div>
-        <h2 id={`${props.passage.id}-title`}>{props.passage.title}</h2>
-        <p>{props.passage.body}</p>
-        <StateStrip state={props.state} />
-        <CharacterSheet adventure={props.adventure} state={props.state} />
-        {props.passage.encounterId
-          ? (
-            <EncounterStatus
-              adventure={props.adventure}
-              encounterId={props.passage.encounterId}
-              state={props.state}
-            />
-          )
-          : null}
-        {props.roll ? <RollSummary roll={props.roll} /> : null}
-        {props.combat ? <CombatSummary combat={props.combat} /> : null}
-        <ActionLog state={props.state} />
-        {props.authorMode
-          ? <DebugPanel adventure={props.adventure} state={props.state} />
-          : null}
-        {props.passage.ending
-          ? (
-            <Notice heading="Ending" tone="success">
-              <span data-ending={props.passage.ending}>{props.passage.ending}</span>
-            </Notice>
-          )
-          : (
-            <ButtonGroup ariaLabel="Choices" className="gamebook-choice-list">
-              {availableChoices.map((choice) => (
-                <HxForm
-                  action={`/gamebook/choices/${choice.id}`}
-                  method="post"
-                  className="gamebook-choice"
-                  {...{
-                    "hx-post": `/gamebook/choices/${choice.id}`,
-                    "hx-target": "#gamebook-passage",
-                    "hx-swap": "innerHTML",
-                  }}
-                >
-                  <input
-                    type="hidden"
-                    name="state"
-                    value={JSON.stringify(props.state)}
-                  />
-                  <input type="hidden" name="choiceId" value={choice.id} />
-                  {props.authorMode
-                    ? <input type="hidden" name="authorMode" value="1" />
-                    : null}
-                  <Button type="submit" variant="outline">
-                    <Icon name="book" /> {choice.text}
-                  </Button>
-                </HxForm>
-              ))}
-            </ButtonGroup>
-          )}
       </article>
     </Card>
   );
@@ -586,11 +593,11 @@ function PassagePanel(props: {
 
 function DebugPanel(props: { adventure: Adventure; state: GameState }) {
   return (
-    <details className="gamebook-popover gamebook-debug-popover" data-author-debug="true">
+    <details className="gamebook-details-card gamebook-debug-panel" data-author-debug="true">
       <summary className="button" data-size="compact" data-variant="ghost">
         <Icon name="database" /> Debug
       </summary>
-      <section className="gamebook-popover-panel" aria-labelledby="debug-state-title">
+      <section className="gamebook-details-body" aria-labelledby="debug-state-title">
         <h2 id="debug-state-title">Debug state</h2>
         <MetadataList
           items={[
@@ -678,6 +685,20 @@ function CombatSummary(props: { combat: CombatRoundResult }) {
   );
 }
 
+function ActionDetails(props: { roll?: RollResult; combat?: CombatRoundResult }) {
+  return (
+    <details className="gamebook-details-card">
+      <summary className="button" data-size="compact" data-variant="ghost">
+        <Icon name="dice" /> Action details
+      </summary>
+      <div className="gamebook-details-body">
+        {props.roll ? <RollSummary roll={props.roll} /> : null}
+        {props.combat ? <CombatSummary combat={props.combat} /> : null}
+      </div>
+    </details>
+  );
+}
+
 function EncounterStatus(props: {
   adventure: Adventure;
   encounterId: string;
@@ -713,11 +734,11 @@ function StateStrip(props: { state: GameState }) {
 function CharacterSheet(props: { adventure: Adventure; state: GameState }) {
   const character = props.state.character;
   return (
-    <details className="gamebook-popover">
+    <details className="gamebook-details-card gamebook-character-sheet">
       <summary className="button" data-size="compact" data-variant="ghost">
         <Icon name="document" /> Character
       </summary>
-      <div className="gamebook-popover-panel" role="group" aria-label="Character sheet">
+      <div className="gamebook-details-body" role="group" aria-label="Character sheet">
         <div className="gamebook-output-grid">
           <LabelledOutput label="Armour class" value={String(character.armourClass)} />
           <LabelledOutput label="Level" value={String(character.level)} />
@@ -761,16 +782,20 @@ function CharacterSheet(props: { adventure: Adventure; state: GameState }) {
 function ActionLog(props: { state: GameState }) {
   const entries = props.state.log.slice(-4).reverse();
   return (
-    <section className="gamebook-action-log" aria-labelledby="gamebook-action-log-title">
-      <h3 id="gamebook-action-log-title">Recent events</h3>
-      <TimelineList
-        items={entries.map((entry) => ({
-          label: entry.message,
-          time: entry.createdAt,
-          meta: shortTime(entry.createdAt),
-        }))}
-      />
-    </section>
+    <details className="gamebook-details-card gamebook-action-log">
+      <summary className="button" data-size="compact" data-variant="ghost">
+        <Icon name="clock" /> Recent events
+      </summary>
+      <div className="gamebook-details-body">
+        <TimelineList
+          items={entries.map((entry) => ({
+            label: entry.message,
+            time: entry.createdAt,
+            meta: shortTime(entry.createdAt),
+          }))}
+        />
+      </div>
+    </details>
   );
 }
 

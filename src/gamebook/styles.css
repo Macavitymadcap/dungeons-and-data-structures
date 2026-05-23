@@ -223,6 +223,23 @@ textarea {
   gap: 1rem;
 }
 
+.gamebook-passage-layout {
+  display: grid;
+  gap: 1rem;
+}
+
+.gamebook-story-column,
+.gamebook-side-rail {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.gamebook-side-rail {
+  order: 2;
+}
+
 .gamebook-passage-card h2 {
   margin: 0;
   font-size: clamp(1.65rem, 6vw, 2.5rem);
@@ -252,6 +269,37 @@ textarea {
   min-width: 0;
 }
 
+.gamebook-details-card {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.gamebook-details-card > summary {
+  width: max-content;
+  cursor: pointer;
+  list-style: none;
+}
+
+.gamebook-details-card > summary::-webkit-details-marker {
+  display: none;
+}
+
+.gamebook-details-body {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.5rem;
+  padding: 0.85rem;
+  background: var(--surface-raised);
+  box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 12%);
+}
+
+.gamebook-details-body h2,
+.gamebook-details-body h3 {
+  margin-block: 0;
+}
+
 .gamebook-choice-list {
   display: grid;
   gap: 0.65rem;
@@ -277,18 +325,6 @@ textarea {
   text-align: start;
 }
 
-.gamebook-action-log {
-  display: grid;
-  gap: 0.5rem;
-  border-block-start: 1px solid var(--border-subtle);
-  padding-block-start: 0.75rem;
-}
-
-.gamebook-action-log h3 {
-  margin: 0;
-  font-size: 1rem;
-}
-
 .gamebook-action-log .timeline-list {
   gap: 0.4rem;
   font-size: 0.95rem;
@@ -304,8 +340,20 @@ textarea {
   font-size: 0.85rem;
 }
 
-.gamebook-debug-popover .gamebook-popover-panel {
+.gamebook-debug-panel .gamebook-details-body {
   width: min(32rem, calc(100vw - 1.5rem));
+}
+
+@media (min-width: 52rem) {
+  .gamebook-passage-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+    align-items: start;
+  }
+
+  .gamebook-side-rail {
+    position: sticky;
+    top: 1rem;
+  }
 }
 
 @media (max-width: 36rem) {
@@ -333,5 +381,14 @@ textarea {
     width: 100%;
     max-height: none;
     margin-block-start: 0.5rem;
+  }
+
+  .gamebook-details-card > summary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .gamebook-debug-panel .gamebook-details-body {
+    width: 100%;
   }
 }
