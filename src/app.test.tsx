@@ -23,6 +23,9 @@ describe("createApp", () => {
     expect(response.status).toBe(200);
     expect(html).toContain("gamebook-site-header");
     expect(html).toContain("Gamebook lab");
+    expect(html).toContain('id="gamebook-theme-toggle"');
+    expect(html).toContain('data-theme-toggle=""');
+    expect(html).toContain("dads-gamebook-theme");
     expect(html).toContain('href="/gamebook/author"');
     expect(html).toContain("Mt. Graphnor");
     expect(html).toContain("Entrance And Guardian");
@@ -105,6 +108,7 @@ describe("createApp", () => {
     expect(response.status).toBe(200);
     expect(html).toContain("gamebook-site-header");
     expect(html).toContain('aria-current="page" href="/gamebook/author"');
+    expect(html).toContain('id="gamebook-theme-toggle"');
     expect(html).toContain("Author Tools");
     expect(html).toContain("role=\"tablist\"");
     expect(html).toContain("data-author-tab=\"audit\"");

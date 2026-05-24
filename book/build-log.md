@@ -45,3 +45,4 @@ Use this log to record major planning, research, manuscript, and gamebook implem
 - Added a development-only content audit tab so authors can scan passage, choice, check, combat, gate, effect, item, discovery, and ending coverage at a glance.
 - Refreshed the gamebook and authoring chrome with a Hyper-Dank-inspired site header, stronger page headers, dimensional surfaces, and clearer play/author navigation while keeping author links out of the player-only build.
 - Tightened the player passage layout with a distinct story/option structure, compact expandable encounter status, and refreshed screenshot evidence for mobile and desktop play states.
+- Added the Hyper-Dank colour-mode switch to gamebook and author headers, persisted the light/dark preference in local storage, and verified expanded mobile detail panels no longer overflow horizontally.
