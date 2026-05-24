@@ -352,7 +352,7 @@ textarea {
 
 .gamebook-author-layout {
   display: grid;
-  gap: 1rem;
+  gap: 1.5rem;
   width: min(96rem, 100%);
 }
 
@@ -384,7 +384,9 @@ textarea {
 
 @media (min-width: 64rem) {
   .gamebook-author-layout {
+    column-gap: 3rem;
     grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
+    row-gap: 1.5rem;
     align-items: start;
   }
 
