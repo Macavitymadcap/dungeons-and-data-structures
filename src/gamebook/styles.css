@@ -28,6 +28,8 @@
   --switch-thumb-travel: 1.625rem;
   --switch-track-padding: 0.1875rem;
   --switch-track-width: 3.75rem;
+  --switch-thumb-bg: #ffffff;
+  --switch-thumb-shadow: 0 0.25rem 0.75rem rgb(15 23 42 / 18%);
   --theme-transition: 180ms ease;
   --theme-text-transition: 140ms ease;
 }
@@ -54,6 +56,10 @@
   --control-depth-shadow: 0 0.4rem 0.95rem rgb(0 0 0 / 24%), inset 0 1px 0 rgb(255 255 255 / 10%);
   --control-depth-shadow-hover:
     0 0.6rem 1.2rem rgb(0 0 0 / 30%), inset 0 1px 0 rgb(255 255 255 / 14%);
+  --switch-icon-dark: #c9fff8;
+  --switch-icon-light: #d2bd62;
+  --switch-thumb-bg: #263330;
+  --switch-thumb-shadow: 0 0.25rem 0.75rem rgb(0 0 0 / 32%);
 }
 
 body {
@@ -153,31 +159,16 @@ textarea {
   height: 2rem;
   overflow: hidden;
   border: 1px solid var(--border-subtle);
-  border-radius: 999px;
+  border-radius: 0.5rem;
   padding: var(--switch-track-padding);
-  background-image: linear-gradient(110deg, #e2ece8 0%, #f6ce8a 34%, #27705c 66%, #111827 100%);
-  background-position: 0% 50%;
-  background-size: 260% 100%;
+  background-image: var(--control-depth-gradient);
   box-shadow: var(--control-depth-shadow);
   color: var(--switch-icon-dark);
   transition:
-    background-position var(--theme-transition),
     border-color var(--theme-transition),
+    box-shadow var(--theme-transition),
     color var(--theme-text-transition);
   pointer-events: none;
-}
-
-.switch-track::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(110deg, #ffffff, #fff3cd, #0d6867, #0f1514);
-  background-position: 0% 50%;
-  background-size: 260% 100%;
-  opacity: 0.48;
-  transition:
-    background-position var(--theme-transition),
-    opacity var(--theme-transition);
 }
 
 .switch-thumb {
@@ -187,12 +178,10 @@ textarea {
   z-index: 0;
   width: var(--switch-thumb-size);
   border-radius: 999px;
-  background-image: linear-gradient(135deg, #ffffff 0%, #fff1bf 45%, #1f2826 100%);
-  background-position: 0% 50%;
-  background-size: 280% 100%;
-  box-shadow: 0 0.25rem 0.75rem rgb(15 23 42 / 22%);
+  background: var(--switch-thumb-bg);
+  box-shadow: var(--switch-thumb-shadow);
   transition:
-    background-position var(--theme-transition),
+    background-color var(--theme-transition),
     box-shadow var(--theme-transition),
     transform var(--theme-transition);
 }
@@ -224,6 +213,14 @@ textarea {
   color: var(--switch-icon-light);
 }
 
+:root[data-theme="dark"] .switch-icon-light {
+  opacity: 0.62;
+}
+
+:root:not([data-theme="dark"]) .switch-icon-dark {
+  opacity: 0.62;
+}
+
 .switch-icon-light::before {
   content: "☀";
   font-size: 0.95rem;
@@ -238,18 +235,11 @@ textarea {
 
 .switch-input:checked + .switch-track,
 :root[data-theme="dark"] .switch-input[data-theme-toggle] + .switch-track {
-  background-position: 100% 50%;
-}
-
-.switch-input:checked + .switch-track::before,
-:root[data-theme="dark"] .switch-input[data-theme-toggle] + .switch-track::before {
-  background-position: 100% 50%;
-  opacity: 0.68;
+  background-image: var(--control-depth-gradient);
 }
 
 .switch-input:checked + .switch-track .switch-thumb,
 :root[data-theme="dark"] .switch-input[data-theme-toggle] + .switch-track .switch-thumb {
-  background-position: 100% 50%;
   transform: translateX(var(--switch-thumb-travel));
 }
 
