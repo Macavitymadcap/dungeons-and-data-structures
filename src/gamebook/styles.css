@@ -474,6 +474,7 @@ textarea {
   width: min(24rem, calc(100vw - 1.5rem));
   max-height: min(34rem, calc(100vh - 7rem));
   overflow: auto;
+  scroll-padding-block-start: 5.5rem;
   border: 1px solid var(--border-subtle);
   border-radius: 0.75rem;
   padding: 0.85rem;
@@ -488,6 +489,27 @@ textarea {
 .gamebook-popover-panel h2,
 .gamebook-popover-panel h3 {
   margin-block: 0;
+}
+
+.gamebook-popover-header {
+  position: sticky;
+  inset-block-start: -0.85rem;
+  z-index: 1;
+  display: grid;
+  gap: 0.15rem;
+  margin: -0.85rem -0.85rem 0;
+  border-block-end: 1px solid var(--border-subtle);
+  padding: 0.85rem;
+  background: color-mix(in oklab, var(--surface-raised) 96%, transparent);
+  box-shadow: 0 0.65rem 1rem rgb(25 33 31 / 8%);
+  backdrop-filter: blur(0.75rem);
+}
+
+.gamebook-popover-header p {
+  margin: 0;
+  color: var(--muted-fg);
+  font-size: 0.9rem;
+  font-weight: 650;
 }
 
 .gamebook-popover-panel form,
@@ -840,7 +862,8 @@ textarea {
   }
 
   .gamebook-command-bar {
-    position: static;
+    position: relative;
+    z-index: 70;
     justify-content: stretch;
   }
 
@@ -880,8 +903,9 @@ textarea {
   .gamebook-command-bar .gamebook-popover-panel {
     position: static;
     width: 100%;
-    max-height: none;
+    max-height: min(34rem, calc(100dvh - 8rem));
     margin-block-start: 0.5rem;
+    overflow: auto;
   }
 
   .gamebook-details-card > summary {

@@ -31,7 +31,7 @@ try {
   await expectText(page.locator("[data-passage-id] .gamebook-story-column > h2"), "Entrance And Guardian");
   await expectText(page.locator("#gamebook-save-status"), "Started a new game.");
 
-  await page.getByText("Settings").click();
+  await page.locator(".gamebook-command-bar summary").click();
   await page.selectOption("#gamebook-class", "rogue");
   await page.selectOption("#gamebook-race", "elf");
   await page.getByRole("button", { name: "New game" }).click();
@@ -63,7 +63,7 @@ try {
   await expectText(page.locator("[data-save-current-passage]"), "keyboard-room-clue");
   await expectText(page.locator("[data-save-version]"), "2");
 
-  await page.getByText("Settings").click();
+  await page.locator(".gamebook-command-bar summary").click();
   await page.getByRole("button", { name: "Export" }).click();
   const exportedSave = await page.locator("#gamebook-save-json").inputValue();
   if (!exportedSave.includes('"currentPassageId": "keyboard-room-clue"')) {
@@ -82,7 +82,7 @@ try {
   }
   await expectText(page.locator("[data-save-current-passage]"), "entrance");
 
-  await page.getByText("Settings").click();
+  await page.locator(".gamebook-command-bar summary").click();
   await page.getByRole("button", { name: "Import" }).click();
   await expectText(page.locator("[data-passage-id] .gamebook-story-column > h2"), "Keyboard Room Clue");
   await expectText(page.locator("#gamebook-save-status"), "Imported saved game.");

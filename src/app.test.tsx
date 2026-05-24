@@ -36,6 +36,8 @@ describe("createApp", () => {
     expect(html).toContain("Shortsword");
     expect(html).toContain("Thieves&#39; tools");
     expect(html).toContain("<dt>Discoveries</dt>");
+    expect(html).toContain("gamebook-popover-header");
+    expect(html).toContain("New games, local saves, and JSON import tools.");
     expect(html).toContain("Save summary");
     expect(html).toContain('data-save-current-passage=""');
     expect(html).toContain('data-save-version=""');

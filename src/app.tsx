@@ -941,6 +941,10 @@ function GameControls(props: {
           <Icon name="settings" /> Settings
         </summary>
         <div className="gamebook-popover-panel" role="group" aria-label="Game settings">
+          <div className="gamebook-popover-header">
+            <h3>Settings</h3>
+            <p>New games, local saves, and JSON import tools.</p>
+          </div>
           <h3>New game</h3>
           <Toolbar ariaLabel="Character setup controls">
             <HxForm
