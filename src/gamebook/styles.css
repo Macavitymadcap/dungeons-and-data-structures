@@ -22,14 +22,9 @@
   --control-depth-shadow-hover:
     0 0.55rem 1.1rem rgb(25 33 31 / 16%), inset 0 1px 0 rgb(255 255 255 / 82%);
   --focus-colour: #0d6867;
-  --switch-icon-dark: #1f3440;
-  --switch-icon-light: #a56516;
-  --switch-thumb-size: 1.5rem;
-  --switch-thumb-travel: 1.625rem;
-  --switch-track-padding: 0.1875rem;
-  --switch-track-width: 3.75rem;
-  --switch-thumb-bg: #ffffff;
-  --switch-thumb-shadow: 0 0.25rem 0.75rem rgb(15 23 42 / 18%);
+  --switch-track-bg: linear-gradient(110deg, #e2e8f0 0%, #bae6fd 34%, #3b82f6 66%, #1e1b4b 100%);
+  --switch-track-overlay: linear-gradient(110deg, #f8fafc, #cffafe, #2563eb, #111827);
+  --switch-thumb-bg: linear-gradient(135deg, #ffffff 0%, #e0f2fe 38%, #bfdbfe 68%, #111827 100%);
   --theme-transition: 180ms ease;
   --theme-text-transition: 140ms ease;
 }
@@ -56,10 +51,6 @@
   --control-depth-shadow: 0 0.4rem 0.95rem rgb(0 0 0 / 24%), inset 0 1px 0 rgb(255 255 255 / 10%);
   --control-depth-shadow-hover:
     0 0.6rem 1.2rem rgb(0 0 0 / 30%), inset 0 1px 0 rgb(255 255 255 / 14%);
-  --switch-icon-dark: #c9fff8;
-  --switch-icon-light: #d2bd62;
-  --switch-thumb-bg: #263330;
-  --switch-thumb-shadow: 0 0.25rem 0.75rem rgb(0 0 0 / 32%);
 }
 
 body {
@@ -155,45 +146,50 @@ textarea {
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: center;
-  width: var(--switch-track-width);
+  width: 3.75rem;
   height: 2rem;
   overflow: hidden;
   border: 1px solid var(--border-subtle);
-  border-radius: 0.5rem;
-  padding: var(--switch-track-padding);
-  background-image: var(--control-depth-gradient);
-  box-shadow: var(--control-depth-shadow);
-  color: var(--switch-icon-dark);
+  border-radius: 999px;
+  padding: 0.1875rem;
+  background-image: var(--switch-track-bg);
+  background-position: 0% 50%;
+  background-size: 260% 100%;
+  color: #0f172a;
   transition:
-    border-color var(--theme-transition),
-    box-shadow var(--theme-transition),
-    color var(--theme-text-transition);
+    background-position var(--theme-transition),
+    border-color var(--theme-transition);
   pointer-events: none;
+}
+
+.switch-track::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--switch-track-overlay);
+  background-position: 0% 50%;
+  background-size: 260% 100%;
+  opacity: 0.5;
+  transition:
+    background-position var(--theme-transition),
+    opacity var(--theme-transition);
 }
 
 .switch-thumb {
   position: absolute;
-  inset-block: var(--switch-track-padding);
-  inset-inline-start: var(--switch-track-padding);
+  inset-block: 0.1875rem;
+  inset-inline-start: 0.1875rem;
   z-index: 0;
-  width: var(--switch-thumb-size);
+  width: 1.5rem;
   border-radius: 999px;
-  background: var(--switch-thumb-bg);
-  box-shadow: var(--switch-thumb-shadow);
+  background-image: var(--switch-thumb-bg);
+  background-position: 0% 50%;
+  background-size: 280% 100%;
+  box-shadow: 0 0.25rem 0.75rem rgb(15 23 42 / 22%);
   transition:
-    background-color var(--theme-transition),
+    background-position var(--theme-transition),
     box-shadow var(--theme-transition),
     transform var(--theme-transition);
-}
-
-.switch-thumb::before {
-  content: "";
-  position: absolute;
-  inset: 0.25rem;
-  border-radius: inherit;
-  background: radial-gradient(circle, rgb(255 255 255 / 70%), transparent 62%);
-  opacity: 0.82;
-  transition: opacity var(--theme-transition);
 }
 
 .switch-icon {
@@ -203,49 +199,30 @@ textarea {
   place-items: center;
   width: 1.5rem;
   height: 1.5rem;
-  overflow: hidden;
-  color: var(--switch-icon-dark);
-  font-size: 0;
-  transition: color var(--theme-text-transition);
-}
-
-.switch-icon-light {
-  color: var(--switch-icon-light);
-}
-
-:root[data-theme="dark"] .switch-icon-light {
-  opacity: 0.62;
-}
-
-:root:not([data-theme="dark"]) .switch-icon-dark {
-  opacity: 0.62;
-}
-
-.switch-icon-light::before {
-  content: "☀";
+  font-family: ui-sans-serif, system-ui, sans-serif;
   font-size: 0.95rem;
   line-height: 1;
 }
 
-.switch-icon-dark::before {
-  content: "☾";
-  font-size: 1rem;
-  line-height: 1;
+.switch-icon-dark {
+  color: #dbeafe;
 }
 
 .switch-input:checked + .switch-track,
 :root[data-theme="dark"] .switch-input[data-theme-toggle] + .switch-track {
-  background-image: var(--control-depth-gradient);
+  background-position: 100% 50%;
+}
+
+.switch-input:checked + .switch-track::before,
+:root[data-theme="dark"] .switch-input[data-theme-toggle] + .switch-track::before {
+  background-position: 100% 50%;
+  opacity: 0.7;
 }
 
 .switch-input:checked + .switch-track .switch-thumb,
 :root[data-theme="dark"] .switch-input[data-theme-toggle] + .switch-track .switch-thumb {
-  transform: translateX(var(--switch-thumb-travel));
-}
-
-.switch-input:checked + .switch-track .switch-thumb::before,
-:root[data-theme="dark"] .switch-input[data-theme-toggle] + .switch-track .switch-thumb::before {
-  opacity: 0.2;
+  background-position: 100% 50%;
+  transform: translateX(1.75rem);
 }
 
 .switch-input:focus-visible + .switch-track {

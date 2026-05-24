@@ -822,8 +822,9 @@ function SiteHeader(props: {
           <Switch
             id="gamebook-theme-toggle"
             label="Colour mode"
-            className="gamebook-theme-toggle"
             dataThemeToggle
+            offIcon="☀"
+            onIcon="☾"
             variant="compact"
           />
           <a
