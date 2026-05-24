@@ -21,6 +21,9 @@ describe("createApp", () => {
     const html = await response.text();
 
     expect(response.status).toBe(200);
+    expect(html).toContain("gamebook-site-header");
+    expect(html).toContain("Gamebook lab");
+    expect(html).toContain('href="/gamebook/author"');
     expect(html).toContain("Mt. Graphnor");
     expect(html).toContain("Entrance And Guardian");
     expect(html).toContain("Slip past the guard");
@@ -75,6 +78,7 @@ describe("createApp", () => {
     expect(pageHtml).not.toContain("Debug state");
     expect(pageHtml).not.toContain("gamebook-force-passage");
     expect(pageHtml).not.toContain('name="authorMode" value="1"');
+    expect(pageHtml).not.toContain('href="/gamebook/author"');
 
     const authorResponse = await app.request("/gamebook/author");
     expect(authorResponse.status).toBe(404);
@@ -98,14 +102,22 @@ describe("createApp", () => {
     const html = await response.text();
 
     expect(response.status).toBe(200);
+    expect(html).toContain("gamebook-site-header");
+    expect(html).toContain('aria-current="page" href="/gamebook/author"');
     expect(html).toContain("Author Tools");
     expect(html).toContain("role=\"tablist\"");
+    expect(html).toContain("data-author-tab=\"audit\"");
     expect(html).toContain("data-author-tab=\"graph\"");
     expect(html).toContain("data-author-tab-panel=\"previews\"");
     expect(html).toContain("Graph validation");
     expect(html).toContain("Validation passed");
     expect(html).toContain("Five-room template");
     expect(html).toContain("Template coverage passed");
+    expect(html).toContain("Content audit");
+    expect(html).toContain("Combat choices");
+    expect(html).toContain("Gated choices");
+    expect(html).toContain("State effects");
+    expect(html).toContain("victory, failure, retreat, cliffhanger");
     expect(html).toContain("room-1");
     expect(html).toContain("gamebook-mermaid-diagram mermaid");
     expect(html).toContain("Mermaid source");
