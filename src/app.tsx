@@ -798,9 +798,29 @@ function GamebookPage(props: {
               authorMode={props.authorMode}
             />
           </div>
+          <AdventureAttribution adventure={props.adventure} />
         </AppShell>
       </body>
     </html>
+  );
+}
+
+function AdventureAttribution(props: { adventure: Adventure }) {
+  if (props.adventure.attribution.length === 0) {
+    return null;
+  }
+
+  return (
+    <details className="gamebook-details-card gamebook-attribution">
+      <summary className="button" data-size="compact" data-variant="ghost">
+        <Icon name="document" /> Attribution
+      </summary>
+      <div className="gamebook-details-body">
+        <ul>
+          {props.adventure.attribution.map((item) => <li>{item}</li>)}
+        </ul>
+      </div>
+    </details>
   );
 }
 

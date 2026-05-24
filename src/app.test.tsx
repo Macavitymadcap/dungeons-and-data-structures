@@ -35,6 +35,7 @@ describe("createApp", () => {
     expect(html).toContain('<output class="labelled-output-value">elf</output>');
     expect(html).toContain("Shortsword");
     expect(html).toContain("Thieves&#39; tools");
+    expect(html).toContain("Dungeons &amp; Dragons System Reference Document 5.1");
     expect(html).toContain("<dt>Discoveries</dt>");
     expect(html).toContain("gamebook-popover-header");
     expect(html).toContain("New games, local saves, and JSON import tools.");
