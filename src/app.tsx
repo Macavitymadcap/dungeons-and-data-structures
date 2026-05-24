@@ -280,82 +280,138 @@ function AuthorPage(props: {
             />
           }
         >
-          <div className="gamebook-author-layout">
-            <Panel labelledBy="author-validation-title">
-              <section aria-labelledby="author-validation-title">
-                <h2 id="author-validation-title">Graph validation</h2>
-                <MetadataList
-                  items={[
-                    { label: "Adventure", value: props.adventure.title },
-                    { label: "Passages", value: String(props.adventure.passages.length) },
-                    {
-                      label: "Reachable passages",
-                      value: String(validation.reachablePassageIds.size),
-                    },
-                    { label: "Issues", value: String(validation.issues.length) },
-                  ]}
-                />
-                <Notice
-                  heading={validation.valid ? "Validation passed" : "Validation failed"}
-                  tone={validation.valid ? "success" : "danger"}
-                >
-                  {validation.valid
-                    ? "All passages and endings are currently reachable."
-                    : "Review the issue list before publishing this adventure."}
-                </Notice>
-                {validation.issues.length > 0
-                  ? (
-                    <ul>
-                      {validation.issues.map((issue) => (
-                        <li>
-                          <strong>{issue.code}</strong>: {issue.message}
-                        </li>
-                      ))}
-                    </ul>
-                  )
-                  : null}
-              </section>
-            </Panel>
-            <Panel labelledBy="author-template-title">
-              <section aria-labelledby="author-template-title">
-                <h2 id="author-template-title">Five-room template</h2>
-                <MetadataList
-                  items={[
-                    { label: "Required rooms", value: String(FIVE_ROOM_TEMPLATE.length) },
-                    { label: "Template issues", value: String(templateIssues.length) },
-                  ]}
-                />
-                <Notice
-                  heading={templateIssues.length === 0
-                    ? "Template coverage passed"
-                    : "Template coverage failed"}
-                  tone={templateIssues.length === 0 ? "success" : "danger"}
-                >
-                  {templateIssues.length === 0
-                    ? "The adventure covers every room role and required ending for the MVP template."
-                    : "Review the missing room roles or endings before using this as the template adventure."}
-                </Notice>
-                <ul>
-                  {FIVE_ROOM_TEMPLATE.map((room) => (
-                    <li>
-                      <strong>{room.tag}</strong>: {room.title}. {room.mechanicalRole}
-                    </li>
-                  ))}
-                </ul>
-                {templateIssues.length > 0
-                  ? (
-                    <ul>
-                      {templateIssues.map((issue) => (
-                        <li>
-                          <strong>{issue.code}</strong>: {issue.message}
-                        </li>
-                      ))}
-                    </ul>
-                  )
-                  : null}
-              </section>
-            </Panel>
-            <div className="gamebook-author-mermaid-panel">
+          <div className="gamebook-author-workspace">
+            <div className="gamebook-author-tabs" role="tablist" aria-label="Author tool sections">
+              <button
+                type="button"
+                className="button"
+                data-author-tab="checks"
+                data-size="compact"
+                data-variant="ghost"
+                role="tab"
+                aria-selected="false"
+                aria-controls="author-tab-checks"
+                id="author-tab-checks-button"
+              >
+                <Icon name="check" /> Checks
+              </button>
+              <button
+                type="button"
+                className="button"
+                data-author-tab="graph"
+                data-size="compact"
+                data-variant="primary"
+                role="tab"
+                aria-selected="true"
+                aria-controls="author-tab-graph"
+                id="author-tab-graph-button"
+              >
+                <Icon name="map" /> Graph
+              </button>
+              <button
+                type="button"
+                className="button"
+                data-author-tab="previews"
+                data-size="compact"
+                data-variant="ghost"
+                role="tab"
+                aria-selected="false"
+                aria-controls="author-tab-previews"
+                id="author-tab-previews-button"
+              >
+                <Icon name="book" /> Previews
+              </button>
+            </div>
+            <div
+              className="gamebook-author-tab-panel gamebook-author-checks-grid"
+              data-author-tab-panel="checks"
+              id="author-tab-checks"
+              role="tabpanel"
+              aria-labelledby="author-tab-checks-button"
+              hidden
+            >
+              <Panel labelledBy="author-validation-title">
+                <section aria-labelledby="author-validation-title">
+                  <h2 id="author-validation-title">Graph validation</h2>
+                  <MetadataList
+                    items={[
+                      { label: "Adventure", value: props.adventure.title },
+                      { label: "Passages", value: String(props.adventure.passages.length) },
+                      {
+                        label: "Reachable passages",
+                        value: String(validation.reachablePassageIds.size),
+                      },
+                      { label: "Issues", value: String(validation.issues.length) },
+                    ]}
+                  />
+                  <Notice
+                    heading={validation.valid ? "Validation passed" : "Validation failed"}
+                    tone={validation.valid ? "success" : "danger"}
+                  >
+                    {validation.valid
+                      ? "All passages and endings are currently reachable."
+                      : "Review the issue list before publishing this adventure."}
+                  </Notice>
+                  {validation.issues.length > 0
+                    ? (
+                      <ul>
+                        {validation.issues.map((issue) => (
+                          <li>
+                            <strong>{issue.code}</strong>: {issue.message}
+                          </li>
+                        ))}
+                      </ul>
+                    )
+                    : null}
+                </section>
+              </Panel>
+              <Panel labelledBy="author-template-title">
+                <section aria-labelledby="author-template-title">
+                  <h2 id="author-template-title">Five-room template</h2>
+                  <MetadataList
+                    items={[
+                      { label: "Required rooms", value: String(FIVE_ROOM_TEMPLATE.length) },
+                      { label: "Template issues", value: String(templateIssues.length) },
+                    ]}
+                  />
+                  <Notice
+                    heading={templateIssues.length === 0
+                      ? "Template coverage passed"
+                      : "Template coverage failed"}
+                    tone={templateIssues.length === 0 ? "success" : "danger"}
+                  >
+                    {templateIssues.length === 0
+                      ? "The adventure covers every room role and required ending for the MVP template."
+                      : "Review the missing room roles or endings before using this as the template adventure."}
+                  </Notice>
+                  <ul>
+                    {FIVE_ROOM_TEMPLATE.map((room) => (
+                      <li>
+                        <strong>{room.tag}</strong>: {room.title}. {room.mechanicalRole}
+                      </li>
+                    ))}
+                  </ul>
+                  {templateIssues.length > 0
+                    ? (
+                      <ul>
+                        {templateIssues.map((issue) => (
+                          <li>
+                            <strong>{issue.code}</strong>: {issue.message}
+                          </li>
+                        ))}
+                      </ul>
+                    )
+                    : null}
+                </section>
+              </Panel>
+            </div>
+            <div
+              className="gamebook-author-tab-panel"
+              data-author-tab-panel="graph"
+              id="author-tab-graph"
+              role="tabpanel"
+              aria-labelledby="author-tab-graph-button"
+            >
               <Panel labelledBy="author-mermaid-title">
                 <section aria-labelledby="author-mermaid-title">
                   <h2 id="author-mermaid-title">Mermaid passage graph</h2>
@@ -371,7 +427,14 @@ function AuthorPage(props: {
                 </section>
               </Panel>
             </div>
-            <div className="gamebook-author-preview-panel">
+            <div
+              className="gamebook-author-tab-panel"
+              data-author-tab-panel="previews"
+              id="author-tab-previews"
+              role="tabpanel"
+              aria-labelledby="author-tab-previews-button"
+              hidden
+            >
               <Panel labelledBy="author-preview-title">
                 <section aria-labelledby="author-preview-title">
                   <h2 id="author-preview-title">Passage previews</h2>

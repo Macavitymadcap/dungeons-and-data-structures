@@ -33,6 +33,7 @@ const saveStatus = document.querySelector<HTMLElement>("#gamebook-save-status");
 const saveJson = document.querySelector<HTMLTextAreaElement>("#gamebook-save-json");
 
 renderMermaidDiagrams();
+initAuthorTabs();
 
 if (bootData && passageRoot) {
   const loaded = loadGame(storage, SAVE_KEY, bootData.adventure);
@@ -259,4 +260,32 @@ function renderMermaidDiagrams(): void {
   void mermaid.run({ nodes: diagrams }).catch((error) => {
     console.error("Could not render Mermaid diagrams.", error);
   });
+}
+
+function initAuthorTabs(): void {
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-author-tab]"));
+  const panels = Array.from(document.querySelectorAll<HTMLElement>("[data-author-tab-panel]"));
+  if (tabs.length === 0 || panels.length === 0) {
+    return;
+  }
+
+  const activate = (tabName: string) => {
+    for (const tab of tabs) {
+      const active = tab.dataset.authorTab === tabName;
+      tab.setAttribute("aria-selected", String(active));
+      tab.dataset.variant = active ? "primary" : "ghost";
+    }
+    for (const panel of panels) {
+      panel.hidden = panel.dataset.authorTabPanel !== tabName;
+    }
+  };
+
+  for (const tab of tabs) {
+    tab.addEventListener("click", () => {
+      const tabName = tab.dataset.authorTab;
+      if (tabName) {
+        activate(tabName);
+      }
+    });
+  }
 }

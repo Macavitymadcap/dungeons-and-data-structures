@@ -99,6 +99,9 @@ describe("createApp", () => {
 
     expect(response.status).toBe(200);
     expect(html).toContain("Author Tools");
+    expect(html).toContain("role=\"tablist\"");
+    expect(html).toContain("data-author-tab=\"graph\"");
+    expect(html).toContain("data-author-tab-panel=\"previews\"");
     expect(html).toContain("Graph validation");
     expect(html).toContain("Validation passed");
     expect(html).toContain("Five-room template");
