@@ -13,6 +13,7 @@ import {
   PageHeader,
   Panel,
   SelectField,
+  Switch,
   TextareaField,
   TimelineList,
   Toolbar,
@@ -59,6 +60,8 @@ export interface AppDependencies {
 }
 
 type PassageFilterValue = "all" | PassageTag | EndingKind;
+
+const THEME_STORAGE_KEY = "dads-gamebook-theme";
 
 const PASSAGE_FILTERS: { value: PassageFilterValue; label: string }[] = [
   { value: "all", label: "All" },
@@ -283,6 +286,7 @@ function AuthorPage(props: {
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Author Tools | {props.appName}</title>
+        <ThemeScript />
         <link rel="stylesheet" href="/assets/hyper-dank-ui.css" />
         <link rel="stylesheet" href="/assets/gamebook.css" />
         <script type="module" src="/assets/client.js"></script>
@@ -746,6 +750,7 @@ function GamebookPage(props: {
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>{props.adventure.title} | {props.appName}</title>
+        <ThemeScript />
         <link rel="stylesheet" href="/assets/hyper-dank-ui.css" />
         <link rel="stylesheet" href="/assets/gamebook.css" />
         <script type="module" src="/assets/client.js"></script>
@@ -814,6 +819,14 @@ function SiteHeader(props: {
           </span>
         </a>
         <div className="gamebook-site-links">
+          <Switch
+            id="gamebook-theme-toggle"
+            label="Colour mode"
+            dataThemeToggle
+            offIcon="☀"
+            onIcon="☾"
+            variant="compact"
+          />
           <a
             className="button"
             data-size="compact"
@@ -839,6 +852,78 @@ function SiteHeader(props: {
         </div>
       </nav>
     </header>
+  );
+}
+
+function ThemeScript() {
+  return (
+    <script
+      dangerouslySetInnerHTML={{
+        __html: `
+(() => {
+  const storageKey = ${JSON.stringify(THEME_STORAGE_KEY)};
+
+  const getStoredTheme = () => {
+    try {
+      return window.localStorage.getItem(storageKey);
+    } catch {
+      return null;
+    }
+  };
+
+  const storeTheme = (theme) => {
+    try {
+      window.localStorage.setItem(storageKey, theme);
+    } catch {
+    }
+  };
+
+  const getPreferredTheme = () => {
+    const stored = getStoredTheme();
+    if (stored === "light" || stored === "dark") return stored;
+
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  };
+
+  const syncToggle = (theme) => {
+    const toggle = document.querySelector("[data-theme-toggle]");
+    if (!toggle) return;
+
+    const isDark = theme === "dark";
+    toggle.checked = isDark;
+    toggle.setAttribute("aria-checked", String(isDark));
+  };
+
+  const applyTheme = (theme) => {
+    document.documentElement.dataset.theme = theme;
+    syncToggle(theme);
+  };
+
+  applyTheme(getPreferredTheme());
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const toggle = document.querySelector("[data-theme-toggle]");
+    const currentTheme = document.documentElement.dataset.theme || getPreferredTheme();
+    syncToggle(currentTheme);
+
+    toggle?.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+
+      event.preventDefault();
+      toggle.checked = !toggle.checked;
+      toggle.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+
+    toggle?.addEventListener("change", () => {
+      const nextTheme = toggle.checked ? "dark" : "light";
+      storeTheme(nextTheme);
+      applyTheme(nextTheme);
+    });
+  });
+})();
+        `,
+      }}
+    />
   );
 }
 
@@ -948,11 +1033,13 @@ function PassagePanel(props: {
       <article data-passage-id={props.passage.id}>
         <div className="gamebook-passage-layout">
           <section className="gamebook-story-column" aria-labelledby={`${props.passage.id}-title`}>
-            <div className="gamebook-passage-kicker">
-              {props.passage.tags?.slice(0, 3).map((tag) => <Badge>{tag}</Badge>)}
+            <div className="gamebook-story-panel">
+              <div className="gamebook-passage-kicker">
+                {props.passage.tags?.slice(0, 3).map((tag) => <Badge>{tag}</Badge>)}
+              </div>
+              <h2 id={`${props.passage.id}-title`}>{props.passage.title}</h2>
+              <p>{props.passage.body}</p>
             </div>
-            <h2 id={`${props.passage.id}-title`}>{props.passage.title}</h2>
-            <p>{props.passage.body}</p>
             {props.passage.ending
               ? (
                 <Notice heading="Ending" tone="success">
@@ -960,33 +1047,36 @@ function PassagePanel(props: {
                 </Notice>
               )
               : (
-                <ButtonGroup ariaLabel="Choices" className="gamebook-choice-list">
-                  {availableChoices.map((choice) => (
-                    <HxForm
-                      action={`/gamebook/choices/${choice.id}`}
-                      method="post"
-                      className="gamebook-choice"
-                      {...{
-                        "hx-post": `/gamebook/choices/${choice.id}`,
-                        "hx-target": "#gamebook-passage",
-                        "hx-swap": "innerHTML",
-                      }}
-                    >
-                      <input
-                        type="hidden"
-                        name="state"
-                        value={JSON.stringify(props.state)}
-                      />
-                      <input type="hidden" name="choiceId" value={choice.id} />
-                      {props.authorMode
-                        ? <input type="hidden" name="authorMode" value="1" />
-                        : null}
-                      <Button type="submit" variant="outline">
-                        <Icon name="book" /> {choice.text}
-                      </Button>
-                    </HxForm>
-                  ))}
-                </ButtonGroup>
+                <section className="gamebook-choice-panel" aria-labelledby={`${props.passage.id}-choices`}>
+                  <h3 id={`${props.passage.id}-choices`}>Options</h3>
+                  <ButtonGroup ariaLabel="Choices" className="gamebook-choice-list">
+                    {availableChoices.map((choice) => (
+                      <HxForm
+                        action={`/gamebook/choices/${choice.id}`}
+                        method="post"
+                        className="gamebook-choice"
+                        {...{
+                          "hx-post": `/gamebook/choices/${choice.id}`,
+                          "hx-target": "#gamebook-passage",
+                          "hx-swap": "innerHTML",
+                        }}
+                      >
+                        <input
+                          type="hidden"
+                          name="state"
+                          value={JSON.stringify(props.state)}
+                        />
+                        <input type="hidden" name="choiceId" value={choice.id} />
+                        {props.authorMode
+                          ? <input type="hidden" name="authorMode" value="1" />
+                          : null}
+                        <Button type="submit" variant="outline">
+                          <Icon name="book" /> {choice.text}
+                        </Button>
+                      </HxForm>
+                    ))}
+                  </ButtonGroup>
+                </section>
               )}
           </section>
           <aside className="gamebook-side-rail" aria-label="Character and play details">
@@ -1137,11 +1227,26 @@ function EncounterStatus(props: {
   }
 
   return (
-    <Notice heading="Encounter status" tone={encounterState.defeated ? "success" : "info"}>
-      {encounter.name}: {encounterState.hitPoints}/{encounter.hitPoints} HP, round{" "}
-      {encounterState.rounds}
-      {encounterState.defeated ? ", defeated." : "."}
-    </Notice>
+    <details className="gamebook-details-card gamebook-encounter-status">
+      <summary className="button" data-size="compact" data-variant="ghost">
+        <Icon name="shield" /> Encounter
+      </summary>
+      <div className="gamebook-details-body">
+        <Notice
+          heading={encounterState.defeated ? "Encounter cleared" : "Encounter status"}
+          tone={encounterState.defeated ? "success" : "info"}
+        >
+          <div className="gamebook-output-grid">
+            <LabelledOutput label="Foe" value={encounter.name} />
+            <LabelledOutput
+              label="HP"
+              value={`${encounterState.hitPoints}/${encounter.hitPoints}`}
+            />
+            <LabelledOutput label="Round" value={String(encounterState.rounds)} />
+          </div>
+        </Notice>
+      </div>
+    </details>
   );
 }
 

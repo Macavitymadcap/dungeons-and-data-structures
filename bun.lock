@@ -6,7 +6,7 @@
       "dependencies": {
         "@macavitymadcap/hyper-dank-automation": "^0.1.0",
         "@macavitymadcap/hyper-dank-transport": "^0.1.0",
-        "@macavitymadcap/hyper-dank-ui": "^0.1.0",
+        "@macavitymadcap/hyper-dank-ui": "^0.2.0",
         "hono": "^4.0.0",
         "htmx.org": "^2.0.10",
         "mermaid": "^11.15.0",
@@ -34,7 +34,7 @@
 
     "@macavitymadcap/hyper-dank-transport": ["@macavitymadcap/hyper-dank-transport@0.1.0", "", { "peerDependencies": { "hono": "^4.0.0", "typescript": "^5" } }, "sha512-dzn3bqdfvsAZPYyzToqtWlfKX+3fJiJeIE2kBWYpFB0wSwfPNkix5/xDaSUwC280ADYrNF4OZZME9c//jsYfww=="],
 
-    "@macavitymadcap/hyper-dank-ui": ["@macavitymadcap/hyper-dank-ui@0.1.0", "", { "peerDependencies": { "hono": "^4.0.0", "typescript": "^5" } }, "sha512-iPpySpB1FAOSQkqVwku3UGUVAiQtVKuf/MiPew9NfTI1FsyDwJ1sCo0F9XC8nfpJq+Kxzn15v2W7B2tWrVxSBA=="],
+    "@macavitymadcap/hyper-dank-ui": ["@macavitymadcap/hyper-dank-ui@0.2.0", "", { "peerDependencies": { "hono": "^4.0.0", "typescript": "^5" } }, "sha512-fmu91lbGpXcSa9DKWQsWjcHm5L+PsfFCTOhRBAYtOZj4f04qa9nE1Id4v4YS7BuZB2kZ44JYah7lQWiv6V1h9g=="],
 
     "@mermaid-js/parser": ["@mermaid-js/parser@1.1.1", "", { "dependencies": { "@chevrotain/types": "~11.1.1" } }, "sha512-VuHdsYMK1bT6X2JbcAaWAhugTRvRBRyuZgd+c22swUeI9g/ntaxF7CY7dYarhZovofCbUNO0G7JesfmNtjYOCw=="],
 
