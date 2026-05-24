@@ -62,7 +62,7 @@ export const mtGraphnorAdventure: Adventure = {
       title: "Entrance And Guardian",
       body:
         "A rain-dark path ends at a mountain door carved with five interlocking circles. A wary guard grips a cudgel under the lintel, more frightened than fierce, and blocks the way inside.",
-      tags: ["start", "room-1"],
+      tags: ["start", "room-1", "roleplay"],
       choices: [
         {
           id: "fight-guard",

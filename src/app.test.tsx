@@ -99,6 +99,9 @@ describe("createApp", () => {
 
     expect(response.status).toBe(200);
     expect(html).toContain("Author Tools");
+    expect(html).toContain("role=\"tablist\"");
+    expect(html).toContain("data-author-tab=\"graph\"");
+    expect(html).toContain("data-author-tab-panel=\"previews\"");
     expect(html).toContain("Graph validation");
     expect(html).toContain("Validation passed");
     expect(html).toContain("Five-room template");
@@ -108,6 +111,15 @@ describe("createApp", () => {
     expect(html).toContain("Mermaid source");
     expect(html).toContain("flowchart TD");
     expect(html).toContain("p_guardian_clash");
+    expect(html).toContain("Passage previews");
+    expect(html).toContain("Filter passage previews");
+    expect(html).toContain("data-passage-filter=\"all\"");
+    expect(html).toContain("data-passage-filter=\"roleplay\"");
+    expect(html).toContain("data-passage-filter=\"combat\"");
+    expect(html).toContain("data-passage-filter=\"failure\"");
+    expect(html).toContain("data-passage-filters=\"start room-1 roleplay\"");
+    expect(html).toContain("Entrance And Guardian");
+    expect(html).toContain("Force a way through -&gt; guardian-clash");
   });
 
   test("author page renders content validation issues", async () => {

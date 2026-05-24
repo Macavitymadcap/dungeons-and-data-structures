@@ -344,26 +344,114 @@ textarea {
   width: min(32rem, calc(100vw - 1.5rem));
 }
 
+.gamebook-author-shell {
+  width: min(96rem, calc(100vw - 1rem));
+}
+
 .gamebook-author-shell .app-shell-body,
 .gamebook-author-shell .app-shell-main,
 .gamebook-author-shell .page-header-content {
   width: min(96rem, calc(100vw - 1rem));
 }
 
-.gamebook-author-layout {
+.gamebook-author-workspace {
   display: grid;
   gap: 1.5rem;
   width: min(96rem, 100%);
 }
 
-.gamebook-author-layout > *,
-.gamebook-author-mermaid-panel {
+.gamebook-author-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.gamebook-author-tabs .button {
+  flex: 1 1 9rem;
+}
+
+.gamebook-author-tab-panel {
   min-width: 0;
 }
 
-.gamebook-author-layout section {
+.gamebook-author-tab-panel[hidden] {
+  display: none;
+}
+
+.gamebook-author-tab-panel > .panel {
+  width: 100%;
+}
+
+.gamebook-author-tab-panel > .panel,
+.gamebook-author-checks-grid > * {
+  min-width: 0;
+}
+
+.gamebook-author-tab-panel section {
   display: grid;
   gap: 1rem;
+}
+
+.gamebook-passage-filter-bar {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.gamebook-passage-filter-bar .button-group {
+  border: 0;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.gamebook-passage-filter-bar legend {
+  font-weight: 700;
+  margin-block-end: 0.5rem;
+}
+
+.gamebook-passage-filter-bar .button {
+  flex: 1 1 7.5rem;
+}
+
+.gamebook-passage-filter-count {
+  color: color-mix(in oklab, currentColor 68%, transparent);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.gamebook-author-preview-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+}
+
+.gamebook-author-passage-preview {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+  min-width: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background: var(--surface-raised);
+}
+
+.gamebook-author-passage-preview[hidden] {
+  display: none;
+}
+
+.gamebook-author-passage-preview h3,
+.gamebook-author-passage-preview p,
+.gamebook-author-passage-preview ol {
+  margin: 0;
+}
+
+.gamebook-author-passage-preview ol {
+  padding-inline-start: 1.25rem;
+}
+
+.gamebook-author-passage-preview li {
+  overflow-wrap: anywhere;
 }
 
 .gamebook-mermaid-diagram {
@@ -383,16 +471,10 @@ textarea {
 }
 
 @media (min-width: 64rem) {
-  .gamebook-author-layout {
-    column-gap: 3rem;
-    grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
-    row-gap: 1.5rem;
-    align-items: start;
-  }
-
-  .gamebook-author-mermaid-panel {
-    grid-column: 2;
-    grid-row: 1 / span 2;
+  .gamebook-author-checks-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
