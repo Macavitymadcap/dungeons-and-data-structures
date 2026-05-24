@@ -419,6 +419,16 @@ textarea {
   margin: 0;
 }
 
+.gamebook-author-audit-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+
+.gamebook-author-audit-grid .labelled-output {
+  min-width: 0;
+}
+
 .gamebook-author-preview-grid {
   display: grid;
   gap: 1rem;

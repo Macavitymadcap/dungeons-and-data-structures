@@ -100,12 +100,18 @@ describe("createApp", () => {
     expect(response.status).toBe(200);
     expect(html).toContain("Author Tools");
     expect(html).toContain("role=\"tablist\"");
+    expect(html).toContain("data-author-tab=\"audit\"");
     expect(html).toContain("data-author-tab=\"graph\"");
     expect(html).toContain("data-author-tab-panel=\"previews\"");
     expect(html).toContain("Graph validation");
     expect(html).toContain("Validation passed");
     expect(html).toContain("Five-room template");
     expect(html).toContain("Template coverage passed");
+    expect(html).toContain("Content audit");
+    expect(html).toContain("Combat choices");
+    expect(html).toContain("Gated choices");
+    expect(html).toContain("State effects");
+    expect(html).toContain("victory, failure, retreat, cliffhanger");
     expect(html).toContain("room-1");
     expect(html).toContain("gamebook-mermaid-diagram mermaid");
     expect(html).toContain("Mermaid source");

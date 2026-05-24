@@ -275,6 +275,7 @@ function AuthorPage(props: {
   const templateIssues = validateFiveRoomTemplate(props.adventure);
   const mermaid = exportMermaid(props.adventure);
   const passageFilterCounts = countPassageFilters(props.adventure.passages);
+  const audit = buildAdventureAudit(props.adventure);
 
   return (
     <html lang="en-GB">
@@ -312,6 +313,19 @@ function AuthorPage(props: {
                 id="author-tab-checks-button"
               >
                 <Icon name="check" /> Checks
+              </button>
+              <button
+                type="button"
+                className="button"
+                data-author-tab="audit"
+                data-size="compact"
+                data-variant="ghost"
+                role="tab"
+                aria-selected="false"
+                aria-controls="author-tab-audit"
+                id="author-tab-audit-button"
+              >
+                <Icon name="search" /> Audit
               </button>
               <button
                 type="button"
@@ -425,6 +439,72 @@ function AuthorPage(props: {
             </div>
             <div
               className="gamebook-author-tab-panel"
+              data-author-tab-panel="audit"
+              id="author-tab-audit"
+              role="tabpanel"
+              aria-labelledby="author-tab-audit-button"
+              hidden
+            >
+              <Panel labelledBy="author-audit-title">
+                <section aria-labelledby="author-audit-title">
+                  <h2 id="author-audit-title">Content audit</h2>
+                  <div className="gamebook-author-audit-grid">
+                    <LabelledOutput
+                      label="Passages"
+                      value={String(props.adventure.passages.length)}
+                      meta="Total authored nodes"
+                    />
+                    <LabelledOutput
+                      label="Choices"
+                      value={String(audit.choiceCount)}
+                      meta="Interactive routes"
+                    />
+                    <LabelledOutput
+                      label="Checks"
+                      value={String(audit.checkChoiceCount)}
+                      meta="d20 resolutions"
+                    />
+                    <LabelledOutput
+                      label="Combat choices"
+                      value={String(audit.combatChoiceCount)}
+                      meta="Encounter loops"
+                    />
+                    <LabelledOutput
+                      label="Gated choices"
+                      value={String(audit.gatedChoiceCount)}
+                      meta="Item, flag, HP or condition requirements"
+                    />
+                    <LabelledOutput
+                      label="State effects"
+                      value={String(audit.effectChoiceCount)}
+                      meta="Choices that mutate save state"
+                    />
+                    <LabelledOutput
+                      label="Encounters"
+                      value={String(props.adventure.encounters?.length ?? 0)}
+                      meta={`${audit.encounterPassageCount} passage references`}
+                    />
+                    <LabelledOutput
+                      label="Items"
+                      value={String(props.adventure.items?.length ?? 0)}
+                      meta={`${audit.itemTouchCount} choice references`}
+                    />
+                    <LabelledOutput
+                      label="Discoveries"
+                      value={String(props.adventure.discoveries?.length ?? 0)}
+                      meta={`${audit.flagTouchCount} flag references`}
+                    />
+                    <LabelledOutput
+                      label="Endings"
+                      value={String(audit.endingCount)}
+                      meta={audit.endingSummary}
+                    />
+                  </div>
+                </section>
+              </Panel>
+            </div>
+            <div
+              className="gamebook-author-tab-panel"
               data-author-tab-panel="graph"
               id="author-tab-graph"
               role="tabpanel"
@@ -496,6 +576,49 @@ function AuthorPage(props: {
       </body>
     </html>
   );
+}
+
+interface AdventureAudit {
+  checkChoiceCount: number;
+  choiceCount: number;
+  combatChoiceCount: number;
+  effectChoiceCount: number;
+  encounterPassageCount: number;
+  endingCount: number;
+  endingSummary: string;
+  flagTouchCount: number;
+  gatedChoiceCount: number;
+  itemTouchCount: number;
+}
+
+function buildAdventureAudit(adventure: Adventure): AdventureAudit {
+  const choices = adventure.passages.flatMap((passage) => passage.choices);
+  const endings = adventure.passages.flatMap((passage) => passage.ending ? [passage.ending] : []);
+
+  return {
+    checkChoiceCount: choices.filter((choice) => choice.check).length,
+    choiceCount: choices.length,
+    combatChoiceCount: choices.filter((choice) => choice.combat).length,
+    effectChoiceCount: choices.filter((choice) => choice.effects).length,
+    encounterPassageCount: adventure.passages.filter((passage) => passage.encounterId).length,
+    endingCount: endings.length,
+    endingSummary: endings.length > 0 ? endings.join(", ") : "No endings",
+    flagTouchCount: choices.reduce((total, choice) => total + countFlagTouches(choice), 0),
+    gatedChoiceCount: choices.filter((choice) => choice.requires).length,
+    itemTouchCount: choices.reduce((total, choice) => total + countItemTouches(choice), 0),
+  };
+}
+
+function countFlagTouches(choice: Passage["choices"][number]): number {
+  return (choice.requires?.flagsAll?.length ?? 0) +
+    (choice.requires?.flagsNone?.length ?? 0) +
+    (choice.effects?.setFlags?.length ?? 0);
+}
+
+function countItemTouches(choice: Passage["choices"][number]): number {
+  return (choice.requires?.itemsAll?.length ?? 0) +
+    (choice.effects?.addItems?.length ?? 0) +
+    (choice.effects?.removeItems?.length ?? 0);
 }
 
 function countPassageFilters(passages: Passage[]): Map<PassageFilterValue, number> {
