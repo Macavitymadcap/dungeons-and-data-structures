@@ -108,6 +108,9 @@ describe("createApp", () => {
     expect(html).toContain("Mermaid source");
     expect(html).toContain("flowchart TD");
     expect(html).toContain("p_guardian_clash");
+    expect(html).toContain("Passage previews");
+    expect(html).toContain("Entrance And Guardian");
+    expect(html).toContain("Force a way through -&gt; guardian-clash");
   });
 
   test("author page renders content validation issues", async () => {

@@ -371,11 +371,70 @@ function AuthorPage(props: {
                 </section>
               </Panel>
             </div>
+            <div className="gamebook-author-preview-panel">
+              <Panel labelledBy="author-preview-title">
+                <section aria-labelledby="author-preview-title">
+                  <h2 id="author-preview-title">Passage previews</h2>
+                  <div className="gamebook-author-preview-grid">
+                    {props.adventure.passages.map((passage) => (
+                      <PassagePreview passage={passage} />
+                    ))}
+                  </div>
+                </section>
+              </Panel>
+            </div>
           </div>
         </AppShell>
       </body>
     </html>
   );
+}
+
+function PassagePreview(props: { passage: Passage }) {
+  return (
+    <article className="gamebook-author-passage-preview">
+      <div className="gamebook-passage-kicker">
+        {props.passage.tags?.map((tag) => <Badge>{tag}</Badge>)}
+        {props.passage.ending ? <Badge>{props.passage.ending}</Badge> : null}
+      </div>
+      <h3>{props.passage.title}</h3>
+      <MetadataList
+        items={[
+          { label: "ID", value: props.passage.id },
+          { label: "Choices", value: String(props.passage.choices.length) },
+          {
+            label: "Encounter",
+            value: props.passage.encounterId ?? "None",
+          },
+        ]}
+      />
+      <p>{props.passage.body}</p>
+      {props.passage.choices.length > 0
+        ? (
+          <ol>
+            {props.passage.choices.map((choice) => (
+              <li>
+                {choice.text} {"->"} {choiceTargetSummary(choice)}
+              </li>
+            ))}
+          </ol>
+        )
+        : null}
+    </article>
+  );
+}
+
+function choiceTargetSummary(choice: Passage["choices"][number]): string {
+  if (choice.targetId) {
+    return choice.targetId;
+  }
+  if (choice.check) {
+    return `${choice.check.onSuccess} / ${choice.check.onFailure}`;
+  }
+  if (choice.combat) {
+    return `${choice.combat.onVictory} / ${choice.combat.onDefeat} / ${choice.combat.onContinue}`;
+  }
+  return "No target";
 }
 
 function parseSubmittedState(
