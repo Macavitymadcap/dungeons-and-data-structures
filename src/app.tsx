@@ -948,11 +948,13 @@ function PassagePanel(props: {
       <article data-passage-id={props.passage.id}>
         <div className="gamebook-passage-layout">
           <section className="gamebook-story-column" aria-labelledby={`${props.passage.id}-title`}>
-            <div className="gamebook-passage-kicker">
-              {props.passage.tags?.slice(0, 3).map((tag) => <Badge>{tag}</Badge>)}
+            <div className="gamebook-story-panel">
+              <div className="gamebook-passage-kicker">
+                {props.passage.tags?.slice(0, 3).map((tag) => <Badge>{tag}</Badge>)}
+              </div>
+              <h2 id={`${props.passage.id}-title`}>{props.passage.title}</h2>
+              <p>{props.passage.body}</p>
             </div>
-            <h2 id={`${props.passage.id}-title`}>{props.passage.title}</h2>
-            <p>{props.passage.body}</p>
             {props.passage.ending
               ? (
                 <Notice heading="Ending" tone="success">
@@ -960,33 +962,36 @@ function PassagePanel(props: {
                 </Notice>
               )
               : (
-                <ButtonGroup ariaLabel="Choices" className="gamebook-choice-list">
-                  {availableChoices.map((choice) => (
-                    <HxForm
-                      action={`/gamebook/choices/${choice.id}`}
-                      method="post"
-                      className="gamebook-choice"
-                      {...{
-                        "hx-post": `/gamebook/choices/${choice.id}`,
-                        "hx-target": "#gamebook-passage",
-                        "hx-swap": "innerHTML",
-                      }}
-                    >
-                      <input
-                        type="hidden"
-                        name="state"
-                        value={JSON.stringify(props.state)}
-                      />
-                      <input type="hidden" name="choiceId" value={choice.id} />
-                      {props.authorMode
-                        ? <input type="hidden" name="authorMode" value="1" />
-                        : null}
-                      <Button type="submit" variant="outline">
-                        <Icon name="book" /> {choice.text}
-                      </Button>
-                    </HxForm>
-                  ))}
-                </ButtonGroup>
+                <section className="gamebook-choice-panel" aria-labelledby={`${props.passage.id}-choices`}>
+                  <h3 id={`${props.passage.id}-choices`}>Options</h3>
+                  <ButtonGroup ariaLabel="Choices" className="gamebook-choice-list">
+                    {availableChoices.map((choice) => (
+                      <HxForm
+                        action={`/gamebook/choices/${choice.id}`}
+                        method="post"
+                        className="gamebook-choice"
+                        {...{
+                          "hx-post": `/gamebook/choices/${choice.id}`,
+                          "hx-target": "#gamebook-passage",
+                          "hx-swap": "innerHTML",
+                        }}
+                      >
+                        <input
+                          type="hidden"
+                          name="state"
+                          value={JSON.stringify(props.state)}
+                        />
+                        <input type="hidden" name="choiceId" value={choice.id} />
+                        {props.authorMode
+                          ? <input type="hidden" name="authorMode" value="1" />
+                          : null}
+                        <Button type="submit" variant="outline">
+                          <Icon name="book" /> {choice.text}
+                        </Button>
+                      </HxForm>
+                    ))}
+                  </ButtonGroup>
+                </section>
               )}
           </section>
           <aside className="gamebook-side-rail" aria-label="Character and play details">
@@ -1137,11 +1142,26 @@ function EncounterStatus(props: {
   }
 
   return (
-    <Notice heading="Encounter status" tone={encounterState.defeated ? "success" : "info"}>
-      {encounter.name}: {encounterState.hitPoints}/{encounter.hitPoints} HP, round{" "}
-      {encounterState.rounds}
-      {encounterState.defeated ? ", defeated." : "."}
-    </Notice>
+    <details className="gamebook-details-card gamebook-encounter-status">
+      <summary className="button" data-size="compact" data-variant="ghost">
+        <Icon name="shield" /> Encounter
+      </summary>
+      <div className="gamebook-details-body">
+        <Notice
+          heading={encounterState.defeated ? "Encounter cleared" : "Encounter status"}
+          tone={encounterState.defeated ? "success" : "info"}
+        >
+          <div className="gamebook-output-grid">
+            <LabelledOutput label="Foe" value={encounter.name} />
+            <LabelledOutput
+              label="HP"
+              value={`${encounterState.hitPoints}/${encounter.hitPoints}`}
+            />
+            <LabelledOutput label="Round" value={String(encounterState.rounds)} />
+          </div>
+        </Notice>
+      </div>
+    </details>
   );
 }
 

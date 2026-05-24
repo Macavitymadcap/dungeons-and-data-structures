@@ -26,6 +26,7 @@ describe("createApp", () => {
     expect(html).toContain('href="/gamebook/author"');
     expect(html).toContain("Mt. Graphnor");
     expect(html).toContain("Entrance And Guardian");
+    expect(html).toContain("Options");
     expect(html).toContain("Slip past the guard");
     expect(html).toContain('<output class="labelled-output-value">rogue</output>');
     expect(html).toContain('<output class="labelled-output-value">elf</output>');
@@ -413,8 +414,11 @@ describe("createApp", () => {
 
     expect(response.status).toBe(200);
     expect(html).toContain("Guardian Clash");
+    expect(html).toContain("gamebook-encounter-status");
     expect(html).toContain("Encounter status");
-    expect(html).toContain("Door Guardian: 6/6 HP, round 1.");
+    expect(html).toContain('<output class="labelled-output-value">Door Guardian</output>');
+    expect(html).toContain('<output class="labelled-output-value">6/6</output>');
+    expect(html).toContain('<output class="labelled-output-value">1</output>');
     expect(html).toContain("Combat round 1");
     expect(html).toContain("Foe attack");
     expect(html).not.toContain("Use a ration and catch your breath");
