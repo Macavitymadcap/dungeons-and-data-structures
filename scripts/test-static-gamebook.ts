@@ -31,12 +31,12 @@ try {
   await expectText(page.locator("[data-passage-id] .gamebook-story-column > h2"), "Entrance And Guardian");
   await expectText(page.locator("#gamebook-save-status"), "Started a new game.");
 
-  await page.getByText("Settings").click();
+  await page.locator(".gamebook-command-bar summary").click();
   await page.selectOption("#gamebook-class", "rogue");
   await page.selectOption("#gamebook-race", "elf");
   await page.getByRole("button", { name: "New game" }).click();
-  await expectText(page.locator(".labelled-output-value").nth(1), "rogue");
-  await expectText(page.locator(".labelled-output-value").nth(2), "elf");
+  await expectText(page.locator(".gamebook-status-strip .labelled-output-value").nth(1), "rogue");
+  await expectText(page.locator(".gamebook-status-strip .labelled-output-value").nth(2), "elf");
   await expectText(page.locator(".metadata-list dd").nth(3), "None");
   await expectText(page.locator(".metadata-list dd").nth(4), "Shortsword, Thieves' tools, Ration");
   await expectText(page.locator(".metadata-list dd").nth(5), "None");
@@ -60,7 +60,10 @@ try {
   await expectText(page.locator(".metadata-list dd").nth(5), "Challenged the door guardian, Solved the keyboard room");
   await expectStorage(page, "currentPassageId", "keyboard-room-clue");
   await expectEncounterDefeated(page, "door-guardian");
+  await expectText(page.locator("[data-save-current-passage]"), "keyboard-room-clue");
+  await expectText(page.locator("[data-save-version]"), "2");
 
+  await page.locator(".gamebook-command-bar summary").click();
   await page.getByRole("button", { name: "Export" }).click();
   const exportedSave = await page.locator("#gamebook-save-json").inputValue();
   if (!exportedSave.includes('"currentPassageId": "keyboard-room-clue"')) {
@@ -68,18 +71,24 @@ try {
   }
   await expectText(page.locator("#gamebook-save-status"), "Exported current save JSON.");
 
+  await page.getByRole("button", { name: "Download JSON" }).click();
+  await expectText(page.locator("#gamebook-save-status"), "Downloaded current save JSON.");
+
   await page.getByRole("button", { name: "Reset" }).click();
   await expectText(page.locator("[data-passage-id] .gamebook-story-column > h2"), "Entrance And Guardian");
   const saved = await page.evaluate(() => localStorage.getItem("dads-gamebook-save"));
   if (saved !== null) {
     throw new Error("Expected reset to clear localStorage save.");
   }
+  await expectText(page.locator("[data-save-current-passage]"), "entrance");
 
+  await page.locator(".gamebook-command-bar summary").click();
   await page.getByRole("button", { name: "Import" }).click();
   await expectText(page.locator("[data-passage-id] .gamebook-story-column > h2"), "Keyboard Room Clue");
   await expectText(page.locator("#gamebook-save-status"), "Imported saved game.");
   await expectStorage(page, "currentPassageId", "keyboard-room-clue");
   await expectEncounterDefeated(page, "door-guardian");
+  await expectText(page.locator("[data-save-current-passage]"), "keyboard-room-clue");
 } finally {
   await browser.close();
   server.server.stop(true);

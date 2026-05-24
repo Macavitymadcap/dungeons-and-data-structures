@@ -36,8 +36,15 @@ describe("createApp", () => {
     expect(html).toContain("Shortsword");
     expect(html).toContain("Thieves&#39; tools");
     expect(html).toContain("<dt>Discoveries</dt>");
+    expect(html).toContain("gamebook-popover-header");
+    expect(html).toContain("New games, local saves, and JSON import tools.");
+    expect(html).toContain("Save summary");
+    expect(html).toContain('data-save-current-passage=""');
+    expect(html).toContain('data-save-version=""');
+    expect(html).toContain('data-save-updated=""');
     expect(html).toContain("gamebook-save-import");
     expect(html).toContain("gamebook-save-json");
+    expect(html).toContain("gamebook-download-save");
   });
 
   test("serves author-capable browser client when author tools are enabled", async () => {
