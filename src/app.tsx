@@ -7,7 +7,6 @@ import {
   CodeBlock,
   HxForm,
   Icon,
-  IconButton,
   LabelledOutput,
   MetadataList,
   Notice,
@@ -119,6 +118,7 @@ export function createApp(dependencies: AppDependencies = {}) {
       <GamebookPage
         appName={appName}
         adventure={adventure}
+        authorToolsEnabled={authorToolsEnabled}
         passage={passages.get(state.currentPassageId)!}
         state={state}
         authorMode={authorMode}
@@ -287,7 +287,8 @@ function AuthorPage(props: {
         <link rel="stylesheet" href="/assets/gamebook.css" />
         <script type="module" src="/assets/client.js"></script>
       </head>
-      <body>
+      <body className="gamebook-page">
+        <SiteHeader appName={props.appName} currentSection="author" showAuthorLink />
         <AppShell
           className="gamebook-author-shell"
           header={
@@ -734,6 +735,7 @@ function normaliseCharacterRace(value: string | undefined): Character["race"] {
 function GamebookPage(props: {
   appName: string;
   adventure: Adventure;
+  authorToolsEnabled: boolean;
   passage: Passage;
   state: GameState;
   authorMode: boolean;
@@ -750,7 +752,12 @@ function GamebookPage(props: {
         <script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js">
         </script>
       </head>
-      <body>
+      <body className="gamebook-page">
+        <SiteHeader
+          appName={props.appName}
+          currentSection="play"
+          showAuthorLink={props.authorToolsEnabled}
+        />
         <AppShell
           className="gamebook-shell"
           header={
@@ -788,6 +795,50 @@ function GamebookPage(props: {
         </AppShell>
       </body>
     </html>
+  );
+}
+
+function SiteHeader(props: {
+  appName: string;
+  currentSection: "author" | "play";
+  showAuthorLink?: boolean;
+}) {
+  return (
+    <header className="gamebook-site-header">
+      <nav className="gamebook-site-nav" aria-label="Primary">
+        <a className="gamebook-site-brand" href="/gamebook">
+          <span className="gamebook-site-mark" aria-hidden="true">D</span>
+          <span>
+            <span className="gamebook-site-title">{props.appName}</span>
+            <span className="gamebook-site-subtitle">Gamebook lab</span>
+          </span>
+        </a>
+        <div className="gamebook-site-links">
+          <a
+            className="button"
+            data-size="compact"
+            data-variant={props.currentSection === "play" ? "primary" : "ghost"}
+            aria-current={props.currentSection === "play" ? "page" : undefined}
+            href="/gamebook"
+          >
+            <Icon name="book" /> Play
+          </a>
+          {props.showAuthorLink
+            ? (
+              <a
+                className="button"
+                data-size="compact"
+                data-variant={props.currentSection === "author" ? "primary" : "ghost"}
+                aria-current={props.currentSection === "author" ? "page" : undefined}
+                href="/gamebook/author"
+              >
+                <Icon name="search" /> Author
+              </a>
+            )
+            : null}
+        </div>
+      </nav>
+    </header>
   );
 }
 
@@ -834,16 +885,8 @@ function GameControls(props: {
                   { label: "Halfling", value: "halfling" },
                 ]}
               />
-              <Button type="submit">New game</Button>
-            </HxForm>
-            <IconButton
-              type="button"
-              variant="danger"
-              icon="delete"
-              label="Reset saved game"
-              {...{ "hx-disable": "true" }}
-              id="gamebook-reset"
-            />
+            <Button type="submit">New game</Button>
+          </HxForm>
           </Toolbar>
           <h3>Save JSON</h3>
           <HxForm
@@ -876,6 +919,14 @@ function GameControls(props: {
       <p id="gamebook-save-status" role="status">
         Saved progress continues automatically in this browser.
       </p>
+      <Button
+        type="button"
+        variant="danger"
+        {...{ "hx-disable": "true" }}
+        id="gamebook-reset"
+      >
+        <Icon name="delete" /> Reset
+      </Button>
     </section>
   );
 }

@@ -43,3 +43,4 @@ Use this log to record major planning, research, manuscript, and gamebook implem
 - Started the authoring-ergonomics epic by surfacing five-room template coverage in development-only author tools.
 - Added development-only passage previews so authors can inspect content, tags, and choice targets without using forced navigation.
 - Added a development-only content audit tab so authors can scan passage, choice, check, combat, gate, effect, item, discovery, and ending coverage at a glance.
+- Refreshed the gamebook and authoring chrome with a Hyper-Dank-inspired site header, stronger page headers, dimensional surfaces, and clearer play/author navigation while keeping author links out of the player-only build.
