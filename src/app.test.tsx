@@ -101,6 +101,11 @@ describe("createApp", () => {
     expect(html).toContain("Author Tools");
     expect(html).toContain("Graph validation");
     expect(html).toContain("Validation passed");
+    expect(html).toContain("Five-room template");
+    expect(html).toContain("Template coverage passed");
+    expect(html).toContain("room-1");
+    expect(html).toContain("gamebook-mermaid-diagram mermaid");
+    expect(html).toContain("Mermaid source");
     expect(html).toContain("flowchart TD");
     expect(html).toContain("p_guardian_clash");
   });
@@ -144,8 +149,11 @@ describe("createApp", () => {
 
     expect(response.status).toBe(200);
     expect(html).toContain("Validation failed");
+    expect(html).toContain("Template coverage failed");
     expect(html).toContain("missing-item");
     expect(html).toContain("missing-discovery");
+    expect(html).toContain("missing-room");
+    expect(html).toContain("missing-ending");
   });
 
   test("choice post returns the next passage fragment", async () => {

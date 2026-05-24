@@ -40,3 +40,4 @@ Use this log to record major planning, research, manuscript, and gamebook implem
 - Added temporary hit point mechanics so choice and combat damage consume temporary hit points before normal hit points.
 - Updated the gamebook roadmap with an explicit Mt. Graphnor MVP completion milestone, replaced obvious placeholder adventure copy, and added content tests for the five-room template shape.
 - Added a reusable Five Room Dungeon template contract and companion planning note so Mt. Graphnor can act as the first adventure template.
+- Started the authoring-ergonomics epic by surfacing five-room template coverage in development-only author tools.

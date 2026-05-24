@@ -1,3 +1,4 @@
+import mermaid from "mermaid";
 import { createPassageMap } from "./graph.ts";
 import {
   Adventure,
@@ -30,6 +31,8 @@ const bootData = readBootData();
 const passageRoot = document.querySelector<HTMLElement>("#gamebook-passage");
 const saveStatus = document.querySelector<HTMLElement>("#gamebook-save-status");
 const saveJson = document.querySelector<HTMLTextAreaElement>("#gamebook-save-json");
+
+renderMermaidDiagrams();
 
 if (bootData && passageRoot) {
   const loaded = loadGame(storage, SAVE_KEY, bootData.adventure);
@@ -240,4 +243,20 @@ function normaliseCharacterClass(value: FormDataEntryValue | null): CharacterCla
     return value;
   }
   return "fighter";
+}
+
+function renderMermaidDiagrams(): void {
+  const diagrams = Array.from(document.querySelectorAll<HTMLElement>(".mermaid"));
+  if (diagrams.length === 0) {
+    return;
+  }
+
+  mermaid.initialize({
+    securityLevel: "strict",
+    startOnLoad: false,
+    theme: "base",
+  });
+  void mermaid.run({ nodes: diagrams }).catch((error) => {
+    console.error("Could not render Mermaid diagrams.", error);
+  });
 }
