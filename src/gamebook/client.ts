@@ -34,6 +34,7 @@ const saveJson = document.querySelector<HTMLTextAreaElement>("#gamebook-save-jso
 
 renderMermaidDiagrams();
 initAuthorTabs();
+initPassageFilters();
 
 if (bootData && passageRoot) {
   const loaded = loadGame(storage, SAVE_KEY, bootData.adventure);
@@ -285,6 +286,46 @@ function initAuthorTabs(): void {
       const tabName = tab.dataset.authorTab;
       if (tabName) {
         activate(tabName);
+      }
+    });
+  }
+}
+
+function initPassageFilters(): void {
+  const controls = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-passage-filter]"));
+  const previews = Array.from(document.querySelectorAll<HTMLElement>("[data-passage-preview]"));
+  const count = document.querySelector<HTMLElement>("[data-passage-filter-count]");
+  if (controls.length === 0 || previews.length === 0) {
+    return;
+  }
+
+  const applyFilter = (filter: string) => {
+    let visibleCount = 0;
+    for (const preview of previews) {
+      const facets = new Set((preview.dataset.passageFilters ?? "").split(/\s+/).filter(Boolean));
+      const visible = filter === "all" || facets.has(filter);
+      preview.hidden = !visible;
+      if (visible) {
+        visibleCount += 1;
+      }
+    }
+
+    for (const control of controls) {
+      const active = control.dataset.passageFilter === filter;
+      control.setAttribute("aria-pressed", String(active));
+      control.dataset.variant = active ? "primary" : "ghost";
+    }
+
+    if (count) {
+      count.textContent = `Showing ${visibleCount} ${visibleCount === 1 ? "passage" : "passages"}.`;
+    }
+  };
+
+  for (const control of controls) {
+    control.addEventListener("click", () => {
+      const filter = control.dataset.passageFilter;
+      if (filter) {
+        applyFilter(filter);
       }
     });
   }

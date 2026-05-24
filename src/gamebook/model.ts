@@ -36,6 +36,7 @@ export type PassageTag =
   | "room-5"
   | "combat"
   | "puzzle"
+  | "roleplay"
   | "trap"
   | "reward";
 

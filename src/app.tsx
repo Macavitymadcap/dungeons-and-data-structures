@@ -35,8 +35,10 @@ import {
   Adventure,
   Character,
   CombatRoundResult,
+  EndingKind,
   GameState,
   Passage,
+  PassageTag,
   RollResult,
 } from "./gamebook/model.ts";
 import { resolveChoice } from "./gamebook/play.ts";
@@ -56,6 +58,21 @@ export interface AppDependencies {
   now?: () => Date;
   random?: () => number;
 }
+
+type PassageFilterValue = "all" | PassageTag | EndingKind;
+
+const PASSAGE_FILTERS: { value: PassageFilterValue; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "roleplay", label: "Roleplay" },
+  { value: "puzzle", label: "Puzzle" },
+  { value: "trap", label: "Trap" },
+  { value: "combat", label: "Combat" },
+  { value: "reward", label: "Reward" },
+  { value: "victory", label: "Victory" },
+  { value: "failure", label: "Failure" },
+  { value: "retreat", label: "Retreat" },
+  { value: "cliffhanger", label: "Cliffhanger" },
+];
 
 export function createApp(dependencies: AppDependencies = {}) {
   const adventure = dependencies.adventure ?? mtGraphnorAdventure;
@@ -257,6 +274,7 @@ function AuthorPage(props: {
   const validation = validateAdventure(props.adventure);
   const templateIssues = validateFiveRoomTemplate(props.adventure);
   const mermaid = exportMermaid(props.adventure);
+  const passageFilterCounts = countPassageFilters(props.adventure.passages);
 
   return (
     <html lang="en-GB">
@@ -438,6 +456,33 @@ function AuthorPage(props: {
               <Panel labelledBy="author-preview-title">
                 <section aria-labelledby="author-preview-title">
                   <h2 id="author-preview-title">Passage previews</h2>
+                  <div className="gamebook-passage-filter-bar">
+                    <ButtonGroup ariaLabel="Filter passage previews">
+                      {PASSAGE_FILTERS.filter((filter) =>
+                        filter.value === "all" || (passageFilterCounts.get(filter.value) ?? 0) > 0
+                      ).map((filter) => {
+                        const count = filter.value === "all"
+                          ? props.adventure.passages.length
+                          : passageFilterCounts.get(filter.value) ?? 0;
+
+                        return (
+                          <button
+                            type="button"
+                            className="button"
+                            data-passage-filter={filter.value}
+                            data-size="compact"
+                            data-variant={filter.value === "all" ? "primary" : "ghost"}
+                            aria-pressed={filter.value === "all" ? "true" : "false"}
+                          >
+                            {filter.label} <span aria-hidden="true">({count})</span>
+                          </button>
+                        );
+                      })}
+                    </ButtonGroup>
+                    <p className="gamebook-passage-filter-count" data-passage-filter-count>
+                      Showing {props.adventure.passages.length} passages.
+                    </p>
+                  </div>
                   <div className="gamebook-author-preview-grid">
                     {props.adventure.passages.map((passage) => (
                       <PassagePreview passage={passage} />
@@ -453,9 +498,33 @@ function AuthorPage(props: {
   );
 }
 
+function countPassageFilters(passages: Passage[]): Map<PassageFilterValue, number> {
+  const counts = new Map<PassageFilterValue, number>();
+  for (const passage of passages) {
+    for (const facet of passageFilterFacets(passage)) {
+      counts.set(facet, (counts.get(facet) ?? 0) + 1);
+    }
+  }
+  return counts;
+}
+
+function passageFilterFacets(passage: Passage): PassageFilterValue[] {
+  const facets = new Set<PassageFilterValue>(passage.tags ?? []);
+  if (passage.ending) {
+    facets.add(passage.ending);
+  }
+  return [...facets];
+}
+
 function PassagePreview(props: { passage: Passage }) {
+  const filterFacets = passageFilterFacets(props.passage);
+
   return (
-    <article className="gamebook-author-passage-preview">
+    <article
+      className="gamebook-author-passage-preview"
+      data-passage-preview
+      data-passage-filters={filterFacets.join(" ")}
+    >
       <div className="gamebook-passage-kicker">
         {props.passage.tags?.map((tag) => <Badge>{tag}</Badge>)}
         {props.passage.ending ? <Badge>{props.passage.ending}</Badge> : null}

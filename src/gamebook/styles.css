@@ -392,6 +392,33 @@ textarea {
   gap: 1rem;
 }
 
+.gamebook-passage-filter-bar {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.gamebook-passage-filter-bar .button-group {
+  border: 0;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.gamebook-passage-filter-bar legend {
+  font-weight: 700;
+  margin-block-end: 0.5rem;
+}
+
+.gamebook-passage-filter-bar .button {
+  flex: 1 1 7.5rem;
+}
+
+.gamebook-passage-filter-count {
+  color: color-mix(in oklab, currentColor 68%, transparent);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
 .gamebook-author-preview-grid {
   display: grid;
   gap: 1rem;
@@ -407,6 +434,10 @@ textarea {
   border-radius: 0.5rem;
   padding: 1rem;
   background: var(--surface-raised);
+}
+
+.gamebook-author-passage-preview[hidden] {
+  display: none;
 }
 
 .gamebook-author-passage-preview h3,
