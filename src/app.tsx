@@ -788,6 +788,7 @@ function GamebookPage(props: {
           <GameControls
             characterClass={props.state.character.class}
             race={props.state.character.race}
+            state={props.state}
           />
           <div id="gamebook-passage" aria-live="polite">
             <PassagePanel
@@ -930,6 +931,7 @@ function ThemeScript() {
 function GameControls(props: {
   characterClass: Character["class"];
   race: Character["race"];
+  state: GameState;
 }) {
   return (
     <section className="gamebook-command-bar" aria-labelledby="gamebook-controls-title">
@@ -973,6 +975,27 @@ function GameControls(props: {
             <Button type="submit">New game</Button>
           </HxForm>
           </Toolbar>
+          <h3>Save summary</h3>
+          <div className="gamebook-save-summary">
+            <SaveSummaryOutput
+              label="Passage"
+              value={props.state.currentPassageId}
+              meta="Current node"
+              dataAttribute="data-save-current-passage"
+            />
+            <SaveSummaryOutput
+              label="Version"
+              value={String(props.state.version)}
+              meta={props.state.schema}
+              dataAttribute="data-save-version"
+            />
+            <SaveSummaryOutput
+              label="Updated"
+              value={formatSaveTime(props.state.updatedAt)}
+              meta="Browser local save"
+              dataAttribute="data-save-updated"
+            />
+          </div>
           <h3>Save JSON</h3>
           <HxForm
             action="/gamebook"
@@ -994,6 +1017,14 @@ function GameControls(props: {
               >
                 <Icon name="download" /> Export
               </Button>
+              <Button
+                type="button"
+                variant="outline"
+                {...{ "hx-disable": "true" }}
+                id="gamebook-download-save"
+              >
+                <Icon name="document" /> Download JSON
+              </Button>
               <Button type="submit" variant="outline">
                 <Icon name="save" /> Import
               </Button>
@@ -1014,6 +1045,35 @@ function GameControls(props: {
       </Button>
     </section>
   );
+}
+
+function SaveSummaryOutput(props: {
+  dataAttribute: string;
+  label: string;
+  meta: string;
+  value: string;
+}) {
+  return (
+    <div className="labelled-output">
+      <output className="labelled-output-label">{props.label}</output>
+      <output className="labelled-output-value" {...{ [props.dataAttribute]: "" }}>
+        {props.value}
+      </output>
+      <span className="labelled-output-meta">{props.meta}</span>
+    </div>
+  );
+}
+
+function formatSaveTime(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.valueOf())) {
+    return "Unknown";
+  }
+
+  return date.toLocaleString("en-GB", {
+    dateStyle: "short",
+    timeStyle: "short",
+  });
 }
 
 function PassagePanel(props: {
