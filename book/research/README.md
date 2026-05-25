@@ -18,6 +18,7 @@ refreshed emphasis in the structure plan.
 - [Chapter 02: Choose Your Node Adventure](chapter-02-choose-your-node-adventure.md)
 - [Chapter 03: Hypertext, HATEOAS, And The Gamebook Page](chapter-03-hypertext-hateoas-and-the-gamebook-page.md)
 - [Chapter 04: Character Sheets As Data Models](chapter-04-character-sheets-as-data-models.md)
+- [Chapter 05: Classes, Composition, And The Limits Of Inheritance](chapter-05-classes-composition-and-the-limits-of-inheritance.md)
 
 ## Dossier Template
 
