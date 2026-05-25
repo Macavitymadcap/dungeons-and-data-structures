@@ -61,6 +61,16 @@ Research should prioritise:
 - D&D: official SRD 5.1 CC BY 4.0 PDF, official SRD resources page, and Creative Commons BY 4.0 licence.
 - Gamebooks: official Fighting Fantasy context, The Encyclopedia of Science Fiction, gamebook/puzzle academic sources, and hypertext/HATEOAS/HTMX primary docs where relevant.
 
+### Current Structure Baseline
+
+The architecture checkpoint in `book/architecture-checkpoint-before-further-dossiers.md` confirms
+that the current outlined topics are supported by patterns already present in the gamebook/storybook
+engine and Campaign Ledger. No planned chapter needs removing.
+
+Use this refreshed structure as the baseline for future dossiers. Each new dossier should name the
+relevant gamebook evidence and Campaign Ledger evidence when both apps are relevant, rather than
+relying on the older abstract chapter plan.
+
 ## Manuscript, Dialogue, And Gamebook Integration
 
 The book should use the gamebook as a cumulative worked example. Each chapter should leave behind one of three artefacts:
@@ -89,14 +99,26 @@ src/gamebook/
 ├── model.ts
 ├── graph.ts
 ├── state.ts
+├── play.ts
 ├── content/
+│   ├── five-room-template.ts
 │   └── mt-graphnor.ts
 ├── rules/
 │   ├── character.ts
 │   ├── combat.ts
-│   └── dice.ts
-└── ui/
+│   ├── dice.ts
+│   └── srd.ts
+├── render.ts
+├── player-render.ts
+├── client.ts
+├── player-client.ts
+└── testing.ts
 ```
+
+The Hono route shell and author pages currently live in `src/app.tsx`. That is an acceptable
+prototype boundary, but chapters on hypermedia, permissions, modules, authoring, and testing should
+be honest about the split between framework-light gamebook modules, shared renderers, player-only
+bundles, and the app shell.
 
 Chapter prose should introduce these modules gradually. Avoid dropping a finished engine on the reader too early; let the mechanics grow by pressure from the playable requirements.
 
@@ -106,29 +128,30 @@ Chapter prose should introduce these modules gradually. Avoid dropping a finishe
 | --- | --- | --- | --- |
 | Introduction | The Wizard explains why a spreadsheet can become a spellbook | Project promise, original adventure premise, licence/originality boundaries | `book/build-log.md` |
 | Choose Your Node Adventure | The Cartographer and the Adventurer argue about whether a room exists before it is reachable | Passage, choice, graph validation, prototype adventure outline | `src/gamebook/model.ts`, `src/gamebook/graph.ts`, `src/gamebook/content/mt-graphnor.ts` |
-| Hypertext, HATEOAS, And The Gamebook Page | A door refuses to say where it leads until the Adventurer asks correctly | Passage renderer and choice controls | `src/gamebook/ui/` |
+| Hypertext, HATEOAS, And The Gamebook Page | A door refuses to say where it leads until the Adventurer asks correctly | Passage renderer, choice controls, full-page routes, fragments, redirects, breadcrumbs, and discovery paths | `src/app.tsx`, `src/gamebook/render.ts`, `src/gamebook/player-render.ts` |
 | Character Sheets As Data Models | The Scribe tries to describe a hero without accidentally becoming the hero | Versioned character state and derived stats | `src/gamebook/model.ts`, `src/gamebook/rules/character.ts` |
 | Classes, Composition, And The Limits Of Inheritance | The Wizard asks whether every spellcaster must inherit from Wizard | Character creator options and capability composition | `src/gamebook/rules/character.ts` |
 | Dice, Probability, And Risk | The Oracle explains why a fair die still feels unfair | Roll result model and transparent d20 log | `src/gamebook/rules/dice.ts` |
 | Combat As An Event Loop | The Dungeon Master pauses time to ask whose turn it is | Encounter state, player turn, monster turn, retreat/defeat transitions | `src/gamebook/rules/combat.ts` |
 | Inventory, Resources, And Encumbrance | The Packrat insists the backpack can hold one more impossible thing | Item and flag-gated choices | `src/gamebook/model.ts`, `src/gamebook/state.ts` |
-| The Dungeon Master And The Admin | The Goblin Doorkeeper checks whether the Admin is actually in the party | Author/debug mode and player-mode boundary | `src/gamebook/ui/` |
-| Adventure Modules And Programming Modules | The Scribe files a dungeon room in the wrong adventure | Separation between content, rules, state, graph, and UI | `src/gamebook/` |
+| The Dungeon Master And The Admin | The Goblin Doorkeeper checks whether the Admin is actually in the party | Author/debug mode, player-mode boundary, and player-safe visibility comparison | `src/app.tsx`, `src/gamebook/player-client.ts`, `src/gamebook/player-render.ts` |
+| Adventure Modules And Programming Modules | The Scribe files a dungeon room in the wrong adventure | Separation between content, rules, state, graph, rendering, app shell, and shared package boundaries | `src/gamebook/`, `src/app.tsx` |
 | Rules As Structured Data | The Wizard demands to know which spellbook a rule came from | SRD attribution notes and small rule lookup tables | `src/gamebook/rules/` |
 | Saving The Game | The Adventurer learns that memory is a contract, not a vibe | Local-storage save document, reset, export/import | `src/gamebook/state.ts` |
-| Authoring A Branching Adventure | The Cartographer finds a beautiful corridor that no one can enter | Passage-content conventions, validation reports, Mermaid graph output | `src/gamebook/content/`, `src/gamebook/graph.ts` |
-| Testing The Dungeon | The Dungeon Master sends a test party into every door | Test suite for graph, state, rules, and content | future test files |
+| Authoring A Branching Adventure | The Cartographer finds a beautiful corridor that no one can enter | Passage-content conventions, validation reports, Mermaid graph output, preview, import, and player-safe authoring pipelines | `src/gamebook/content/`, `src/gamebook/graph.ts`, `src/app.tsx` |
+| Testing The Dungeon | The Dungeon Master sends a test party into every door | Test suite, verification manifest, static smoke, accessibility expectations, screenshots, and acceptance evidence | `src/gamebook/testing.ts`, `src/app.test.tsx`, `scripts/` |
 | Conclusion | The Wizard closes one spellbook and opens another | Reflection on the completed gamebook as a graph of choices, constraints, state, and meaning | `book/build-log.md` |
 
 ## Campaign Ledger Case Study
 
 Campaign Ledger should provide concrete software-engineering evidence, not just an aside. Use it as the mature case study for:
 
-- Role-based access: player, Game Master, admin, capabilities, ownership, and route guards.
-- HTMX and hypermedia: full pages versus fragments, state transitions, and focused swaps.
+- Role-based access: player, Game Master, admin, capabilities, ownership, selected-player visibility, player preview, and route guards.
+- HTMX and hypermedia: full pages versus fragments, state transitions, focused swaps, action redirects, breadcrumbs, and discovery paths.
 - Local-first persistence: SQLite as source of truth, browser-local play documents, export/import, and hosted rehearsal.
-- SRD import and provenance: local corpus, importer boundaries, source categories, public versus private rules, and attribution.
-- Testing and delivery: repository tests, route tests, component tests, Pa11y, screenshots, smoke tests, and `bun run verify`.
+- SRD import and provenance: local corpus, importer boundaries, source categories, public versus private rules, discoverability, and attribution.
+- Authoring pipelines: wiki rendering, staged imports, Google Docs manual export, preview, warnings, source metadata, and player-safe publishing.
+- Testing and delivery: repository tests, route tests, component tests, Pa11y, screenshots, smoke tests, acceptance notes, and `bun run verify`.
 - Hyper-Dank adoption: package boundaries, compatibility tests, and shared framework primitives versus app-owned domain logic.
 
 ## Proposed Book Structure
@@ -152,9 +175,9 @@ Campaign Ledger should provide concrete software-engineering evidence, not just 
 
 3. **Hypertext, HATEOAS, And The Gamebook Page**
    - Split the HTMX/gamebook material out from the graph chapter.
-   - Teach links, forms, fragments, state transitions, HTMX swaps, and hypermedia as application state.
-   - Use campaign-ledger's full-page and fragment architecture as supporting evidence.
-   - Build move: render a static adventure passage, visible choices, and a progressive enhancement path for fragment swaps.
+   - Teach links, forms, fragments, redirects, state transitions, HTMX swaps, breadcrumbs, and hypermedia as application state.
+   - Use the gamebook passage/choice flow as the beginner example and Campaign Ledger's full-page, fragment, redirect, breadcrumb, and discovery architecture as the mature case study.
+   - Build move: render a static adventure passage, visible choices, and a progressive enhancement path for fragment swaps and refreshable routes.
    - Optional dialogue: a door refuses to reveal its state without the right request.
 
 ### Part II: Characters, Rules, And State
@@ -199,17 +222,17 @@ Campaign Ledger should provide concrete software-engineering evidence, not just 
 9. **The Dungeon Master And The Admin**
    - Teach role-based access control, capabilities, ownership, permissions, and guard placement.
    - Compare DM/player roles with admin/user roles.
-   - Use campaign-ledger's role guards and capability model as the mature case study.
-   - Keep the gamebook version intentionally lightweight: player mode for normal play, author/debug mode for validation and forced navigation.
+   - Use campaign-ledger's role guards, selected-player NPC visibility, player preview, campaign reads, and capability model as the mature case study.
+   - Keep the gamebook version intentionally lightweight: player mode for normal play, author/debug mode for validation, forced navigation, and player-only static publishing.
    - Build move: debug state panel and author/player mode distinction.
    - Optional dialogue: the Goblin Doorkeeper checks whether the Admin is actually in the party.
 
 10. **Adventure Modules And Programming Modules**
-    - Teach modularity, boundaries, public contracts, dependency inversion, package adoption, and refactoring.
-    - Use campaign-ledger and Hyper-Dank package adoption as evidence.
-    - Use the `src/gamebook` shape as the concrete module map.
-    - Build move: separate adventure content, graph validation, rules, state, and UI controls.
-    - Optional dialogue: the Scribe files a dungeon room in the wrong adventure.
+   - Teach modularity, boundaries, public contracts, dependency inversion, package adoption, and refactoring.
+   - Use Campaign Ledger's Hyper-Dank adoption, compatibility shims, breadcrumbs, app-owned boundaries, and package-update audit as the mature evidence.
+   - Use the `src/gamebook` shape as the beginner module map, including the current split between domain modules, renderers, player-only bundles, and `src/app.tsx`.
+   - Build move: separate adventure content, graph validation, rules, state, rendering, app-shell routes, and author tooling.
+   - Optional dialogue: the Scribe files a dungeon room in the wrong adventure.
 
 11. **Rules As Structured Data**
     - Teach parsing, provenance, source precedence, schema design, and licence-aware data import.
@@ -228,17 +251,19 @@ Campaign Ledger should provide concrete software-engineering evidence, not just 
 ### Part IV: Building The Book's Gamebook
 
 13. **Authoring A Branching Adventure**
-    - Teach content modelling, passage IDs, choice constraints, dead-end checks, reachability, endings, and puzzle gates.
+    - Teach content modelling, passage IDs, choice constraints, dead-end checks, reachability, endings, puzzle gates, preview, import, warnings, and player-safe publishing.
     - Apply Fighting Fantasy-inspired structure without copying protected expression.
+    - Use Campaign Ledger's wiki renderer, staged import, Google Docs manual import, source metadata, and player preview as the mature authoring-pipeline case study.
     - Finalise the prototype room contracts: guardian, puzzle, trap, climax, reward/twist.
-    - Build move: content conventions for passages, choices, checks, encounters, flags, and endings.
+    - Build move: content conventions for passages, choices, checks, encounters, flags, endings, validation, and previewable authoring surfaces.
     - Narrative note: this is still mechanics planning. Final prose and setting detail come later.
     - Optional dialogue: the Cartographer finds a beautiful corridor that no one can enter.
 
 14. **Testing The Dungeon**
-    - Teach verification, smoke tests, route/component tests, accessibility checks, screenshots, and acceptance criteria.
-    - Use campaign-ledger's verification posture as the mature case study.
-    - Build move: graph, state, rules, content, and accessibility tests for the gamebook.
+    - Teach verification, smoke tests, route/component tests, accessibility checks, screenshots, acceptance notes, and evidence-led PR review.
+    - Use Campaign Ledger's verification posture as the mature case study: tests, Pa11y targets, MVP smoke, screenshots, compatibility tests, and acceptance notes.
+    - Use the gamebook's verification manifest as the compact worked example.
+    - Build move: graph, state, rules, content, route, static build, static browser, and accessibility-style tests for the gamebook.
     - Optional dialogue: the Dungeon Master sends a test party into every door.
 
 15. **Conclusion: The Labyrinth Never Ends**
