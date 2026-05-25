@@ -47,3 +47,4 @@ Use this log to record major planning, research, manuscript, and gamebook implem
 - Tightened the player passage layout with a distinct story/option structure, compact expandable encounter status, and refreshed screenshot evidence for mobile and desktop play states.
 - Added the Hyper-Dank colour-mode switch to gamebook and author headers, persisted the light/dark preference in local storage, and verified expanded mobile detail panels no longer overflow horizontally.
 - Polished save management with a visible save summary, downloadable save JSON, import/export smoke coverage, and settings-popover behaviour that does not block the next player choice after starting, importing, or resetting a game.
+- Added a structured rules catalogue for SRD 5.1 provenance, playable ability/skill/class/race mechanics, prototype equipment, and Mt. Graphnor attribution coverage.

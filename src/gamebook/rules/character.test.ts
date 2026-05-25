@@ -3,8 +3,10 @@ import {
   abilityModifier,
   createCharacter,
   proficiencyBonus,
+  RACE_TEMPLATES,
   skillModifier,
 } from "./character.ts";
+import { RACE_RULES } from "./srd.ts";
 
 test("ability modifiers follow SRD-style score maths", () => {
   expect(abilityModifier(1)).toBe(-5);
@@ -46,4 +48,13 @@ test("race templates apply ability, skill, inventory, and hit point changes", ()
   expect(dwarfFighter.inventory.includes("stone-token")).toBe(true);
 
   expect(halflingRogue.inventory.includes("lucky-charm")).toBe(true);
+});
+
+test("race templates reuse the structured race rule bonuses", () => {
+  expect(RACE_TEMPLATES).toMatchObject({
+    human: { abilityBonuses: RACE_RULES.human.abilityBonuses },
+    elf: { abilityBonuses: RACE_RULES.elf.abilityBonuses },
+    dwarf: { abilityBonuses: RACE_RULES.dwarf.abilityBonuses },
+    halfling: { abilityBonuses: RACE_RULES.halfling.abilityBonuses },
+  });
 });

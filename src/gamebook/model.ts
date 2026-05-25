@@ -57,6 +57,7 @@ export interface ItemDefinition {
   id: string;
   name: string;
   kind: "equipment" | "key" | "consumable" | "treasure";
+  sourceId?: string;
 }
 
 export interface DiscoveryDefinition {

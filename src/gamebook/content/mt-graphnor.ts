@@ -1,27 +1,25 @@
 import { Adventure } from "../model.ts";
+import { EQUIPMENT_RULES, gamebookRuleAttributions } from "../rules/srd.ts";
 
 export const mtGraphnorAdventure: Adventure = {
   id: "mt-graphnor",
   title: "Mt. Graphnor",
   startPassageId: "entrance",
-  attribution: [
-    "Uses original adventure content and SRD 5.1-compatible mechanics concepts.",
-    "Dungeons & Dragons System Reference Document 5.1 is licensed under Creative Commons Attribution 4.0 International.",
-  ],
+  attribution: gamebookRuleAttributions(),
   items: [
-    { id: "sword", name: "Sword", kind: "equipment" },
-    { id: "shield", name: "Shield", kind: "equipment" },
-    { id: "ration", name: "Ration", kind: "consumable" },
-    { id: "shortsword", name: "Shortsword", kind: "equipment" },
-    { id: "thieves-tools", name: "Thieves' tools", kind: "equipment" },
-    { id: "staff", name: "Staff", kind: "equipment" },
-    { id: "spellbook", name: "Spellbook", kind: "equipment" },
-    { id: "mace", name: "Mace", kind: "equipment" },
-    { id: "holy-symbol", name: "Holy symbol", kind: "equipment" },
-    { id: "stone-token", name: "Stone token", kind: "treasure" },
-    { id: "lucky-charm", name: "Lucky charm", kind: "treasure" },
-    { id: "brass-key", name: "Brass key", kind: "key" },
-    { id: "graphnor-map", name: "Graphnor map", kind: "treasure" },
+    EQUIPMENT_RULES.sword,
+    EQUIPMENT_RULES.shield,
+    EQUIPMENT_RULES.ration,
+    EQUIPMENT_RULES.shortsword,
+    EQUIPMENT_RULES["thieves-tools"],
+    EQUIPMENT_RULES.staff,
+    EQUIPMENT_RULES.spellbook,
+    EQUIPMENT_RULES.mace,
+    EQUIPMENT_RULES["holy-symbol"],
+    EQUIPMENT_RULES["stone-token"],
+    EQUIPMENT_RULES["lucky-charm"],
+    EQUIPMENT_RULES["brass-key"],
+    EQUIPMENT_RULES["graphnor-map"],
   ],
   discoveries: [
     { id: "challenged-guardian", name: "Challenged the door guardian" },
