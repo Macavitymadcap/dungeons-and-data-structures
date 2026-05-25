@@ -121,6 +121,7 @@ describe("createApp", () => {
     expect(html).toContain("role=\"tablist\"");
     expect(html).toContain("data-author-tab=\"audit\"");
     expect(html).toContain("data-author-tab=\"graph\"");
+    expect(html).toContain("data-author-tab=\"testing\"");
     expect(html).toContain("data-author-tab-panel=\"previews\"");
     expect(html).toContain("Graph validation");
     expect(html).toContain("Validation passed");
@@ -130,6 +131,10 @@ describe("createApp", () => {
     expect(html).toContain("Combat choices");
     expect(html).toContain("Gated choices");
     expect(html).toContain("State effects");
+    expect(html).toContain("Testing coverage");
+    expect(html).toContain("Verification gates");
+    expect(html).toContain("Published static gamebook");
+    expect(html).toContain("scripts/test-static-gamebook.ts");
     expect(html).toContain("victory, failure, retreat, cliffhanger");
     expect(html).toContain("room-1");
     expect(html).toContain("gamebook-mermaid-diagram mermaid");
