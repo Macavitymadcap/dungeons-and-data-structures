@@ -13,7 +13,8 @@ The gamebook should be:
 - Inspired by gamebook form without copying Fighting Fantasy text, maps, encounters, or trade dress.
 - Built around original mechanics and working room concepts from the book seed chapters.
 - Mechanically compatible with D&D 5e SRD 5.1 where useful.
-- Framework-light in the domain layer so a later Deno-to-Hyper-Dank/Bun migration can preserve the core code.
+- Framework-light in the domain layer so the gamebook can preserve its core code even as Hono,
+  Hyper-Dank, static rendering, and author tooling evolve around it.
 
 This plan is intentionally about mechanics, data, validation, and implementation structure. Final narrative writing, tone, setting, names, and prose style come later. The playable gamebook should not be a direct computer-science allegory; the book can use separate dialogues and examples to explain technical concepts.
 
@@ -268,34 +269,52 @@ Completion tests should assert:
 
 The reusable template contract lives in `src/gamebook/content/five-room-template.ts`, with a prose-facing explanation in `book/gamebook-template.md`.
 
-## Suggested Source Shape
+## Current Source Shape
 
-Use this future structure:
+Use this current structure as the source of truth for chapter dossiers:
 
 ```text
 src/gamebook/
 ├── model.ts
 ├── graph.ts
 ├── state.ts
+├── play.ts
 ├── content/
+│   ├── five-room-template.ts
 │   └── mt-graphnor.ts
 ├── rules/
 │   ├── character.ts
 │   ├── combat.ts
-│   └── dice.ts
-└── ui/
+│   ├── dice.ts
+│   └── srd.ts
+├── render.ts
+├── player-render.ts
+├── client.ts
+├── player-client.ts
+└── testing.ts
 ```
 
-Suggested responsibilities:
+Current responsibilities:
 
 - `model.ts`: `Passage`, `Choice`, `GameState`, `Character`, `Encounter`, `Item`, `Condition`, and `RollResult` types.
 - `content/mt-graphnor.ts`: first adventure content.
 - `graph.ts`: validation, reachability, and Mermaid export.
 - `state.ts`: local-storage document, save, load, reset, export, and import.
+- `play.ts`: shared choice resolution for checks, combat, effects, logging, and passage movement.
 - `rules/dice.ts`: dice roller and probability-friendly roll results.
 - `rules/character.ts`: ability modifiers, proficiency, and derived stats.
 - `rules/combat.ts`: attack, damage, and turn resolution.
-- `ui/`: static rendering, controls, character creator, passage view, and state panel.
+- `rules/srd.ts`: compact SRD provenance and structured rule references for playable mechanics.
+- `render.ts`: shared player-facing gamebook rendering.
+- `player-render.ts`: static player-only rendering for the published build.
+- `client.ts`: author-capable browser behaviour used in development.
+- `player-client.ts`: player-only browser behaviour used in static publishing.
+- `testing.ts`: verification gates and coverage areas surfaced in author tools.
+
+`src/app.tsx` remains the Hono and Hyper-Dank application shell for routes, author pages, fragment
+responses, development assets, and author/player bundle selection. A future `src/gamebook/ui/`
+directory is optional; do not assume it exists in chapter dossiers unless a later refactor creates
+it.
 
 ## Test Plan
 

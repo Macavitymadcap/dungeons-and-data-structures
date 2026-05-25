@@ -2,6 +2,17 @@
 
 Create one dossier per planned chapter before drafting full prose.
 
+## Current Baseline
+
+The architecture checkpoint in `book/architecture-checkpoint-before-further-dossiers.md` confirms
+that the outlined book topics are supported by patterns already present in the gamebook/storybook
+engine and Campaign Ledger. The refreshed structure in `book/book-structure-plan.md` is now the
+baseline for new dossiers.
+
+Resume one dossier at a time and name exact evidence from both apps whenever a chapter depends on
+both. Chapter 02 can proceed from the existing graph dossier; chapters 03 onward should use the
+refreshed emphasis in the structure plan.
+
 ## Dossier Template
 
 ```markdown

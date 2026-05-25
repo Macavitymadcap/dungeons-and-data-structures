@@ -36,6 +36,7 @@ export type PassageTag =
   | "room-5"
   | "combat"
   | "puzzle"
+  | "roleplay"
   | "trap"
   | "reward";
 
@@ -56,6 +57,7 @@ export interface ItemDefinition {
   id: string;
   name: string;
   kind: "equipment" | "key" | "consumable" | "treasure";
+  sourceId?: string;
 }
 
 export interface DiscoveryDefinition {

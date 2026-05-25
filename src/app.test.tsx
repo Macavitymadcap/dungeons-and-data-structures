@@ -21,16 +21,31 @@ describe("createApp", () => {
     const html = await response.text();
 
     expect(response.status).toBe(200);
+    expect(html).toContain("gamebook-site-header");
+    expect(html).toContain("Gamebook lab");
+    expect(html).toContain('id="gamebook-theme-toggle"');
+    expect(html).toContain('data-theme-toggle=""');
+    expect(html).toContain("dads-gamebook-theme");
+    expect(html).toContain('href="/gamebook/author"');
     expect(html).toContain("Mt. Graphnor");
     expect(html).toContain("Entrance And Guardian");
+    expect(html).toContain("Options");
     expect(html).toContain("Slip past the guard");
     expect(html).toContain('<output class="labelled-output-value">rogue</output>');
     expect(html).toContain('<output class="labelled-output-value">elf</output>');
     expect(html).toContain("Shortsword");
     expect(html).toContain("Thieves&#39; tools");
+    expect(html).toContain("Dungeons &amp; Dragons System Reference Document 5.1");
     expect(html).toContain("<dt>Discoveries</dt>");
+    expect(html).toContain("gamebook-popover-header");
+    expect(html).toContain("New games, local saves, and JSON import tools.");
+    expect(html).toContain("Save summary");
+    expect(html).toContain('data-save-current-passage=""');
+    expect(html).toContain('data-save-version=""');
+    expect(html).toContain('data-save-updated=""');
     expect(html).toContain("gamebook-save-import");
     expect(html).toContain("gamebook-save-json");
+    expect(html).toContain("gamebook-download-save");
   });
 
   test("serves author-capable browser client when author tools are enabled", async () => {
@@ -75,6 +90,7 @@ describe("createApp", () => {
     expect(pageHtml).not.toContain("Debug state");
     expect(pageHtml).not.toContain("gamebook-force-passage");
     expect(pageHtml).not.toContain('name="authorMode" value="1"');
+    expect(pageHtml).not.toContain('href="/gamebook/author"');
 
     const authorResponse = await app.request("/gamebook/author");
     expect(authorResponse.status).toBe(404);
@@ -98,11 +114,42 @@ describe("createApp", () => {
     const html = await response.text();
 
     expect(response.status).toBe(200);
+    expect(html).toContain("gamebook-site-header");
+    expect(html).toContain('aria-current="page" href="/gamebook/author"');
+    expect(html).toContain('id="gamebook-theme-toggle"');
     expect(html).toContain("Author Tools");
+    expect(html).toContain("role=\"tablist\"");
+    expect(html).toContain("data-author-tab=\"audit\"");
+    expect(html).toContain("data-author-tab=\"graph\"");
+    expect(html).toContain("data-author-tab=\"testing\"");
+    expect(html).toContain("data-author-tab-panel=\"previews\"");
     expect(html).toContain("Graph validation");
     expect(html).toContain("Validation passed");
+    expect(html).toContain("Five-room template");
+    expect(html).toContain("Template coverage passed");
+    expect(html).toContain("Content audit");
+    expect(html).toContain("Combat choices");
+    expect(html).toContain("Gated choices");
+    expect(html).toContain("State effects");
+    expect(html).toContain("Testing coverage");
+    expect(html).toContain("Verification gates");
+    expect(html).toContain("Published static gamebook");
+    expect(html).toContain("scripts/test-static-gamebook.ts");
+    expect(html).toContain("victory, failure, retreat, cliffhanger");
+    expect(html).toContain("room-1");
+    expect(html).toContain("gamebook-mermaid-diagram mermaid");
+    expect(html).toContain("Mermaid source");
     expect(html).toContain("flowchart TD");
     expect(html).toContain("p_guardian_clash");
+    expect(html).toContain("Passage previews");
+    expect(html).toContain("Filter passage previews");
+    expect(html).toContain("data-passage-filter=\"all\"");
+    expect(html).toContain("data-passage-filter=\"roleplay\"");
+    expect(html).toContain("data-passage-filter=\"combat\"");
+    expect(html).toContain("data-passage-filter=\"failure\"");
+    expect(html).toContain("data-passage-filters=\"start room-1 roleplay\"");
+    expect(html).toContain("Entrance And Guardian");
+    expect(html).toContain("Force a way through -&gt; guardian-clash");
   });
 
   test("author page renders content validation issues", async () => {
@@ -144,8 +191,11 @@ describe("createApp", () => {
 
     expect(response.status).toBe(200);
     expect(html).toContain("Validation failed");
+    expect(html).toContain("Template coverage failed");
     expect(html).toContain("missing-item");
     expect(html).toContain("missing-discovery");
+    expect(html).toContain("missing-room");
+    expect(html).toContain("missing-ending");
   });
 
   test("choice post returns the next passage fragment", async () => {
@@ -381,8 +431,11 @@ describe("createApp", () => {
 
     expect(response.status).toBe(200);
     expect(html).toContain("Guardian Clash");
+    expect(html).toContain("gamebook-encounter-status");
     expect(html).toContain("Encounter status");
-    expect(html).toContain("Door Guardian: 6/6 HP, round 1.");
+    expect(html).toContain('<output class="labelled-output-value">Door Guardian</output>');
+    expect(html).toContain('<output class="labelled-output-value">6/6</output>');
+    expect(html).toContain('<output class="labelled-output-value">1</output>');
     expect(html).toContain("Combat round 1");
     expect(html).toContain("Foe attack");
     expect(html).not.toContain("Use a ration and catch your breath");

@@ -6,6 +6,7 @@ import {
   CharacterRace,
   Skill,
 } from "../model.ts";
+import { RACE_RULES } from "./srd.ts";
 
 export interface CharacterTemplate {
   class: CharacterClass;
@@ -110,28 +111,21 @@ export interface RaceTemplate {
 export const RACE_TEMPLATES: Record<CharacterRace, RaceTemplate> = {
   human: {
     race: "human",
-    abilityBonuses: {
-      strength: 1,
-      dexterity: 1,
-      constitution: 1,
-      intelligence: 1,
-      wisdom: 1,
-      charisma: 1,
-    },
+    abilityBonuses: RACE_RULES.human.abilityBonuses,
   },
   elf: {
     race: "elf",
-    abilityBonuses: { dexterity: 2 },
+    abilityBonuses: RACE_RULES.elf.abilityBonuses,
     skillProficiencies: ["perception"],
   },
   dwarf: {
     race: "dwarf",
-    abilityBonuses: { constitution: 2 },
+    abilityBonuses: RACE_RULES.dwarf.abilityBonuses,
     inventory: ["stone-token"],
   },
   halfling: {
     race: "halfling",
-    abilityBonuses: { dexterity: 2 },
+    abilityBonuses: RACE_RULES.halfling.abilityBonuses,
     inventory: ["lucky-charm"],
   },
 };

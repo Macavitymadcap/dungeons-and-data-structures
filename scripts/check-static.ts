@@ -40,7 +40,7 @@ const checked = await smokeStaticSite({
 
 const gamebookHtml = await readFile("dist/gamebook/index.html", "utf8");
 const clientJs = await readFile("dist/assets/client.js", "utf8");
-for (const forbidden of ["Debug state", "gamebook-force-passage", "authorMode"]) {
+for (const forbidden of ["Debug state", "gamebook-force-passage", "authorMode", "mermaid"]) {
   for (const [label, content] of [
     ["gamebook HTML", gamebookHtml],
     ["client bundle", clientJs],

@@ -40,3 +40,15 @@ Use this log to record major planning, research, manuscript, and gamebook implem
 - Added temporary hit point mechanics so choice and combat damage consume temporary hit points before normal hit points.
 - Updated the gamebook roadmap with an explicit Mt. Graphnor MVP completion milestone, replaced obvious placeholder adventure copy, and added content tests for the five-room template shape.
 - Added a reusable Five Room Dungeon template contract and companion planning note so Mt. Graphnor can act as the first adventure template.
+- Started the authoring-ergonomics epic by surfacing five-room template coverage in development-only author tools.
+- Added development-only passage previews so authors can inspect content, tags, and choice targets without using forced navigation.
+- Added a development-only content audit tab so authors can scan passage, choice, check, combat, gate, effect, item, discovery, and ending coverage at a glance.
+- Refreshed the gamebook and authoring chrome with a Hyper-Dank-inspired site header, stronger page headers, dimensional surfaces, and clearer play/author navigation while keeping author links out of the player-only build.
+- Tightened the player passage layout with a distinct story/option structure, compact expandable encounter status, and refreshed screenshot evidence for mobile and desktop play states.
+- Added the Hyper-Dank colour-mode switch to gamebook and author headers, persisted the light/dark preference in local storage, and verified expanded mobile detail panels no longer overflow horizontally.
+- Polished save management with a visible save summary, downloadable save JSON, import/export smoke coverage, and settings-popover behaviour that does not block the next player choice after starting, importing, or resetting a game.
+- Added a structured rules catalogue for SRD 5.1 provenance, playable ability/skill/class/race mechanics, prototype equipment, and Mt. Graphnor attribution coverage.
+- Added a structured testing coverage manifest and surfaced it in author tools so chapter 14 can point at concrete graph, state, rules, UI, and static-browser verification evidence.
+- Seeded the Chapter 02 **Choose Your Node Adventure** research dossier, then paused further chapter dossiers for an architecture research checkpoint across the gamebook/storybook engine and recent Campaign Ledger work.
+- Recorded the checkpoint in `book/architecture-checkpoint-before-further-dossiers.md`: Chapter 02 can proceed, the remaining topics are still sound, and chapters 03 onward should use the refreshed cross-app structure.
+- Refreshed `book/book-structure-plan.md`, `book/gamebook-plan.md`, and `book/research/README.md` from the checkpoint so future chapter dossiers can proceed from the current cross-app architecture baseline.

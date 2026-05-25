@@ -27,6 +27,9 @@ const bootData = readBootData();
 const passageRoot = document.querySelector<HTMLElement>("#gamebook-passage");
 const saveStatus = document.querySelector<HTMLElement>("#gamebook-save-status");
 const saveJson = document.querySelector<HTMLTextAreaElement>("#gamebook-save-json");
+const saveCurrentPassage = document.querySelector<HTMLElement>("[data-save-current-passage]");
+const saveVersion = document.querySelector<HTMLElement>("[data-save-version]");
+const saveUpdated = document.querySelector<HTMLElement>("[data-save-updated]");
 
 if (bootData && passageRoot) {
   const loaded = loadGame(storage, SAVE_KEY, bootData.adventure);
@@ -58,6 +61,7 @@ if (bootData && passageRoot) {
         createCharacter("hero-1", "Adventurer", characterClass, race),
       );
       saveGame(storage, state);
+      closeGameControls();
       renderCurrentState(
         bootData.adventure,
         state,
@@ -88,6 +92,7 @@ if (bootData && passageRoot) {
 
       state = imported.state;
       saveGame(storage, state);
+      closeGameControls();
       renderCurrentState(
         bootData.adventure,
         state,
@@ -136,6 +141,7 @@ if (bootData && passageRoot) {
   document.querySelector("#gamebook-reset")?.addEventListener("click", () => {
     resetGame(storage);
     state = bootData.state;
+    closeGameControls();
     renderCurrentState(
       bootData.adventure,
       state,
@@ -145,11 +151,14 @@ if (bootData && passageRoot) {
   });
 
   document.querySelector("#gamebook-export")?.addEventListener("click", () => {
-    if (saveJson) {
-      saveJson.value = JSON.stringify(state, null, 2);
-      saveJson.focus();
-    }
+    writeSaveJson(state);
     setStatus("Exported current save JSON.");
+  });
+
+  document.querySelector("#gamebook-download-save")?.addEventListener("click", () => {
+    writeSaveJson(state);
+    downloadSaveJson(state);
+    setStatus("Downloaded current save JSON.");
   });
 }
 
@@ -181,6 +190,7 @@ function renderCurrentState(
   combat?: Parameters<typeof renderPlayerPassage>[3],
 ): void {
   target.innerHTML = renderPlayerPassage(adventure, state, roll, combat);
+  syncSaveSummary(state);
   if (saveStatus) {
     setStatus(status);
   }
@@ -189,6 +199,66 @@ function renderCurrentState(
 function setStatus(status: string): void {
   if (saveStatus) {
     saveStatus.textContent = status;
+  }
+}
+
+function writeSaveJson(state: GameState): void {
+  if (!saveJson) {
+    return;
+  }
+
+  saveJson.value = JSON.stringify(state, null, 2);
+  saveJson.focus();
+}
+
+function syncSaveSummary(state: GameState): void {
+  if (saveCurrentPassage) {
+    saveCurrentPassage.textContent = state.currentPassageId;
+  }
+  if (saveVersion) {
+    saveVersion.textContent = String(state.version);
+  }
+  if (saveUpdated) {
+    saveUpdated.textContent = formatSaveTime(state.updatedAt);
+  }
+}
+
+function downloadSaveJson(state: GameState): void {
+  const blob = new Blob([JSON.stringify(state, null, 2)], {
+    type: "application/json",
+  });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.href = url;
+  link.download = saveFileName(state);
+  link.hidden = true;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function saveFileName(state: GameState): string {
+  const updatedAt = state.updatedAt.replace(/[:.]/g, "-");
+  return `${state.adventureId}-${state.currentPassageId}-${updatedAt}.json`;
+}
+
+function formatSaveTime(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.valueOf())) {
+    return "Unknown";
+  }
+
+  return date.toLocaleString("en-GB", {
+    dateStyle: "short",
+    timeStyle: "short",
+  });
+}
+
+function closeGameControls(): void {
+  const controls = document.querySelector<HTMLDetailsElement>(".gamebook-command-bar details");
+  if (controls) {
+    controls.open = false;
   }
 }
 
