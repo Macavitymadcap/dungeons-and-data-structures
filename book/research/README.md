@@ -13,6 +13,10 @@ Resume one dossier at a time and name exact evidence from both apps whenever a c
 both. Chapter 02 can proceed from the existing graph dossier; chapters 03 onward should use the
 refreshed emphasis in the structure plan.
 
+## Dossiers
+
+- [Chapter 02: Choose Your Node Adventure](chapter-02-choose-your-node-adventure.md)
+
 ## Dossier Template
 
 ```markdown
