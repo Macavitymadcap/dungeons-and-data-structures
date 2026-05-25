@@ -21,6 +21,7 @@ refreshed emphasis in the structure plan.
 - [Chapter 05: Classes, Composition, And The Limits Of Inheritance](chapter-05-classes-composition-and-the-limits-of-inheritance.md)
 - [Chapter 06: Dice, Probability, And Risk](chapter-06-dice-probability-and-risk.md)
 - [Chapter 07: Combat As An Event Loop](chapter-07-combat-as-an-event-loop.md)
+- [Chapter 08: Inventory, Resources, And Encumbrance](chapter-08-inventory-resources-and-encumbrance.md)
 
 ## Dossier Template
 
