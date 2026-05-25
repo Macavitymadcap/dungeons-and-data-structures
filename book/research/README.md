@@ -25,6 +25,7 @@ refreshed emphasis in the structure plan.
 - [Chapter 09: The Dungeon Master And The Admin](chapter-09-the-dungeon-master-and-the-admin.md)
 - [Chapter 10: Adventure Modules And Programming Modules](chapter-10-adventure-modules-and-programming-modules.md)
 - [Chapter 11: Rules As Structured Data](chapter-11-rules-as-structured-data.md)
+- [Chapter 12: Saving The Game](chapter-12-saving-the-game.md)
 
 ## Dossier Template
 
