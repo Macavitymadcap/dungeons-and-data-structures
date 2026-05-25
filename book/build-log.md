@@ -49,3 +49,6 @@ Use this log to record major planning, research, manuscript, and gamebook implem
 - Polished save management with a visible save summary, downloadable save JSON, import/export smoke coverage, and settings-popover behaviour that does not block the next player choice after starting, importing, or resetting a game.
 - Added a structured rules catalogue for SRD 5.1 provenance, playable ability/skill/class/race mechanics, prototype equipment, and Mt. Graphnor attribution coverage.
 - Added a structured testing coverage manifest and surfaced it in author tools so chapter 14 can point at concrete graph, state, rules, UI, and static-browser verification evidence.
+- Seeded the Chapter 02 **Choose Your Node Adventure** research dossier, then paused further chapter dossiers for an architecture research checkpoint across the gamebook/storybook engine and recent Campaign Ledger work.
+- Recorded the checkpoint in `book/architecture-checkpoint-before-further-dossiers.md`: Chapter 02 can proceed, the remaining topics are still sound, and chapters 03 onward should use the refreshed cross-app structure.
+- Refreshed `book/book-structure-plan.md`, `book/gamebook-plan.md`, and `book/research/README.md` from the checkpoint so future chapter dossiers can proceed from the current cross-app architecture baseline.
