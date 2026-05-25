@@ -22,6 +22,7 @@ refreshed emphasis in the structure plan.
 - [Chapter 06: Dice, Probability, And Risk](chapter-06-dice-probability-and-risk.md)
 - [Chapter 07: Combat As An Event Loop](chapter-07-combat-as-an-event-loop.md)
 - [Chapter 08: Inventory, Resources, And Encumbrance](chapter-08-inventory-resources-and-encumbrance.md)
+- [Chapter 09: The Dungeon Master And The Admin](chapter-09-the-dungeon-master-and-the-admin.md)
 
 ## Dossier Template
 
