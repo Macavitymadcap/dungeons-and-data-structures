@@ -50,6 +50,11 @@ import {
   moveToPassage,
   parseGame,
 } from "./gamebook/state.ts";
+import {
+  gateNamesForArea,
+  TEST_COVERAGE_AREAS,
+  VERIFICATION_GATES,
+} from "./gamebook/testing.ts";
 
 export interface AppDependencies {
   adventure?: Adventure;
@@ -337,13 +342,26 @@ function AuthorPage(props: {
                 className="button"
                 data-author-tab="graph"
                 data-size="compact"
-                data-variant="primary"
+                data-variant="ghost"
                 role="tab"
-                aria-selected="true"
+                aria-selected="false"
                 aria-controls="author-tab-graph"
                 id="author-tab-graph-button"
               >
                 <Icon name="map" /> Graph
+              </button>
+              <button
+                type="button"
+                className="button"
+                data-author-tab="testing"
+                data-size="compact"
+                data-variant="primary"
+                role="tab"
+                aria-selected="true"
+                aria-controls="author-tab-testing"
+                id="author-tab-testing-button"
+              >
+                <Icon name="check" /> Testing
               </button>
               <button
                 type="button"
@@ -514,6 +532,7 @@ function AuthorPage(props: {
               id="author-tab-graph"
               role="tabpanel"
               aria-labelledby="author-tab-graph-button"
+              hidden
             >
               <Panel labelledBy="author-mermaid-title">
                 <section aria-labelledby="author-mermaid-title">
@@ -527,6 +546,54 @@ function AuthorPage(props: {
                       <CodeBlock code={mermaid} language="mermaid" />
                     </div>
                   </details>
+                </section>
+              </Panel>
+            </div>
+            <div
+              className="gamebook-author-tab-panel"
+              data-author-tab-panel="testing"
+              id="author-tab-testing"
+              role="tabpanel"
+              aria-labelledby="author-tab-testing-button"
+            >
+              <Panel labelledBy="author-testing-title">
+                <section aria-labelledby="author-testing-title">
+                  <h2 id="author-testing-title">Testing coverage</h2>
+                  <div className="gamebook-author-audit-grid">
+                    <LabelledOutput
+                      label="Verification gates"
+                      value={String(VERIFICATION_GATES.length)}
+                      meta="Repo-level checks"
+                    />
+                    <LabelledOutput
+                      label="Coverage areas"
+                      value={String(TEST_COVERAGE_AREAS.length)}
+                      meta="Gamebook surfaces"
+                    />
+                    <LabelledOutput
+                      label="Browser smoke"
+                      value="Static"
+                      meta="Served Playwright path"
+                    />
+                  </div>
+                  <div className="gamebook-author-preview-grid">
+                    {TEST_COVERAGE_AREAS.map((area) => (
+                      <article className="gamebook-author-passage-preview">
+                        <div className="gamebook-passage-kicker">
+                          <Badge>{area.id}</Badge>
+                          <Badge>{area.gates.length === 1 ? "1 gate" : `${area.gates.length} gates`}</Badge>
+                        </div>
+                        <h3>{area.title}</h3>
+                        <p>{area.purpose}</p>
+                        <MetadataList
+                          items={[
+                            { label: "Gates", value: gateNamesForArea(area) },
+                            { label: "Evidence", value: area.coveredBy.join(", ") },
+                          ]}
+                        />
+                      </article>
+                    ))}
+                  </div>
                 </section>
               </Panel>
             </div>

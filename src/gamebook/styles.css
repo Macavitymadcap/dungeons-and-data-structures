@@ -812,6 +812,15 @@ textarea {
   margin: 0;
 }
 
+.gamebook-author-passage-preview .badge,
+.gamebook-author-passage-preview .metadata-list,
+.gamebook-author-passage-preview .metadata-list-row,
+.gamebook-author-passage-preview dt,
+.gamebook-author-passage-preview dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .gamebook-author-passage-preview ol {
   padding-inline-start: 1.25rem;
 }
