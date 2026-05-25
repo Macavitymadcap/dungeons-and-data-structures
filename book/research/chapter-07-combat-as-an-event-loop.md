@@ -75,6 +75,12 @@ Campaign Ledger is the mature case study for command-driven resource mutation an
 It is not a combat engine, which is useful to say plainly. Its value here is that it shows the same
 state-transition pattern at product scale.
 
+Important future note: Campaign Ledger is expected to gain a combat tracker. When drafting this
+chapter, revisit Campaign Ledger and replace or extend this section with the combat-tracker
+implementation if it exists. That future feature should become the strongest mature case study for
+initiative, turns, encounter state, participant resources, combat commands, and refreshed
+representations.
+
 - `/Users/dank/Code/personal/web/campaign-ledger/src/app.tsx`
   - `PATCH /sheet/:characterRef/resources/:resourceId` accepts a current value or delta, updates a
     resource, reloads the sheet, and returns either the sheet header or the focused tab panel.
@@ -99,7 +105,9 @@ state-transition pattern at product scale.
 
 Inference from project context: Campaign Ledger shows the grown-up version of the same rule-loop
 discipline. Commands should validate input, apply bounded state changes, refresh the representation,
-and leave enough evidence for tests and users to trust what changed.
+and leave enough evidence for tests and users to trust what changed. If Campaign Ledger's combat
+tracker exists by drafting time, prefer concrete tracker evidence over the current rest/resource
+analogy while keeping the analogy as supporting context.
 
 ## Gamebook Build Payoff
 
@@ -275,7 +283,9 @@ Keep the chapter about one combat loop and state transitions. Save probability d
 Chapter 09, and full verification strategy for Chapter 14.
 
 Mention initiative queues as future growth, but do not require the prototype to implement full
-initiative before the chapter can be drafted.
+initiative before the chapter can be drafted. Re-check Campaign Ledger before drafting: its planned
+combat tracker may provide the richer initiative/turn-order example that the current static
+gamebook intentionally avoids.
 
 ## Risks
 
