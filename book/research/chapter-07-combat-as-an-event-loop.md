@@ -70,6 +70,17 @@ loops feel like table practice before naming them as software ideas.
 - Licence source: Creative Commons Attribution 4.0 International legal code:
   <https://creativecommons.org/licenses/by/4.0/legalcode.en>.
 
+## Shelf References
+
+- Dungeons & Dragons 2014 *Player's Handbook*: use combat order, actions, attacks, damage, hit
+  points, and conditions as familiar event-loop material; cite SRD 5.1 for reusable mechanics.
+- Dungeons & Dragons 2014 *Dungeon Master's Guide*: use for adjudication, encounter flow, and the
+  Game Master as the table's event processor.
+- Fighting Fantasy combat examples from owned books: use as a solo-loop contrast where the book and
+  reader alternate rule steps.
+- Martin Fowler, *Refactoring*: use for separating transition logic from presentation as combat code
+  grows.
+
 ## Campaign Ledger Evidence
 
 Campaign Ledger is the mature case study for command-driven resource mutation and sheet refreshes.

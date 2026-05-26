@@ -73,6 +73,18 @@ records, counters, maps, and constraints.
 - Licence source: Creative Commons Attribution 4.0 International legal code:
   <https://creativecommons.org/licenses/by/4.0/legalcode.en>.
 
+## Shelf References
+
+- Dungeons & Dragons 2014 *Player's Handbook*: use equipment, adventuring gear, carrying capacity,
+  spell slots, hit dice, and consumables as familiar collection/resource examples; cite SRD 5.1 for
+  reusable mechanics.
+- Steve Jackson, *Sorcery!* series: use as a shelf example of inventory, spell components, food,
+  gold, and long-running state pressure; keep examples original.
+- Fighting Fantasy books with item gates and codewords: use to discuss membership, one-off objects,
+  and reader-maintained state without copying specific solutions.
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for plain-text/data representation
+  and avoiding representation duplication.
+
 ## Campaign Ledger Evidence
 
 Campaign Ledger is the mature case study for the chapter because it separates possessions from

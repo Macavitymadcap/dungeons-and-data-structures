@@ -62,6 +62,17 @@ should introduce the difference between a game label, a shared capability, and a
   International:
   <https://media.wizards.com/2023/downloads/dnd/SRD_CC_v5.1.pdf>.
 
+## Shelf References
+
+- Dungeons & Dragons 2014 *Player's Handbook*: use Fighter, Rogue, Wizard, and Cleric as familiar
+  labels for class identity and capability bundles; cite SRD 5.1 for reusable mechanics.
+- Martin Fowler, *Refactoring*: use for replacing inheritance tangles with clearer object
+  composition and behaviour-preserving design changes.
+- Robert C. Martin, *Clean Code*: use cautiously for class size, names, and single-responsibility
+  pressure.
+- Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides, *Design Patterns*: use for the
+  composition-over-inheritance principle and strategy-like capability modelling.
+
 ## Campaign Ledger Evidence
 
 Campaign Ledger is the mature case study because it avoids turning the whole character sheet into a

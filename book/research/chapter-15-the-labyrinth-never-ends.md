@@ -98,6 +98,17 @@ programmes hiding in plain sight.
   `/Users/dank/Code/personal/web/campaign-ledger/docs/operations/`,
   `/Users/dank/Code/personal/web/campaign-ledger/src/`.
 
+## Shelf References
+
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for the closing emphasis on lifelong
+  learning, craft, feedback, and choosing the next problem.
+- Robert C. Martin, *The Clean Coder*: use carefully for the professional identity arc from private
+  toolmaking to accountable delivery.
+- A favourite Fighting Fantasy book from the author's shelf: use as a personal return point, showing
+  how the same object looks different after learning graphs, state, rules, and tests.
+- Dungeons & Dragons 2014 *Dungeon Master's Guide*: use for the image of ending one adventure while
+  leaving hooks for the next.
+
 ## Campaign Ledger Evidence
 
 The conclusion should use Campaign Ledger as evidence of the journey from private need to real

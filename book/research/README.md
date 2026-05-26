@@ -61,6 +61,12 @@ technical explanation begins.
 - Gamebook/hypertext source, if relevant:
 - Campaign Ledger evidence, if relevant:
 
+## Shelf References
+
+List real books or physical references to revisit while drafting. Prefer books the author owns or can
+reasonably find in a library. Explain what each book contributes, and keep licence/originality
+guardrails explicit for D&D and gamebook sources.
+
 ## Campaign Ledger Evidence
 
 List exact files, features, or workflows from campaign-ledger that support the chapter.
@@ -78,6 +84,9 @@ Beginner-friendly explanation, examples, diagrams, code snippets, and sidebars.
 Include at least one Mermaid diagram idea. Prefer a fenced `mermaid` block in the dossier so the
 draft has a concrete starting point.
 
+Optional subsections can include code examples, sidebar ideas, chapter boundaries, SRD-safe handling,
+bibliography entries, reusable sentences, or chapter echoes where they genuinely help the draft.
+
 ## Risks
 
 Licensing, over-complexity, unclear analogy, or missing evidence.
@@ -92,3 +101,5 @@ Licensing, over-complexity, unclear analogy, or missing evidence.
 - Tie the chapter back to the gamebook mechanics wherever practical.
 - Use opening gamebook passages or table transcripts for allegory; do not force the playable gamebook to explain computer science in-world.
 - Every dossier should include at least one Mermaid diagram idea or draft diagram.
+- Every dossier should include shelf references to concrete books where useful, alongside web
+  sources and implementation evidence.

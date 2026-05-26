@@ -100,6 +100,17 @@ open the door and then hand off to the personal spreadsheet story.
   `/Users/dank/Code/personal/web/campaign-ledger/src/app.tsx`,
   `/Users/dank/Code/personal/web/campaign-ledger/docs/operations/`.
 
+## Shelf References
+
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for the lifelong-learning frame,
+  practical craft habits, and the idea that programmers build small tools to solve real problems.
+- Robert C. Martin, *The Clean Coder*: use cautiously for professional identity and the transition
+  from hobby problem-solving to accountable software work.
+- A personally meaningful Fighting Fantasy book from the author's shelf: use as memory and form
+  context, not as source text to imitate.
+- Dungeons & Dragons 2014 *Player's Handbook*: use as the familiar table object that makes rules,
+  character sheets, dice, and play procedure concrete; cite SRD 5.1 for reusable mechanics.
+
 ## Campaign Ledger Evidence
 
 The introduction should mention Campaign Ledger as the origin pressure and mature case study, not as

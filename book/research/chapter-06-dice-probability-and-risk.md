@@ -62,6 +62,17 @@ miss a likely roll, making expectation, variance, risk, and narrative consequenc
 - Licence source: Creative Commons Attribution 4.0 International legal code:
   <https://creativecommons.org/licenses/by/4.0/legalcode.en>.
 
+## Shelf References
+
+- Dungeons & Dragons 2014 *Player's Handbook*: use d20 checks, advantage/disadvantage, attacks, and
+  damage as table-familiar probability examples; cite SRD 5.1 for reusable rules.
+- Fighting Fantasy books with Skill, Stamina, Luck, and combat rolls: use as a contrast between
+  different dice systems and risk curves; do not reproduce tables or passage outcomes.
+- Ian Livingstone, *Deathtrap Dungeon*: use as a shelf example of visible risk, luck pressure, and
+  trap consequences in solo play.
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for making hidden behaviour visible
+  through feedback, logs, and clear outputs.
+
 ## Campaign Ledger Evidence
 
 Campaign Ledger is the mature case study for visible dice as a sheet interaction.

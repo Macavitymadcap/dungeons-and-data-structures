@@ -73,6 +73,17 @@ system can safely change it later".
 - Hono source: Hono routing documentation, including route composition:
   <https://hono.dev/api/routing>.
 
+## Shelf References
+
+- Robert C. Martin, *Clean Architecture*: use for dependency direction, policy/detail boundaries,
+  and separating domain rules from frameworks.
+- Martin Fowler, *Refactoring*: use for behaviour-preserving structure changes and module-boundary
+  clean-up.
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for orthogonality, tracer bullets,
+  and pragmatic modularity.
+- Dungeons & Dragons 2014 *Dungeon Master's Guide*: use adventure modules, encounter organisation,
+  and reusable table material as the RPG-side analogy.
+
 ## Campaign Ledger Evidence
 
 Campaign Ledger is the mature case study because it has already had to separate app-owned domain

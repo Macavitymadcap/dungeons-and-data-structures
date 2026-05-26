@@ -108,6 +108,17 @@ failed combat roll because it tells the player the game forgot them.
   `/Users/dank/Code/personal/web/dungeons-and-data-structures/src/gamebook/player-client.ts`,
   `/Users/dank/Code/personal/web/dungeons-and-data-structures/scripts/test-static-gamebook.ts`.
 
+## Shelf References
+
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for plain-text persistence,
+  reversibility, and treating stored data as a long-lived interface.
+- Robert C. Martin, *Clean Architecture*: use for persistence as a boundary and for separating
+  business rules from storage details.
+- Dungeons & Dragons 2014 *Player's Handbook*: use character state, rests, resources, and conditions
+  as familiar examples of what must survive between scenes; cite SRD 5.1 for reusable mechanics.
+- Steve Jackson, *Sorcery!* series or other long-form gamebooks: use as shelf examples of persistent
+  adventure state across a solo campaign.
+
 ## Campaign Ledger Evidence
 
 Campaign Ledger gives the mature comparison: browser-local documents for public play, SQLite for

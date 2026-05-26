@@ -68,6 +68,17 @@ capabilities.
 - HTTP source: MDN on `403 Forbidden` for understood requests that the server refuses to process:
   <https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403>.
 
+## Shelf References
+
+- Dungeons & Dragons 2014 *Dungeon Master's Guide*: use the Game Master role, hidden information,
+  table authority, and adjudication as the table-side analogy for admin boundaries.
+- Robert C. Martin, *Clean Architecture*: use for policy boundaries, dependency direction, and
+  keeping privileged decisions out of incidental UI code.
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for tracer bullets and guardrails
+  around risky workflows.
+- Campaign notebooks or prep documents: use as private context for what should remain hidden from
+  players; do not publish private campaign material.
+
 ## Campaign Ledger Evidence
 
 Campaign Ledger is the mature case study because it has real sessions, roles, campaign membership,

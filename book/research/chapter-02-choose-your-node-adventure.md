@@ -44,6 +44,18 @@ player's traversal.
 - Gamebook/hypertext source, if relevant: [Fighting Fantasy official site](https://www.fightingfantasy.com/), [Choose Your Own Adventure official site](https://www.cyoa.com/), [Roleplaying Tips: 5 Room Dungeons](https://www.roleplayingtips.com/5-room-dungeons/), and [Steve Lawford, Five-Room Dungeons](https://enac.hal.science/hal-03097484/document).
 - Campaign Ledger evidence, if relevant: use only as a light comparison for website navigation and route graphs unless a later Hypertext chapter does the deeper case study.
 
+## Shelf References
+
+- Steve Jackson and Ian Livingstone, *The Warlock of Firetop Mountain*: use as a familiar example of
+  numbered passages, directed choice, mapping, risk, and endings; do not copy passages, map shape,
+  encounters, names, or puzzle answers.
+- Ian Livingstone, *Deathtrap Dungeon*: use as a shelf example for lethal branching, traps, item
+  gates, and reader mapping; keep all examples original.
+- A Choose Your Own Adventure volume: use only to compare choice-driven prose without dice or RPG
+  combat.
+- Dungeons & Dragons 2014 *Dungeon Master's Guide*: use for dungeon/adventure structure and table
+  navigation as a contrast to fixed gamebook traversal.
+
 ## Campaign Ledger Evidence
 
 Use this chapter mostly to set up graph thinking rather than to lean on Campaign Ledger. Useful later evidence to inspect when drafting:

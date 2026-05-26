@@ -68,6 +68,19 @@ the reader to know the whole server, graph, or rules engine in advance.
 - Gamebook/hypertext source, if relevant: use the Chapter 02 gamebook and graph sources as the
   bridge. The chapter's new research focus is the web/hypermedia layer, not gamebook history.
 
+## Shelf References
+
+- A Fighting Fantasy book with visible paragraph references and return instructions: use the physical
+  page-turning experience to explain hypertext controls, backtracking pressure, and state held by
+  the reader.
+- Steve Jackson, *Sorcery!* series: use as a richer shelf example of stateful choices, spell codes,
+  inventory memory, and long-running adventure continuity; do not borrow distinctive mechanics or
+  wording.
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for interface clarity, feedback, and
+  building systems from simple interactions.
+- Dungeons & Dragons 2014 *Dungeon Master's Guide*: use as a table contrast where the Game Master
+  supplies available actions conversationally.
+
 ## Campaign Ledger Evidence
 
 Campaign Ledger is the mature case study for this chapter.

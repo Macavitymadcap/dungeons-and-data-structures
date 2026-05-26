@@ -110,6 +110,18 @@ more useful only when it also makes the rule more accountable.
   `/Users/dank/Code/personal/web/dungeons-and-data-structures/src/gamebook/rules/srd.test.ts`,
   `/Users/dank/Code/personal/web/dungeons-and-data-structures/src/gamebook/content/mt-graphnor.ts`.
 
+## Shelf References
+
+- Dungeons & Dragons 2014 *Player's Handbook*, *Monster Manual*, and *Dungeon Master's Guide*: use
+  as proprietary table references for how rules, stat blocks, equipment, and advice are organised;
+  cite SRD 5.1 for reusable public mechanics.
+- Dungeons & Dragons System Reference Document 5.1: keep this as the publishable rules source for
+  mechanics examples.
+- Robert C. Martin, *Clean Architecture*: use for separating rules policy from delivery mechanisms
+  and import details.
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for plain text, metadata, and
+  keeping knowledge in one place.
+
 ## Campaign Ledger Evidence
 
 Campaign Ledger is the mature case study for this chapter because it already treats rules as

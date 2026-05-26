@@ -62,6 +62,18 @@ difference between the living story and the structured model that software can s
 - Campaign Ledger evidence: character read models, SQLite checks, calculation helpers, and sheet
   update routes in the local Campaign Ledger app.
 
+## Shelf References
+
+- Dungeons & Dragons 2014 *Player's Handbook*: use the printed character sheet, ability scores,
+  modifiers, classes, backgrounds, equipment, and level as familiar modelling examples; cite SRD 5.1
+  for reusable mechanics and avoid copying protected prose.
+- Robert C. Martin, *Clean Code*: use selectively for names, small functions, and readable model
+  code; avoid turning the chapter into style dogma.
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for plain-text data, orthogonality,
+  and keeping representations easy to reason about.
+- Campaign character sheets from the author's table: use as private drafting context only, not as
+  published personal data.
+
 ## Campaign Ledger Evidence
 
 Campaign Ledger is the mature case study for this chapter. It shows that the small gamebook model is
