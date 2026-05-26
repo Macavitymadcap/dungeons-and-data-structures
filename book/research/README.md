@@ -26,6 +26,7 @@ refreshed emphasis in the structure plan.
 - [Chapter 10: Adventure Modules And Programming Modules](chapter-10-adventure-modules-and-programming-modules.md)
 - [Chapter 11: Rules As Structured Data](chapter-11-rules-as-structured-data.md)
 - [Chapter 12: Saving The Game](chapter-12-saving-the-game.md)
+- [Chapter 13: Authoring A Branching Adventure](chapter-13-authoring-a-branching-adventure.md)
 
 ## Dossier Template
 
