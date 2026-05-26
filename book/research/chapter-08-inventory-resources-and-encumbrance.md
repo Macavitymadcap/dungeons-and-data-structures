@@ -45,13 +45,14 @@ The gamebook turns those table questions into choice gates:
 - If a later version adds weight, capacity, or slots, make that constraint visible before the player
   commits.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Quartermaster and the Adventurer** argue over whether "I have a rope" is enough information.
+Open with a table transcript where **the Quartermaster and the Adventurer** argue over whether "I
+have a rope" is enough information.
 
 The Adventurer wants one heroic list of possessions. The Quartermaster keeps asking annoying but
 useful questions: how many, where is it, is it equipped, can you carry it, and what happens when you
-spend the last one? Their exchange dramatises the move from a simple array of item ids to richer
+spend the last one? The excerpt should dramatise the move from a simple array of item ids to richer
 records, counters, maps, and constraints.
 
 ## Sources
@@ -71,6 +72,18 @@ records, counters, maps, and constraints.
   <https://media.dndbeyond.com/compendium-images/srd/5.1/SRD_CC_v5.1.pdf>.
 - Licence source: Creative Commons Attribution 4.0 International legal code:
   <https://creativecommons.org/licenses/by/4.0/legalcode.en>.
+
+## Shelf References
+
+- Dungeons & Dragons 2014 *Player's Handbook*: use equipment, adventuring gear, carrying capacity,
+  spell slots, hit dice, and consumables as familiar collection/resource examples; cite SRD 5.1 for
+  reusable mechanics.
+- Steve Jackson, *Sorcery!* series: use as a shelf example of inventory, spell components, food,
+  gold, and long-running state pressure; keep examples original.
+- Fighting Fantasy books with item gates and codewords: use to discuss membership, one-off objects,
+  and reader-maintained state without copying specific solutions.
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for plain-text/data representation
+  and avoiding representation duplication.
 
 ## Campaign Ledger Evidence
 
@@ -213,16 +226,55 @@ constraints.
    - Coins, faction tokens, and market prices are resource/accounting examples.
    - Avoid turning this chapter into a market-simulation chapter.
 
-### Diagrams
+### Diagram Idea
 
-Use three diagrams:
+Use Mermaid for three diagrams.
 
-- **Item gate**:
-  `choice -> requires.itemsAll -> inventory membership -> shown | hidden`.
-- **Inventory effect**:
-  `GameState.inventory + add/remove item effects -> Set update -> next inventory array`.
-- **Model growth**:
-  `string id -> item definition -> item record with quantity/equipped -> resource counter`.
+Item gate:
+
+```mermaid
+flowchart LR
+  choice["Choice"]
+  requires["requires.itemsAll"]
+  inventory["Inventory membership"]
+  shown["Shown"]
+  hidden["Hidden"]
+
+  choice --> requires
+  requires --> inventory
+  inventory -->|has items| shown
+  inventory -->|missing items| hidden
+```
+
+Inventory effect:
+
+```mermaid
+flowchart LR
+  current["GameState.inventory"]
+  effects["Add/remove item effects"]
+  update["Set update"]
+  next["Next inventory array"]
+
+  current --> update
+  effects --> update
+  update --> next
+```
+
+Model growth:
+
+```mermaid
+flowchart LR
+  id["String id"]
+  definition["Item definition"]
+  record["Item record"]
+  quantity["Quantity/equipped"]
+  resource["Resource counter"]
+
+  id --> definition
+  definition --> record
+  record --> quantity
+  quantity --> resource
+```
 
 ### Code Examples
 

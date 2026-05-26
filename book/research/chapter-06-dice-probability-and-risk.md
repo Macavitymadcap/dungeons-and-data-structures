@@ -36,13 +36,14 @@ story; it is a threshold. A character's modifier moves the threshold closer. Adv
 shape of the chance. A roll log lets the reader see the raw dice, the kept die, the modifier, the
 total, and the result.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Oracle and the Dice** argue about fairness.
+Open with a table transcript where **the Oracle and the Dice** expose the difference between fairness
+and risk.
 
 The Dice says every face has the same chance. The Oracle replies that a single fair roll can still
-hurt, because probability only promises patterns over time. Their exchange introduces the difference
-between fairness, expectation, risk, and narrative consequence.
+hurt, because probability only promises patterns over time. The table should then watch a player
+miss a likely roll, making expectation, variance, risk, and narrative consequence concrete.
 
 ## Sources
 
@@ -60,6 +61,17 @@ between fairness, expectation, risk, and narrative consequence.
   <https://media.wizards.com/2023/downloads/dnd/SRD_CC_v5.1.pdf>.
 - Licence source: Creative Commons Attribution 4.0 International legal code:
   <https://creativecommons.org/licenses/by/4.0/legalcode.en>.
+
+## Shelf References
+
+- Dungeons & Dragons 2014 *Player's Handbook*: use d20 checks, advantage/disadvantage, attacks, and
+  damage as table-familiar probability examples; cite SRD 5.1 for reusable rules.
+- Fighting Fantasy books with Skill, Stamina, Luck, and combat rolls: use as a contrast between
+  different dice systems and risk curves; do not reproduce tables or passage outcomes.
+- Ian Livingstone, *Deathtrap Dungeon*: use as a shelf example of visible risk, luck pressure, and
+  trap consequences in solo play.
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for making hidden behaviour visible
+  through feedback, logs, and clear outputs.
 
 ## Campaign Ledger Evidence
 
@@ -182,16 +194,57 @@ That sequence moves naturally from game text to probability and then to implemen
    - Campaign Ledger's dice popover and the gamebook's action details both prove the same UX point:
      reveal the arithmetic when the result changes the story.
 
-### Diagrams
+### Diagram Idea
 
-Use three diagrams:
+Use Mermaid for three diagrams.
 
-- **Check pipeline**:
-  `choice -> ability/skill modifier -> d20 roll -> total -> DC comparison -> passage target`.
-- **Distribution comparison**:
-  simple bars for 1d20 versus 2d6. Avoid over-detailed probability tables in the main chapter.
-- **Advantage/disadvantage**:
-  two d20s feeding into `max()` or `min()`, then one kept die.
+Check pipeline:
+
+```mermaid
+flowchart LR
+  choice["Choice"]
+  modifier["Ability or skill modifier"]
+  roll["d20 roll"]
+  total["Total"]
+  dc["DC comparison"]
+  target["Passage target"]
+
+  choice --> modifier
+  modifier --> roll
+  roll --> total
+  total --> dc
+  dc --> target
+```
+
+Distribution comparison can use Mermaid as a conceptual bar chart, avoiding over-detailed
+probability tables in the main chapter:
+
+```mermaid
+xychart-beta
+  title "Roll shape comparison"
+  x-axis ["Low", "Middle", "High"]
+  y-axis "Relative chance" 0 --> 10
+  bar "1d20" [5, 5, 5]
+  bar "2d6" [2, 9, 2]
+```
+
+Advantage/disadvantage:
+
+```mermaid
+flowchart TD
+  dieA["d20 A"]
+  dieB["d20 B"]
+  max["Advantage: keep max"]
+  min["Disadvantage: keep min"]
+  kept["Kept die"]
+
+  dieA --> max
+  dieB --> max
+  dieA --> min
+  dieB --> min
+  max --> kept
+  min --> kept
+```
 
 ### Code Examples
 

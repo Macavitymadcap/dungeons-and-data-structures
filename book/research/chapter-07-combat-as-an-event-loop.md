@@ -42,14 +42,15 @@ A gamebook has to turn that conversation into a small machine. The page must rem
 encounter, offer valid actions, process one action, and then decide whether the reader sees victory,
 defeat, retreat, or another combat passage.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Dungeon Master and the Hourglass** argue about whose turn it is.
+Open with a D&D table transcript where **the Dungeon Master and the Hourglass** interrupt a chaotic
+fight to ask whose turn it is.
 
 The Hourglass insists that time should simply flow. The Dungeon Master pauses the room after every
 action and says: first we resolve this event, then we update the world, then we ask what can happen
-next. Their exchange dramatises run-to-completion processing, state transitions, and why a combat
-loop can feel orderly even when the story is chaotic.
+next. The transcript should make run-to-completion processing, state transitions, and orderly combat
+loops feel like table practice before naming them as software ideas.
 
 ## Sources
 
@@ -68,6 +69,17 @@ loop can feel orderly even when the story is chaotic.
   <https://media.wizards.com/2023/downloads/dnd/SRD_CC_v5.1.pdf>.
 - Licence source: Creative Commons Attribution 4.0 International legal code:
   <https://creativecommons.org/licenses/by/4.0/legalcode.en>.
+
+## Shelf References
+
+- Dungeons & Dragons 2014 *Player's Handbook*: use combat order, actions, attacks, damage, hit
+  points, and conditions as familiar event-loop material; cite SRD 5.1 for reusable mechanics.
+- Dungeons & Dragons 2014 *Dungeon Master's Guide*: use for adjudication, encounter flow, and the
+  Game Master as the table's event processor.
+- Fighting Fantasy combat examples from owned books: use as a solo-loop contrast where the book and
+  reader alternate rule steps.
+- Martin Fowler, *Refactoring*: use for separating transition logic from presentation as combat code
+  grows.
 
 ## Campaign Ledger Evidence
 
@@ -199,17 +211,60 @@ That sequence is the event loop in miniature.
    - "Sword hits for 8 slashing damage" is both feedback and debugging evidence.
    - Connect this to Campaign Ledger's visible resource counts and refreshed fragments.
 
-### Diagrams
+### Diagram Idea
 
-Use three diagrams:
+Use Mermaid for three diagrams.
 
-- **Combat round pipeline**:
-  `combat choice -> player attack -> player damage? -> victory? -> monster attack -> monster
-  damage? -> outcome`.
-- **Reducer split**:
-  `GameState + CombatRoundResult -> applyCombatRound -> GameState`.
-- **Encounter state machine**:
-  `ready -> resolving -> continue -> resolving`, with exits to `victory`, `defeat`, and `retreat`.
+Combat round pipeline:
+
+```mermaid
+flowchart LR
+  choice["Combat choice"]
+  player["Player attack"]
+  pDamage["Player damage?"]
+  victory["Victory?"]
+  monster["Monster attack"]
+  mDamage["Monster damage?"]
+  outcome["Outcome"]
+
+  choice --> player
+  player --> pDamage
+  pDamage --> victory
+  victory -->|no| monster
+  victory -->|yes| outcome
+  monster --> mDamage
+  mDamage --> outcome
+```
+
+Reducer split:
+
+```mermaid
+flowchart LR
+  state["GameState"]
+  result["CombatRoundResult"]
+  reducer["applyCombatRound"]
+  next["Next GameState"]
+
+  state --> reducer
+  result --> reducer
+  reducer --> next
+```
+
+Encounter state machine:
+
+```mermaid
+stateDiagram-v2
+  [*] --> ready
+  ready --> resolving
+  resolving --> continue
+  continue --> resolving
+  resolving --> victory
+  resolving --> defeat
+  resolving --> retreat
+  victory --> [*]
+  defeat --> [*]
+  retreat --> [*]
+```
 
 ### Code Examples
 

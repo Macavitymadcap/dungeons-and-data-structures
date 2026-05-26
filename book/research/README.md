@@ -15,6 +15,7 @@ refreshed emphasis in the structure plan.
 
 ## Dossiers
 
+- [Supplementary Reading List](supplementary-reading-list.md)
 - [Chapter 01: From Spreadsheets To Spellcraft](chapter-01-from-spreadsheets-to-spellcraft.md)
 - [Chapter 02: Choose Your Node Adventure](chapter-02-choose-your-node-adventure.md)
 - [Chapter 03: Hypertext, HATEOAS, And The Gamebook Page](chapter-03-hypertext-hateoas-and-the-gamebook-page.md)
@@ -48,9 +49,11 @@ Name the computer science or software engineering idea.
 
 Explain the reader-friendly metaphor.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-Optional Godel, Escher, Bach-inspired setup. Name the speakers and the concept they dramatise.
+Describe the short gamebook passage or D&D-session transcript that should open the chapter. Name any
+recurring characters only if they help. The excerpt should embody the chapter's problem before the
+technical explanation begins.
 
 ## Sources
 
@@ -58,6 +61,12 @@ Optional Godel, Escher, Bach-inspired setup. Name the speakers and the concept t
 - D&D 5e SRD source, if relevant:
 - Gamebook/hypertext source, if relevant:
 - Campaign Ledger evidence, if relevant:
+
+## Shelf References
+
+List real books or physical references to revisit while drafting. Prefer books the author owns or can
+reasonably find in a library. Explain what each book contributes, and keep licence/originality
+guardrails explicit for D&D and gamebook sources.
 
 ## Campaign Ledger Evidence
 
@@ -73,6 +82,12 @@ Keep this mechanical unless the chapter is explicitly about narrative design. Fi
 
 Beginner-friendly explanation, examples, diagrams, code snippets, and sidebars.
 
+Include at least one Mermaid diagram idea. Prefer a fenced `mermaid` block in the dossier so the
+draft has a concrete starting point.
+
+Optional subsections can include code examples, sidebar ideas, chapter boundaries, SRD-safe handling,
+bibliography entries, reusable sentences, or chapter echoes where they genuinely help the draft.
+
 ## Risks
 
 Licensing, over-complexity, unclear analogy, or missing evidence.
@@ -85,4 +100,7 @@ Licensing, over-complexity, unclear analogy, or missing evidence.
 - Use SRD 5.1-compatible mechanics unless the chapter explicitly compares editions.
 - Treat Fighting Fantasy as form inspiration and history, not as material to copy.
 - Tie the chapter back to the gamebook mechanics wherever practical.
-- Use dialogues or interludes for allegory; do not force the playable gamebook to explain computer science in-world.
+- Use opening gamebook passages or table transcripts for allegory; do not force the playable gamebook to explain computer science in-world.
+- Every dossier should include at least one Mermaid diagram idea or draft diagram.
+- Every dossier should include shelf references to concrete books where useful, alongside web
+  sources and implementation evidence.

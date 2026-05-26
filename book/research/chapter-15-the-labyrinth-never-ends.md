@@ -45,15 +45,16 @@ The conclusion should feel like returning from a dungeon with a better map than 
 entered with. There may be deeper rooms, but the reader can now recognise doors, keys, traps,
 routes, ledgers, and safe exits.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Wizard and the Apprentice** return to the original spreadsheet.
+Open with a table transcript where **the Wizard and the Apprentice** return to the original
+spreadsheet.
 
 The Apprentice sees the old spreadsheet again and notices that it was never "just" a spreadsheet. It
 was already a small system: records, rules, state, formulas, constraints, and user workflows. The
 Wizard closes the first spellbook and says the next one will be written by the Apprentice.
 
-This dialogue should echo the introduction without repeating it. It should show growth through
+This transcript should echo the introduction without repeating it. It should show growth through
 recognition: the world did not become programmable at the end; the reader learned how to see the
 programmes hiding in plain sight.
 
@@ -96,6 +97,17 @@ programmes hiding in plain sight.
   `/Users/dank/Code/personal/web/campaign-ledger/ARCHITECTURE.md`,
   `/Users/dank/Code/personal/web/campaign-ledger/docs/operations/`,
   `/Users/dank/Code/personal/web/campaign-ledger/src/`.
+
+## Shelf References
+
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for the closing emphasis on lifelong
+  learning, craft, feedback, and choosing the next problem.
+- Robert C. Martin, *The Clean Coder*: use carefully for the professional identity arc from private
+  toolmaking to accountable delivery.
+- A favourite Fighting Fantasy book from the author's shelf: use as a personal return point, showing
+  how the same object looks different after learning graphs, state, rules, and tests.
+- Dungeons & Dragons 2014 *Dungeon Master's Guide*: use for the image of ending one adventure while
+  leaving hooks for the next.
 
 ## Campaign Ledger Evidence
 

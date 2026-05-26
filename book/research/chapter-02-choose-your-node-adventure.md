@@ -27,11 +27,15 @@ The chapter can contrast three related maps:
 - **Gamebook map**: passages and numbered choices, often mostly directed toward endings.
 - **Five Room Dungeon map**: a small adventure graph whose rooms are mechanical roles rather than only literal locations.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Cartographer and the Adventurer** argue about whether an unreachable room exists.
+Open with a gamebook passage in which **the Cartographer and the Adventurer** discover a room drawn
+on the map that no visible choice can reach.
 
-The Cartographer says a room drawn on the map is real. The Adventurer says a room no door can reach is only decoration. The compromise introduces graph validation: authored content can exist in the data while still failing the player's traversal.
+The passage should offer the reader two valid exits and one tantalising room visible only on the map.
+The Adventurer treats the hidden room as fiction; the Cartographer treats it as authored content.
+The technical handoff is graph validation: content can exist in the data while still failing the
+player's traversal.
 
 ## Sources
 
@@ -39,6 +43,18 @@ The Cartographer says a room drawn on the map is real. The Adventurer says a roo
 - D&D 5e SRD source, if relevant: not central for this chapter. Mention table adventures only as a graph analogy and keep rules detail for later chapters.
 - Gamebook/hypertext source, if relevant: [Fighting Fantasy official site](https://www.fightingfantasy.com/), [Choose Your Own Adventure official site](https://www.cyoa.com/), [Roleplaying Tips: 5 Room Dungeons](https://www.roleplayingtips.com/5-room-dungeons/), and [Steve Lawford, Five-Room Dungeons](https://enac.hal.science/hal-03097484/document).
 - Campaign Ledger evidence, if relevant: use only as a light comparison for website navigation and route graphs unless a later Hypertext chapter does the deeper case study.
+
+## Shelf References
+
+- Steve Jackson and Ian Livingstone, *The Warlock of Firetop Mountain*: use as a familiar example of
+  numbered passages, directed choice, mapping, risk, and endings; do not copy passages, map shape,
+  encounters, names, or puzzle answers.
+- Ian Livingstone, *Deathtrap Dungeon*: use as a shelf example for lethal branching, traps, item
+  gates, and reader mapping; keep all examples original.
+- A Choose Your Own Adventure volume: use only to compare choice-driven prose without dice or RPG
+  combat.
+- Dungeons & Dragons 2014 *Dungeon Master's Guide*: use for dungeon/adventure structure and table
+  navigation as a contrast to fixed gamebook traversal.
 
 ## Campaign Ledger Evidence
 
@@ -109,13 +125,55 @@ Avoid starting with mathematical notation. Let the reader experience the idea be
    - Missing ending coverage.
    - Mermaid graph output as a visual debugging aid.
 
-### Diagrams
+### Diagram Idea
 
-Use three diagrams:
+Use Mermaid for three diagrams.
 
-- A tiny website cycle.
-- A simple branching gamebook path with reconvergence.
-- Mt. Graphnor's five-room shape, ideally generated from `exportMermaid`.
+Tiny website cycle:
+
+```mermaid
+flowchart LR
+  home["Home page"]
+  rules["Rules page"]
+  sheet["Character sheet"]
+
+  home --> rules
+  rules --> sheet
+  sheet --> home
+```
+
+Branching gamebook path with reconvergence:
+
+```mermaid
+flowchart TD
+  start["Entrance"]
+  sneak["Sneak past"]
+  fight["Fight guard"]
+  clue["Find clue"]
+  puzzle["Puzzle room"]
+
+  start --> sneak
+  start --> fight
+  sneak --> clue
+  fight --> clue
+  clue --> puzzle
+```
+
+Mt. Graphnor's five-room shape should ideally be generated from `exportMermaid`:
+
+```mermaid
+flowchart TD
+  r1["Room 1: Entrance and guardian"]
+  r2["Room 2: Puzzle or roleplay"]
+  r3["Room 3: Trick or setback"]
+  r4["Room 4: Climax"]
+  r5["Room 5: Reward and twist"]
+
+  r1 --> r2
+  r2 --> r3
+  r3 --> r4
+  r4 --> r5
+```
 
 ### Code Examples
 

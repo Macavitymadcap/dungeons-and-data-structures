@@ -42,12 +42,14 @@ what the viewer can know and do. A forced navigation form is not just a shortcut
 normal path through the graph. A player-safe build must omit those tools entirely, not merely hide
 them behind polite styling.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Doorkeeper and the Admin** argue over whether an impressive title is enough.
+Open with a gamebook passage where **the Doorkeeper and the Admin** argue over whether an impressive
+title is enough.
 
 The Admin says they have a master key. The Doorkeeper asks a narrower question: are you allowed to
-open this door, in this campaign, for this character, right now? Their exchange dramatises the
+open this door, in this campaign, for this character, right now? The passage should turn that into a
+choice: show title, show membership, show permission, or retreat. The technical handoff is the
 difference between global roles, local membership, ownership, permissions, and context-specific
 capabilities.
 
@@ -65,6 +67,17 @@ capabilities.
   <https://csrc.nist.gov/glossary/term/rbac>.
 - HTTP source: MDN on `403 Forbidden` for understood requests that the server refuses to process:
   <https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403>.
+
+## Shelf References
+
+- Dungeons & Dragons 2014 *Dungeon Master's Guide*: use the Game Master role, hidden information,
+  table authority, and adjudication as the table-side analogy for admin boundaries.
+- Robert C. Martin, *Clean Architecture*: use for policy boundaries, dependency direction, and
+  keeping privileged decisions out of incidental UI code.
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for tracer bullets and guardrails
+  around risky workflows.
+- Campaign notebooks or prep documents: use as private context for what should remain hidden from
+  players; do not publish private campaign material.
 
 ## Campaign Ledger Evidence
 
@@ -218,17 +231,64 @@ That moves the reader from "hide a button" to "guard the capability".
    - Show a small matrix: actor, resource, action, expected result.
    - Compare Campaign Ledger guard tests with gamebook static checks.
 
-### Diagrams
+### Diagram Idea
 
-Use three diagrams:
+Use Mermaid for three diagrams.
 
-- **Access decision**:
-  `request -> session -> role/capability/ownership -> guard -> allow | redirect | 403 | 404`.
-- **Representation filter**:
-  `domain data + viewer context -> player-safe view | author/GM view`.
-- **Static publish boundary**:
-  `development app + author client -> author tools`, and
-  `static build + player client -> no debug controls`.
+Access decision:
+
+```mermaid
+flowchart LR
+  request["Request"]
+  session["Session"]
+  context["Role, capability, ownership"]
+  guard["Guard"]
+  allow["Allow"]
+  redirect["Redirect"]
+  forbidden["403"]
+  missing["404"]
+
+  request --> session
+  session --> context
+  context --> guard
+  guard --> allow
+  guard --> redirect
+  guard --> forbidden
+  guard --> missing
+```
+
+Representation filter:
+
+```mermaid
+flowchart LR
+  data["Domain data"]
+  viewer["Viewer context"]
+  filter["Visibility filter"]
+  player["Player-safe view"]
+  author["Author or Game Master view"]
+
+  data --> filter
+  viewer --> filter
+  filter --> player
+  filter --> author
+```
+
+Static publish boundary:
+
+```mermaid
+flowchart TD
+  dev["Development app"]
+  authorClient["Author-capable client"]
+  authorTools["Author/debug tools"]
+  static["Static build"]
+  playerClient["Player-only client"]
+  public["No debug controls"]
+
+  dev --> authorClient
+  authorClient --> authorTools
+  static --> playerClient
+  playerClient --> public
+```
 
 ### Code Examples
 

@@ -37,14 +37,14 @@ A gamebook passage is a hypermedia response. It gives the reader:
 At the table, a Dungeon Master does this conversationally. In a solo gamebook or web app, the page
 does it through links, forms, buttons, labels, and responses.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Door and the Adventurer** argue about whether a door should reveal every possible room in the
-dungeon.
+Open with a gamebook passage where a door refuses to reveal every possible room in the dungeon.
 
-The Door says it only needs to show the choices available from here. The Adventurer wants a complete
-map. The Door wins the architectural point: a good hypermedia representation offers the next valid
-actions without requiring the reader to know the whole server, graph, or rules engine in advance.
+The door offers only the actions available from the current passage: listen, knock, force, retreat.
+The Adventurer wants a complete map, but the passage only gives valid next moves. The technical
+handoff is HATEOAS: a good hypermedia representation offers the next valid actions without requiring
+the reader to know the whole server, graph, or rules engine in advance.
 
 ## Sources
 
@@ -67,6 +67,19 @@ actions without requiring the reader to know the whole server, graph, or rules e
   examples, but save rules detail for later chapters.
 - Gamebook/hypertext source, if relevant: use the Chapter 02 gamebook and graph sources as the
   bridge. The chapter's new research focus is the web/hypermedia layer, not gamebook history.
+
+## Shelf References
+
+- A Fighting Fantasy book with visible paragraph references and return instructions: use the physical
+  page-turning experience to explain hypertext controls, backtracking pressure, and state held by
+  the reader.
+- Steve Jackson, *Sorcery!* series: use as a richer shelf example of stateful choices, spell codes,
+  inventory memory, and long-running adventure continuity; do not borrow distinctive mechanics or
+  wording.
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for interface clarity, feedback, and
+  building systems from simple interactions.
+- Dungeons & Dragons 2014 *Dungeon Master's Guide*: use as a table contrast where the Game Master
+  supplies available actions conversationally.
 
 ## Campaign Ledger Evidence
 
@@ -176,20 +189,54 @@ state is carried forward by representations and controls.
    - Campaign Ledger: full pages, fragments, redirects, breadcrumbs, player/GM route availability.
    - The beginner lesson survives the grown-up app.
 
-### Diagrams
+### Diagram Idea
 
-Use two diagrams:
+Use Mermaid for at least two diagrams.
 
-- **Choice request loop**:
-  `PassagePanel -> choice form -> POST /gamebook/choices/:choiceId -> resolveChoice -> next PassagePanel`.
-- **Full page versus fragment**:
-  show `GET /gamebook` returning the shell and `POST /gamebook/choices/:choiceId` replacing only
-  `#gamebook-passage`.
+Choice request loop:
 
-Optional third diagram:
+```mermaid
+flowchart LR
+  panel["Passage panel"]
+  form["Choice form"]
+  post["POST /gamebook/choices/:choiceId"]
+  resolve["resolveChoice"]
+  next["Next passage panel"]
 
-- **Campaign Ledger tab flow**:
-  canonical sheet URL, HTMX tab request, fragment response, `hx-push-url`.
+  panel --> form
+  form --> post
+  post --> resolve
+  resolve --> next
+```
+
+Full page versus fragment:
+
+```mermaid
+flowchart TD
+  get["GET /gamebook"]
+  shell["Full page shell"]
+  post["POST /gamebook/choices/:choiceId"]
+  fragment["Passage fragment"]
+  target["#gamebook-passage"]
+
+  get --> shell
+  post --> fragment
+  fragment --> target
+```
+
+Optional Campaign Ledger tab flow:
+
+```mermaid
+flowchart LR
+  canonical["Canonical sheet URL"]
+  tab["HTMX tab request"]
+  response["Fragment response"]
+  push["hx-push-url"]
+
+  canonical --> tab
+  tab --> response
+  response --> push
+```
 
 ### Code Examples
 

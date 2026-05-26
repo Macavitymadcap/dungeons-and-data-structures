@@ -44,14 +44,15 @@ When those jobs blur together, changing one room can break combat, changing the 
 saves, or adding author tools can leak into the player build. The chapter should help the reader
 see modules as promises about what is allowed to know what.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Scribe and the Archivist** argue over where a dungeon room belongs.
+Open with a table transcript where **the Scribe and the Archivist** argue over where a dungeon room
+belongs.
 
 The Scribe wants to file everything in one giant tome because it is faster today. The Archivist
 insists on separate shelves: maps, rules, character records, room text, and public exports. Their
-exchange dramatises cohesion, coupling, and the difference between "I can find it" and "the system
-can safely change it later".
+argument should dramatise cohesion, coupling, and the difference between "I can find it" and "the
+system can safely change it later".
 
 ## Sources
 
@@ -71,6 +72,17 @@ can safely change it later".
   <https://www.typescriptlang.org/docs/handbook/2/modules.html>.
 - Hono source: Hono routing documentation, including route composition:
   <https://hono.dev/api/routing>.
+
+## Shelf References
+
+- Robert C. Martin, *Clean Architecture*: use for dependency direction, policy/detail boundaries,
+  and separating domain rules from frameworks.
+- Martin Fowler, *Refactoring*: use for behaviour-preserving structure changes and module-boundary
+  clean-up.
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for orthogonality, tracer bullets,
+  and pragmatic modularity.
+- Dungeons & Dragons 2014 *Dungeon Master's Guide*: use adventure modules, encounter organisation,
+  and reusable table material as the RPG-side analogy.
 
 ## Campaign Ledger Evidence
 
@@ -250,19 +262,68 @@ The reader should see that each split answers "what might change independently?"
    - Show the cycle: identify boundary, add/keep tests, move code, keep public behaviour stable,
      then remove obsolete shims later.
 
-### Diagrams
+### Diagram Idea
 
-Use three diagrams:
+Use Mermaid for three diagrams.
 
-- **Gamebook module map**:
-  `content -> model`, `graph -> model`, `state -> model/rules`, `play -> state/rules`, `render ->
-  state/model`, `app -> all public surfaces`.
-- **Layer boundary**:
-  `runtime -> createApp -> routes -> domain modules -> model`, with static build using the same app
-  factory in player-only mode.
-- **Package adoption**:
-  `Campaign Ledger component import -> compatibility shim -> Hyper-Dank primitive`, protected by
-  `test:hyper-dank`.
+Gamebook module map:
+
+```mermaid
+flowchart TD
+  model["model.ts"]
+  content["content/"]
+  graph["graph.ts"]
+  rules["rules/"]
+  state["state.ts"]
+  play["play.ts"]
+  render["renderers"]
+  app["app shell"]
+
+  content --> model
+  graph --> model
+  state --> model
+  state --> rules
+  play --> state
+  play --> rules
+  render --> state
+  render --> model
+  app --> content
+  app --> graph
+  app --> play
+  app --> render
+```
+
+Layer boundary:
+
+```mermaid
+flowchart LR
+  runtime["Runtime"]
+  createApp["createApp"]
+  routes["Routes"]
+  domain["Domain modules"]
+  model["Model contracts"]
+  static["Static build player-only mode"]
+
+  runtime --> createApp
+  createApp --> routes
+  routes --> domain
+  domain --> model
+  static --> createApp
+```
+
+Package adoption:
+
+```mermaid
+flowchart LR
+  import["Campaign Ledger component import"]
+  shim["Compatibility shim"]
+  primitive["Hyper-Dank primitive"]
+  compat["test:hyper-dank"]
+
+  import --> shim
+  shim --> primitive
+  compat -.protects.-> shim
+```
 
 ### Code Examples
 

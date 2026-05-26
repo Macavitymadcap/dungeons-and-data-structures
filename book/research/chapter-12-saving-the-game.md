@@ -68,12 +68,12 @@ That gives the chapter its ladder:
 - The copied page in the player's bag is export/import.
 - The revised character sheet template is schema migration.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Adventurer and the Timekeeper** argue about a checkpoint.
+Open with a gamebook passage where **the Adventurer and the Timekeeper** argue about a checkpoint.
 
 The Adventurer says, "I saved the game." The Timekeeper asks, "Which game, which adventure, which
-schema, which version, and what happens if the dungeon map changed overnight?" Their exchange can
+schema, which version, and what happens if the dungeon map changed overnight?" The passage can
 dramatise versioned documents, validation errors, and migrations without turning the playable
 adventure itself into a lecture.
 
@@ -107,6 +107,17 @@ failed combat roll because it tells the player the game forgot them.
   `/Users/dank/Code/personal/web/dungeons-and-data-structures/src/gamebook/state.test.ts`,
   `/Users/dank/Code/personal/web/dungeons-and-data-structures/src/gamebook/player-client.ts`,
   `/Users/dank/Code/personal/web/dungeons-and-data-structures/scripts/test-static-gamebook.ts`.
+
+## Shelf References
+
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for plain-text persistence,
+  reversibility, and treating stored data as a long-lived interface.
+- Robert C. Martin, *Clean Architecture*: use for persistence as a boundary and for separating
+  business rules from storage details.
+- Dungeons & Dragons 2014 *Player's Handbook*: use character state, rests, resources, and conditions
+  as familiar examples of what must survive between scenes; cite SRD 5.1 for reusable mechanics.
+- Steve Jackson, *Sorcery!* series or other long-form gamebooks: use as shelf examples of persistent
+  adventure state across a solo campaign.
 
 ## Campaign Ledger Evidence
 

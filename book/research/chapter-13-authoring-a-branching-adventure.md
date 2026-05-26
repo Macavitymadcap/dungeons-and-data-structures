@@ -65,13 +65,14 @@ This keeps the chapter grounded in craft:
 - A dramatic ending still needs a playable path.
 - A private draft must not appear in the public player build.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Cartographer and the Playtester** argue over an impossible map.
+Open with a gamebook passage where **the Cartographer and the Playtester** discover an impossible
+map.
 
 The Cartographer sees every node at once and points to unreachable rooms. The Playtester sees only
-the current page and says the choices feel good. Their disagreement can dramatise the difference
-between local experience and whole-graph validation. The dialogue should end with both being right:
+the current page and says the choices feel good. The excerpt should dramatise the difference
+between local experience and whole-graph validation. It should end with both being right:
 good authoring needs local prose feel and global structural checks.
 
 ## Sources
@@ -98,6 +99,19 @@ good authoring needs local prose feel and global structural checks.
   `/Users/dank/Code/personal/web/dungeons-and-data-structures/src/gamebook/content/five-room-template.ts`,
   `/Users/dank/Code/personal/web/dungeons-and-data-structures/src/gamebook/content/mt-graphnor.ts`,
   `/Users/dank/Code/personal/web/dungeons-and-data-structures/src/app.tsx`.
+
+## Shelf References
+
+- Steve Jackson and Ian Livingstone, *The Warlock of Firetop Mountain*: use as a familiar shelf model
+  for authored branching, inventory, risk, and mapping; keep the Mt. Graphnor structure original.
+- Ian Livingstone, *Deathtrap Dungeon*: use for traps, gating, failure, and replay pressure without
+  copying passage structure or set pieces.
+- Steve Jackson, *Sorcery!* series: use for authoring longer continuity, spells, state, and player
+  memory across books.
+- Dungeons & Dragons 2014 *Dungeon Master's Guide*: use for adventure design, encounter purpose,
+  pacing, treasure, clues, and table-facing preparation.
+- Martin Fowler, *Refactoring*: use for keeping content conventions and validation adaptable as the
+  authoring model changes.
 
 ## Rights And Originality Notes
 

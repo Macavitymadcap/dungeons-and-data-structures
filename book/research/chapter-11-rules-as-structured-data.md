@@ -74,16 +74,16 @@ That gives a friendly metaphor for schemas and provenance. A rule without source
 spell copied onto a loose page: useful at the table for a moment, risky inside software that must
 search, filter, publish, and explain itself later.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Wizard and the Archivist** argue over a spellbook index.
+Open with a table transcript where **the Wizard and the Archivist** argue over a spellbook index.
 
 The Wizard wants to know the one true rule. The Archivist insists there is no rule without a source,
-a version, a shelf mark, and a policy label. Their exchange can dramatise source precedence:
+a version, a shelf mark, and a policy label. The transcript can dramatise source precedence:
 the newer spellbook may win for a private campaign, but the public book may still be allowed to
 quote only the SRD-derived catalogue entry.
 
-The dialogue should stay playful, but the teaching point is sober: structured data can make a rule
+The excerpt should stay playful, but the teaching point is sober: structured data can make a rule
 more useful only when it also makes the rule more accountable.
 
 ## Sources
@@ -109,6 +109,18 @@ more useful only when it also makes the rule more accountable.
   `/Users/dank/Code/personal/web/dungeons-and-data-structures/src/gamebook/rules/srd.ts`,
   `/Users/dank/Code/personal/web/dungeons-and-data-structures/src/gamebook/rules/srd.test.ts`,
   `/Users/dank/Code/personal/web/dungeons-and-data-structures/src/gamebook/content/mt-graphnor.ts`.
+
+## Shelf References
+
+- Dungeons & Dragons 2014 *Player's Handbook*, *Monster Manual*, and *Dungeon Master's Guide*: use
+  as proprietary table references for how rules, stat blocks, equipment, and advice are organised;
+  cite SRD 5.1 for reusable public mechanics.
+- Dungeons & Dragons System Reference Document 5.1: keep this as the publishable rules source for
+  mechanics examples.
+- Robert C. Martin, *Clean Architecture*: use for separating rules policy from delivery mechanisms
+  and import details.
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for plain text, metadata, and
+  keeping knowledge in one place.
 
 ## Campaign Ledger Evidence
 

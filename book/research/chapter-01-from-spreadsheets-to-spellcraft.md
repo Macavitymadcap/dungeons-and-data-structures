@@ -51,17 +51,18 @@ That image should carry the introduction without becoming too grand. The joke wo
 half silly and half true: programming really does feel like writing precise words that change the
 world.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Wizard and the Apprentice** discuss whether a spreadsheet can be a spellbook.
+Open with a table transcript: **The Wizard and the Apprentice** discuss whether a spreadsheet can be
+a spellbook.
 
 The Apprentice thinks a spreadsheet is mundane. The Wizard points at a formula, then a custom
-function, then a web app, and asks where the spell begins. The dialogue should dramatise the first
+function, then a web app, and asks where the spell begins. The transcript should dramatise the first
 conceptual shift of the book: a tool becomes programmable when the user can describe rules and
 state changes precisely enough for a machine to repeat them.
 
-The dialogue should be warm, short, and introductory. It should not explain the full book. It should
-open the door.
+The excerpt should be warm, short, and introductory. It should not explain the full book. It should
+open the door and then hand off to the personal spreadsheet story.
 
 ## Sources
 
@@ -98,6 +99,17 @@ open the door.
   `/Users/dank/Code/personal/web/campaign-ledger/ARCHITECTURE.md`,
   `/Users/dank/Code/personal/web/campaign-ledger/src/app.tsx`,
   `/Users/dank/Code/personal/web/campaign-ledger/docs/operations/`.
+
+## Shelf References
+
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for the lifelong-learning frame,
+  practical craft habits, and the idea that programmers build small tools to solve real problems.
+- Robert C. Martin, *The Clean Coder*: use cautiously for professional identity and the transition
+  from hobby problem-solving to accountable software work.
+- A personally meaningful Fighting Fantasy book from the author's shelf: use as memory and form
+  context, not as source text to imitate.
+- Dungeons & Dragons 2014 *Player's Handbook*: use as the familiar table object that makes rules,
+  character sheets, dice, and play procedure concrete; cite SRD 5.1 for reusable mechanics.
 
 ## Campaign Ledger Evidence
 
@@ -189,7 +201,7 @@ Keep the tone lightly funny and sincere. The reader should feel invited, not lec
 7. **How To Read It**
    - Each chapter teaches one idea.
    - Code examples are there to make the idea concrete.
-   - Dialogues are optional doorways into the idea.
+   - Opening passages and table transcripts are doorways into the idea.
    - The gamebook grows by pressure from the concepts.
 
 ### Diagram Idea

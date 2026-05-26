@@ -74,14 +74,15 @@ This gives the chapter a friendly mental model:
 - Screenshots let reviewers see the room without travelling there themselves.
 - Acceptance notes tell the table what was actually checked.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Dungeon Master and the Test Party** rehearse a dungeon before opening night.
+Open with a D&D table transcript where **the Dungeon Master and the Test Party** rehearse a dungeon
+before opening night.
 
 The Dungeon Master wants to say "it works". The Test Party keeps asking, "which part, and how do you
 know?" One character finds a broken secret door; another proves the public map hides the private
 notes; another points out that a narrow hallway looks fine to the author but not to the player. The
-interlude can end with the Dungeon Master replacing certainty with evidence.
+transcript can end with the Dungeon Master replacing certainty with evidence.
 
 ## Sources
 
@@ -120,6 +121,16 @@ interlude can end with the Dungeon Master replacing certainty with evidence.
   `/Users/dank/Code/personal/web/dungeons-and-data-structures/src/gamebook/state.test.ts`,
   `/Users/dank/Code/personal/web/dungeons-and-data-structures/src/gamebook/play.test.ts`,
   `/Users/dank/Code/personal/web/dungeons-and-data-structures/src/gamebook/rules/`.
+
+## Shelf References
+
+- Robert C. Martin, *The Clean Coder*: use for professionalism, commitments, and the obligation to
+  supply evidence rather than reassurance.
+- Andrew Hunt and David Thomas, *The Pragmatic Programmer*: use for testing habits, tracer bullets,
+  automation, and pragmatic feedback loops.
+- Martin Fowler, *Refactoring*: use for regression tests and behaviour-preserving change.
+- Dungeons & Dragons 2014 *Dungeon Master's Guide*: use table rehearsal, encounter checks, and
+  playtesting as the RPG-side analogy for verification.
 
 ## Rights And Originality Notes
 

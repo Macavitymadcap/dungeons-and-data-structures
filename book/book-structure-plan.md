@@ -71,7 +71,7 @@ Use this refreshed structure as the baseline for future dossiers. Each new dossi
 relevant gamebook evidence and Campaign Ledger evidence when both apps are relevant, rather than
 relying on the older abstract chapter plan.
 
-## Manuscript, Dialogue, And Gamebook Integration
+## Manuscript, Opening Fiction, And Gamebook Integration
 
 The book should use the gamebook as a cumulative worked example. Each chapter should leave behind one of three artefacts:
 
@@ -79,18 +79,31 @@ The book should use the gamebook as a cumulative worked example. Each chapter sh
 - **Model artefact**: a TypeScript type, schema, content format, or state shape.
 - **Playable artefact**: a feature that appears in the gamebook mechanics prototype.
 
-The book can also use short Godel, Escher, Bach-inspired dialogues or interludes to carry the more playful allegorical work. These dialogues can personify the concept without forcing the playable gamebook to lecture the reader.
+Each chapter should open with a short fictional excerpt before the technical explanation begins.
+Prefer one of two forms:
 
-Suggested recurring dialogue pairs:
+- **Gamebook passage**: a second-person paragraph with two or three choices that embody the chapter's
+  problem before the reader sees the code.
+- **Table transcript**: a brief D&D-session exchange between the Game Master and players that exposes
+  the same tension in play.
+
+These openings should break up the dry material, but they should not become loose skits. Each one
+must set up the chapter's core technical question and point naturally into the worked example. The
+playable gamebook proper should remain an original adventure whose mechanics the book analyses; the
+chapter openings may be allegorical, but the published gamebook should not become a lecture.
+
+Useful recurring voices and roles:
 
 - **The Cartographer and the Adventurer**: graphs, maps, traversal, reachability, paths, and dead ends.
 - **The Wizard and the Apprentice**: functions, spells, abstraction, composition, and type systems.
 - **The Dungeon Master and the Scribe**: state, rules, source of truth, persistence, and provenance.
-- **The Goblin Doorkeeper and the Admin**: permissions, roles, capabilities, and access boundaries.
+- **The Doorkeeper and the Admin**: permissions, roles, capabilities, and access boundaries.
 - **The Oracle and the Dice**: probability, uncertainty, risk, and randomness.
-- **The Blacksmith and the Packrat**: inventory, constraints, resource trade-offs, and collections.
+- **The Blacksmith and the Quartermaster**: inventory, constraints, resource trade-offs, and collections.
 
-These dialogues should usually open a chapter or appear as short interludes. They are allowed to be allegorical. The gamebook proper should remain an original adventure whose mechanics the book later analyses.
+The dossiers should describe the opening as a passage or table transcript. They may name these
+characters, but the form should be concrete: what the reader sees first, what the conflict is, and
+how it leads into the chapter.
 
 The gamebook implementation should stay framework-light at the domain layer. Treat this source shape as the working architecture:
 
@@ -124,7 +137,7 @@ Chapter prose should introduce these modules gradually. Avoid dropping a finishe
 
 ## Chapter-To-Gamebook Build Map
 
-| Chapter | Dialogue premise | Gamebook artefact | Main module or file |
+| Chapter | Opening fiction premise | Gamebook artefact | Main module or file |
 | --- | --- | --- | --- |
 | Introduction | The Wizard explains why a spreadsheet can become a spellbook | Project promise, original adventure premise, licence/originality boundaries | `book/build-log.md` |
 | Choose Your Node Adventure | The Cartographer and the Adventurer argue about whether a room exists before it is reachable | Passage, choice, graph validation, prototype adventure outline | `src/gamebook/model.ts`, `src/gamebook/graph.ts`, `src/gamebook/content/mt-graphnor.ts` |
@@ -133,8 +146,8 @@ Chapter prose should introduce these modules gradually. Avoid dropping a finishe
 | Classes, Composition, And The Limits Of Inheritance | The Wizard asks whether every spellcaster must inherit from Wizard | Character creator options and capability composition | `src/gamebook/rules/character.ts` |
 | Dice, Probability, And Risk | The Oracle explains why a fair die still feels unfair | Roll result model and transparent d20 log | `src/gamebook/rules/dice.ts` |
 | Combat As An Event Loop | The Dungeon Master pauses time to ask whose turn it is | Encounter state, player turn, monster turn, retreat/defeat transitions | `src/gamebook/rules/combat.ts` |
-| Inventory, Resources, And Encumbrance | The Packrat insists the backpack can hold one more impossible thing | Item and flag-gated choices | `src/gamebook/model.ts`, `src/gamebook/state.ts` |
-| The Dungeon Master And The Admin | The Goblin Doorkeeper checks whether the Admin is actually in the party | Author/debug mode, player-mode boundary, and player-safe visibility comparison | `src/app.tsx`, `src/gamebook/player-client.ts`, `src/gamebook/player-render.ts` |
+| Inventory, Resources, And Encumbrance | The Quartermaster refuses one more impossible thing in the backpack | Item and flag-gated choices | `src/gamebook/model.ts`, `src/gamebook/state.ts` |
+| The Dungeon Master And The Admin | The Doorkeeper checks whether the Admin is actually in the party | Author/debug mode, player-mode boundary, and player-safe visibility comparison | `src/app.tsx`, `src/gamebook/player-client.ts`, `src/gamebook/player-render.ts` |
 | Adventure Modules And Programming Modules | The Scribe files a dungeon room in the wrong adventure | Separation between content, rules, state, graph, rendering, app shell, and shared package boundaries | `src/gamebook/`, `src/app.tsx` |
 | Rules As Structured Data | The Wizard demands to know which spellbook a rule came from | SRD attribution notes and small rule lookup tables | `src/gamebook/rules/` |
 | Saving The Game | The Adventurer learns that memory is a contract, not a vibe | Local-storage save document, reset, export/import | `src/gamebook/state.ts` |
@@ -164,21 +177,21 @@ Campaign Ledger should provide concrete software-engineering evidence, not just 
    - Promise that games are systems made visible, not just decorative examples.
    - Introduce the gamebook as an original companion adventure and worked mechanics example.
    - Set licence guardrails: SRD mechanics with attribution, gamebook form as inspiration, original adventure prose.
-   - Optional dialogue: the Wizard explains why a spreadsheet can become a spellbook.
+   - Opening fiction: the Wizard shows the Apprentice how a spreadsheet becomes a spellbook.
 
 2. **Choose Your Node Adventure**
    - Rewrite and expand `book/chapters/seed/choose-your-node-adventure.md`.
    - Teach graphs, nodes, edges, directed graphs, DAGs, cycles, trees, adjacency lists, and adjacency matrices.
    - Use gamebooks, websites, Five Room Dungeons, and table adventures as graph examples.
    - Build move: define `Passage`, `Choice`, start passage, endings, and graph validation for the prototype adventure.
-   - Optional dialogue: the Cartographer and the Adventurer argue about whether unreachable rooms count.
+   - Opening fiction: a gamebook passage offers a room that no choice can reach.
 
 3. **Hypertext, HATEOAS, And The Gamebook Page**
    - Split the HTMX/gamebook material out from the graph chapter.
    - Teach links, forms, fragments, redirects, state transitions, HTMX swaps, breadcrumbs, and hypermedia as application state.
    - Use the gamebook passage/choice flow as the beginner example and Campaign Ledger's full-page, fragment, redirect, breadcrumb, and discovery architecture as the mature case study.
    - Build move: render a static adventure passage, visible choices, and a progressive enhancement path for fragment swaps and refreshable routes.
-   - Optional dialogue: a door refuses to reveal its state without the right request.
+   - Opening fiction: a door reveals only the valid actions available from the current passage.
 
 ### Part II: Characters, Rules, And State
 
@@ -187,35 +200,35 @@ Campaign Ledger should provide concrete software-engineering evidence, not just 
    - Start from SRD 5.1-safe mechanics.
    - Keep the first character model small enough for a beginner: identity, class, level, abilities, HP, AC, inventory, conditions.
    - Build move: define the gamebook's `Character` and derived-stat helpers.
-   - Optional dialogue: the Scribe tries to describe a hero without becoming one.
+   - Opening fiction: a table transcript where the Scribe must turn a messy hero into structured facts.
 
 5. **Classes, Composition, And The Limits Of Inheritance**
    - Teach OOP, inheritance, composition, polymorphism, and Liskov through character classes and stat blocks.
    - Use `stats.md` and `character.md` as raw material, but split examples into smaller pieces.
    - Contrast the early abstract `StatBlock` idea with a more flexible capability model.
    - Build move: create beginner-friendly Fighter, Rogue, Wizard, and Cleric options without non-SRD subclasses.
-   - Optional dialogue: the Wizard asks whether all spellcasters must inherit from Wizard.
+   - Opening fiction: the Apprentice challenges the Wizard's claim that all spellcasters belong in one inheritance tower.
 
 6. **Dice, Probability, And Risk**
    - Rewrite `docs/dice-systems.md`.
    - Teach random variables, distributions, expected value, advantage/disadvantage, and probability curves.
    - Use prototype choices that trigger checks: sneak past a guardian, force a mechanism, escape a trap.
    - Build move: transparent d20 roller with structured roll logs.
-   - Optional dialogue: the Oracle explains why a fair die still feels unfair.
+   - Opening fiction: the Oracle lets the table feel the difference between fairness and risk.
 
 7. **Combat As An Event Loop**
    - Teach state machines, queues, events, reducers, and command handling through initiative and combat rounds.
    - Use campaign-ledger resource mutation, rests, conditions, and sheet refreshes as evidence.
    - Keep the first combat loop small: player action, monster action, hit/miss, damage, defeat, retreat.
    - Build move: encounter loop for the prototype climax.
-   - Optional dialogue: the Dungeon Master pauses time to ask whose turn it is.
+   - Opening fiction: the Dungeon Master pauses a chaotic fight and resolves one event at a time.
 
 8. **Inventory, Resources, And Encumbrance**
    - Rewrite `docs/inventory-systems.md` and relevant parts of `docs/game-economy-systems.md`.
    - Teach collections, constraints, stacks, nested containers, search, and resource accounting.
    - Use clue, potion, key, treasure, or tool choices as examples.
    - Build move: inventory and flag-gated choices.
-   - Optional dialogue: the Packrat insists the backpack can hold one more impossible thing.
+   - Opening fiction: the Quartermaster refuses one more impossible thing until the inventory rules are named.
 
 ### Part III: Adventures As Software Systems
 
@@ -225,28 +238,28 @@ Campaign Ledger should provide concrete software-engineering evidence, not just 
    - Use campaign-ledger's role guards, selected-player NPC visibility, player preview, campaign reads, and capability model as the mature case study.
    - Keep the gamebook version intentionally lightweight: player mode for normal play, author/debug mode for validation, forced navigation, and player-only static publishing.
    - Build move: debug state panel and author/player mode distinction.
-   - Optional dialogue: the Goblin Doorkeeper checks whether the Admin is actually in the party.
+   - Opening fiction: the Doorkeeper checks whether the Admin is actually allowed through this door.
 
 10. **Adventure Modules And Programming Modules**
    - Teach modularity, boundaries, public contracts, dependency inversion, package adoption, and refactoring.
    - Use Campaign Ledger's Hyper-Dank adoption, compatibility shims, breadcrumbs, app-owned boundaries, and package-update audit as the mature evidence.
    - Use the `src/gamebook` shape as the beginner module map, including the current split between domain modules, renderers, player-only bundles, and `src/app.tsx`.
    - Build move: separate adventure content, graph validation, rules, state, rendering, app-shell routes, and author tooling.
-   - Optional dialogue: the Scribe files a dungeon room in the wrong adventure.
+   - Opening fiction: the Scribe files a dungeon room in the wrong adventure and breaks the table's map.
 
 11. **Rules As Structured Data**
     - Teach parsing, provenance, source precedence, schema design, and licence-aware data import.
     - Use campaign-ledger's SRD importer, `rules_sources`, `rules_entities`, `rule_mechanics`, and character rule links.
     - Keep the gamebook rules table modest; do not import a full rules corpus into the first static gamebook.
     - Build move: small SRD-attributed lookup tables for conditions, attacks, equipment, or class options.
-    - Optional dialogue: the Wizard demands to know which spellbook a rule came from.
+    - Opening fiction: the Wizard demands to know which spellbook a rule came from.
 
 12. **Saving The Game**
     - Teach persistence trade-offs: local storage, JSON documents, SQLite, export/import, schema versioning, and migrations.
     - Use campaign-ledger browser-local play documents and SQLite architecture as evidence.
     - Compare the static gamebook's local-storage document with campaign-ledger's browser-local play export and SQLite source of truth.
     - Build move: versioned gamebook save document with validation, reset, export/import, and migration notes.
-    - Optional dialogue: the Adventurer learns that memory is a contract, not a vibe.
+    - Opening fiction: the Adventurer learns that memory is a contract, not a vibe.
 
 ### Part IV: Building The Book's Gamebook
 
@@ -257,14 +270,14 @@ Campaign Ledger should provide concrete software-engineering evidence, not just 
     - Finalise the prototype room contracts: guardian, puzzle, trap, climax, reward/twist.
     - Build move: content conventions for passages, choices, checks, encounters, flags, endings, validation, and previewable authoring surfaces.
     - Narrative note: this is still mechanics planning. Final prose and setting detail come later.
-    - Optional dialogue: the Cartographer finds a beautiful corridor that no one can enter.
+    - Opening fiction: the Cartographer finds a beautiful corridor that no one can enter.
 
 14. **Testing The Dungeon**
     - Teach verification, smoke tests, route/component tests, accessibility checks, screenshots, acceptance notes, and evidence-led PR review.
     - Use Campaign Ledger's verification posture as the mature case study: tests, Pa11y targets, MVP smoke, screenshots, compatibility tests, and acceptance notes.
     - Use the gamebook's verification manifest as the compact worked example.
     - Build move: graph, state, rules, content, route, static build, static browser, and accessibility-style tests for the gamebook.
-    - Optional dialogue: the Dungeon Master sends a test party into every door.
+    - Opening fiction: the Dungeon Master sends a test party into every door.
 
 15. **Conclusion: The Labyrinth Never Ends**
     - Return to the personal story.
@@ -283,7 +296,7 @@ Campaign Ledger should provide concrete software-engineering evidence, not just 
 - Export/import save state.
 - Test harness for graph traversal and state transitions.
 - Optional authoring tools: Mermaid graph output, passage previews, and adventure-content linting.
-- Optional GEB-style dialogues that explain chapter concepts without making the playable gamebook itself an allegory.
+- Opening gamebook passages or table transcripts that explain chapter concepts without making the playable gamebook itself an allegory.
 
 ## Initial Gamebook Milestones
 
@@ -323,7 +336,7 @@ The playable gamebook should be planned mechanically first and written narrative
 
 - Do not make the playable adventure a direct allegory for graphs, data structures, or software engineering.
 - Do use the adventure's mechanics as examples in the book.
-- Do use separate chapter dialogues and interludes for playful allegory.
+- Do use separate chapter-opening passages or table transcripts for playful allegory.
 - Treat names like "Mt. Graphnor" and "The Dungeon Of Data Structures" as working/prototype labels unless they still feel good once narrative drafting begins.
 - Final narrative goals will be decided after the mechanical prototype proves the graph, state, checks, combat, inventory, flags, and validation model.
 
@@ -337,4 +350,4 @@ The playable gamebook should be planned mechanically first and written narrative
 - The book remains beginner-friendly, with deeper material moved into sidebars or appendices.
 - The build map stays aligned with `book/gamebook-plan.md`.
 - The first implementation target remains a small, complete mechanical prototype rather than a sprawling engine.
-- The playable gamebook remains narratively independent from the book's allegorical dialogues.
+- The playable gamebook remains narratively independent from the book's allegorical opening excerpts.

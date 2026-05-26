@@ -35,13 +35,14 @@ equipment, proficiencies, attacks, spellcasting, resources, and feature rules.
 The beginner-friendly question is not "which parent class does Wizard inherit from?" It is "what
 does this character need to be able to do, and which small parts describe that?"
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Wizard and the Apprentice** argue about whether every spellcaster must inherit from Wizard.
+Open with a table transcript where **the Wizard and the Apprentice** argue about whether every
+spellcaster must inherit from Wizard.
 
 The Wizard claims that all magic should pass through the grand ancestral tower of `Wizard`. The
-Apprentice points at the Cleric, who can cast spells without being a wizard at all. Their argument
-introduces the difference between a game label, a shared capability, and a class hierarchy.
+Apprentice points at the Cleric, who can cast spells without being a wizard at all. The excerpt
+should introduce the difference between a game label, a shared capability, and a class hierarchy.
 
 ## Sources
 
@@ -60,6 +61,17 @@ introduces the difference between a game label, a shared capability, and a class
 - D&D 5e SRD source: System Reference Document 5.1 under Creative Commons Attribution 4.0
   International:
   <https://media.wizards.com/2023/downloads/dnd/SRD_CC_v5.1.pdf>.
+
+## Shelf References
+
+- Dungeons & Dragons 2014 *Player's Handbook*: use Fighter, Rogue, Wizard, and Cleric as familiar
+  labels for class identity and capability bundles; cite SRD 5.1 for reusable mechanics.
+- Martin Fowler, *Refactoring*: use for replacing inheritance tangles with clearer object
+  composition and behaviour-preserving design changes.
+- Robert C. Martin, *Clean Code*: use cautiously for class size, names, and single-responsibility
+  pressure.
+- Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides, *Design Patterns*: use for the
+  composition-over-inheritance principle and strategy-like capability modelling.
 
 ## Campaign Ledger Evidence
 
@@ -187,21 +199,67 @@ has earned that complexity.
      without reconstructing an inheritance tree.
    - Keep the beginner principle: model the axis of change, not the label that feels most dramatic.
 
-### Diagrams
+### Diagram Idea
 
-Use two diagrams:
+Use Mermaid for two diagrams.
 
-- **Tempting hierarchy**:
-  `StatBlock -> PlayerCharacter -> Wizard`, with warning callouts for cross-cutting abilities.
-- **Composed character**:
-  `Character = identity + class template + race template + attack + inventory + proficiencies +
-  resources`.
+Tempting hierarchy:
 
-Optional third diagram:
+```mermaid
+flowchart TD
+  stat["StatBlock"]
+  pc["PlayerCharacter"]
+  wizard["Wizard"]
+  cleric["Cleric with spellcasting"]
+  item["Magic item grants spell-like ability"]
 
-- **Campaign Ledger sheet composition**:
-  `CharacterSheetReadModel` in the centre, with abilities, classes, resources, equipment, defences,
-  proficiencies, senses, and skills around it.
+  stat --> pc
+  pc --> wizard
+  pc --> cleric
+  item -.cross-cutting capability.-> pc
+```
+
+Composed character:
+
+```mermaid
+flowchart LR
+  identity["Identity"]
+  classTemplate["Class template"]
+  raceTemplate["Race template"]
+  attack["Attack profile"]
+  inventory["Inventory"]
+  profs["Proficiencies"]
+  resources["Resources"]
+  character["Character"]
+
+  identity --> character
+  classTemplate --> character
+  raceTemplate --> character
+  attack --> character
+  inventory --> character
+  profs --> character
+  resources --> character
+```
+
+Optional Campaign Ledger sheet composition:
+
+```mermaid
+flowchart TD
+  sheet["CharacterSheetReadModel"]
+  abilities["Abilities"]
+  classes["Classes"]
+  resources["Resources"]
+  equipment["Equipment"]
+  defences["Defences"]
+  skills["Skills"]
+
+  sheet --> abilities
+  sheet --> classes
+  sheet --> resources
+  sheet --> equipment
+  sheet --> defences
+  sheet --> skills
+```
 
 ### Code Examples
 
