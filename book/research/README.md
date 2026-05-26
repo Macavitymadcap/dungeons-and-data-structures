@@ -27,6 +27,7 @@ refreshed emphasis in the structure plan.
 - [Chapter 11: Rules As Structured Data](chapter-11-rules-as-structured-data.md)
 - [Chapter 12: Saving The Game](chapter-12-saving-the-game.md)
 - [Chapter 13: Authoring A Branching Adventure](chapter-13-authoring-a-branching-adventure.md)
+- [Chapter 14: Testing The Dungeon](chapter-14-testing-the-dungeon.md)
 
 ## Dossier Template
 
