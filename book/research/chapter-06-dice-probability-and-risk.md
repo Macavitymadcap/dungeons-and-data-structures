@@ -36,13 +36,14 @@ story; it is a threshold. A character's modifier moves the threshold closer. Adv
 shape of the chance. A roll log lets the reader see the raw dice, the kept die, the modifier, the
 total, and the result.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Oracle and the Dice** argue about fairness.
+Open with a table transcript where **the Oracle and the Dice** expose the difference between fairness
+and risk.
 
 The Dice says every face has the same chance. The Oracle replies that a single fair roll can still
-hurt, because probability only promises patterns over time. Their exchange introduces the difference
-between fairness, expectation, risk, and narrative consequence.
+hurt, because probability only promises patterns over time. The table should then watch a player
+miss a likely roll, making expectation, variance, risk, and narrative consequence concrete.
 
 ## Sources
 
@@ -182,16 +183,57 @@ That sequence moves naturally from game text to probability and then to implemen
    - Campaign Ledger's dice popover and the gamebook's action details both prove the same UX point:
      reveal the arithmetic when the result changes the story.
 
-### Diagrams
+### Diagram Idea
 
-Use three diagrams:
+Use Mermaid for three diagrams.
 
-- **Check pipeline**:
-  `choice -> ability/skill modifier -> d20 roll -> total -> DC comparison -> passage target`.
-- **Distribution comparison**:
-  simple bars for 1d20 versus 2d6. Avoid over-detailed probability tables in the main chapter.
-- **Advantage/disadvantage**:
-  two d20s feeding into `max()` or `min()`, then one kept die.
+Check pipeline:
+
+```mermaid
+flowchart LR
+  choice["Choice"]
+  modifier["Ability or skill modifier"]
+  roll["d20 roll"]
+  total["Total"]
+  dc["DC comparison"]
+  target["Passage target"]
+
+  choice --> modifier
+  modifier --> roll
+  roll --> total
+  total --> dc
+  dc --> target
+```
+
+Distribution comparison can use Mermaid as a conceptual bar chart, avoiding over-detailed
+probability tables in the main chapter:
+
+```mermaid
+xychart-beta
+  title "Roll shape comparison"
+  x-axis ["Low", "Middle", "High"]
+  y-axis "Relative chance" 0 --> 10
+  bar "1d20" [5, 5, 5]
+  bar "2d6" [2, 9, 2]
+```
+
+Advantage/disadvantage:
+
+```mermaid
+flowchart TD
+  dieA["d20 A"]
+  dieB["d20 B"]
+  max["Advantage: keep max"]
+  min["Disadvantage: keep min"]
+  kept["Kept die"]
+
+  dieA --> max
+  dieB --> max
+  dieA --> min
+  dieB --> min
+  max --> kept
+  min --> kept
+```
 
 ### Code Examples
 

@@ -36,14 +36,15 @@ points, and any conditions that alter the result.
 That makes the sheet a friendly way to introduce records. A record gathers related fields under one
 name. A good model also makes illegal or meaningless states harder to express.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Scribe and the Hero** argue about whether writing something down makes it true.
+Open with a D&D table transcript where **the Scribe and the Hero** disagree about what belongs on a
+character sheet.
 
 The Hero insists they are brave, wounded, hungry, and very hard to describe. The Scribe replies that
 the rules only need some facts right now: level, ability scores, hit points, armour class,
-inventory, and a list of current conditions. Their argument dramatises the difference between the
-living story and the structured model that software can safely use.
+inventory, and a list of current conditions. The transcript should make the reader feel the
+difference between the living story and the structured model that software can safely use.
 
 ## Sources
 
@@ -184,20 +185,49 @@ natural route into records, fields, allowed values, and derived helpers.
    - Every derived value should have one obvious calculation.
    - Every outside input should pass through a gate before the rules trust it.
 
-### Diagrams
+### Diagram Idea
 
-Use two diagrams:
+Use Mermaid for two diagrams.
 
-- **Character record**:
-  `Character -> abilityScores -> Ability keys -> numeric scores`.
-- **Stored to derived flow**:
-  `score -> abilityModifier(score) -> skillModifier(character, ability, skill) -> d20 check`.
+Character record:
 
-Optional third diagram:
+```mermaid
+flowchart TD
+  character["Character"]
+  abilities["abilityScores"]
+  keys["Ability keys"]
+  scores["Numeric scores"]
 
-- **Small model to large model**:
-  gamebook `Character` on the left; Campaign Ledger `CharacterSheetReadModel` on the right; arrows
-  to shared concepts such as abilities, HP, AC, skills, and resources.
+  character --> abilities
+  abilities --> keys
+  keys --> scores
+```
+
+Stored to derived flow:
+
+```mermaid
+flowchart LR
+  score["Ability score"]
+  mod["abilityModifier(score)"]
+  skill["skillModifier(character, ability, skill)"]
+  check["d20 check"]
+
+  score --> mod
+  mod --> skill
+  skill --> check
+```
+
+Optional small-to-large model:
+
+```mermaid
+flowchart LR
+  gamebook["Gamebook Character"]
+  shared["Shared concepts: abilities, HP, AC, skills, resources"]
+  ledger["Campaign Ledger CharacterSheetReadModel"]
+
+  gamebook --> shared
+  shared --> ledger
+```
 
 ### Code Examples
 

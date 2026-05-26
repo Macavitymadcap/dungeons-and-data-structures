@@ -10,7 +10,7 @@ Use this log to record major planning, research, manuscript, and gamebook implem
 - Saved the first gamebook structure plan under the original **The Dungeon Of Data Structures** working title.
 - Confirmed that seed chapters are source material to split, research, rewrite, and SRD-align rather than final manuscript chapters.
 - Revised the book structure plan to align each chapter with a concrete gamebook artefact and initial mechanics-first implementation milestone.
-- Updated the planning boundary: gamebook work now focuses on mechanics first, with final narrative drafting later. Technical allegory moves into optional Godel, Escher, Bach-style chapter dialogues rather than the playable adventure itself.
+- Updated the planning boundary: gamebook work now focuses on mechanics first, with final narrative drafting later. Technical allegory moves into chapter-opening passages or table transcripts rather than the playable adventure itself.
 - Started the Bun/Hyper-Dank implementation path for the gamebook rather than extending the older Deno examples.
 - Added a framework-light `src/gamebook` domain layer for passages, graph validation, Mt. Graphnor content, character templates, dice checks, choice effects, local save state, and shared choice resolution.
 - Added a Hono `createApp()` shell that renders the gamebook with Hyper-Dank UI primitives and Hyper-Dank transport helpers.
@@ -66,3 +66,4 @@ Use this log to record major planning, research, manuscript, and gamebook implem
 - Seeded the Chapter 13 **Authoring A Branching Adventure** research dossier, mapping content modelling, passage IDs, graph validation, five-room template coverage, author previews, staged imports, visibility previews, and originality guardrails.
 - Seeded the Chapter 14 **Testing The Dungeon** research dossier, mapping verification gates, unit and route tests, static artefact checks, browser smoke, accessibility targets, screenshot evidence, compatibility checks, acceptance notes, and compact PR verification.
 - Seeded the Chapter 01 **From Spreadsheets To Spellcraft** and Chapter 15 **The Labyrinth Never Ends** planning dossiers, framing the personal spreadsheet-to-software journey, the book/gamebook contract, the Campaign Ledger case-study role, and the final synthesis of choices, constraints, state, rules, boundaries, evidence, and meaning.
+- Normalised the research dossier structure for the epic review: every chapter now uses an opening passage or table transcript instead of a loose dramatic note, and every dossier includes at least one Mermaid diagram seed.

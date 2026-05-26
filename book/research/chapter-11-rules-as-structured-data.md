@@ -74,16 +74,16 @@ That gives a friendly metaphor for schemas and provenance. A rule without source
 spell copied onto a loose page: useful at the table for a moment, risky inside software that must
 search, filter, publish, and explain itself later.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Wizard and the Archivist** argue over a spellbook index.
+Open with a table transcript where **the Wizard and the Archivist** argue over a spellbook index.
 
 The Wizard wants to know the one true rule. The Archivist insists there is no rule without a source,
-a version, a shelf mark, and a policy label. Their exchange can dramatise source precedence:
+a version, a shelf mark, and a policy label. The transcript can dramatise source precedence:
 the newer spellbook may win for a private campaign, but the public book may still be allowed to
 quote only the SRD-derived catalogue entry.
 
-The dialogue should stay playful, but the teaching point is sober: structured data can make a rule
+The excerpt should stay playful, but the teaching point is sober: structured data can make a rule
 more useful only when it also makes the rule more accountable.
 
 ## Sources

@@ -74,14 +74,15 @@ This gives the chapter a friendly mental model:
 - Screenshots let reviewers see the room without travelling there themselves.
 - Acceptance notes tell the table what was actually checked.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Dungeon Master and the Test Party** rehearse a dungeon before opening night.
+Open with a D&D table transcript where **the Dungeon Master and the Test Party** rehearse a dungeon
+before opening night.
 
 The Dungeon Master wants to say "it works". The Test Party keeps asking, "which part, and how do you
 know?" One character finds a broken secret door; another proves the public map hides the private
 notes; another points out that a narrow hallway looks fine to the author but not to the player. The
-interlude can end with the Dungeon Master replacing certainty with evidence.
+transcript can end with the Dungeon Master replacing certainty with evidence.
 
 ## Sources
 

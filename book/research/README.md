@@ -48,9 +48,11 @@ Name the computer science or software engineering idea.
 
 Explain the reader-friendly metaphor.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-Optional Godel, Escher, Bach-inspired setup. Name the speakers and the concept they dramatise.
+Describe the short gamebook passage or D&D-session transcript that should open the chapter. Name any
+recurring characters only if they help. The excerpt should embody the chapter's problem before the
+technical explanation begins.
 
 ## Sources
 
@@ -73,6 +75,9 @@ Keep this mechanical unless the chapter is explicitly about narrative design. Fi
 
 Beginner-friendly explanation, examples, diagrams, code snippets, and sidebars.
 
+Include at least one Mermaid diagram idea. Prefer a fenced `mermaid` block in the dossier so the
+draft has a concrete starting point.
+
 ## Risks
 
 Licensing, over-complexity, unclear analogy, or missing evidence.
@@ -85,4 +90,5 @@ Licensing, over-complexity, unclear analogy, or missing evidence.
 - Use SRD 5.1-compatible mechanics unless the chapter explicitly compares editions.
 - Treat Fighting Fantasy as form inspiration and history, not as material to copy.
 - Tie the chapter back to the gamebook mechanics wherever practical.
-- Use dialogues or interludes for allegory; do not force the playable gamebook to explain computer science in-world.
+- Use opening gamebook passages or table transcripts for allegory; do not force the playable gamebook to explain computer science in-world.
+- Every dossier should include at least one Mermaid diagram idea or draft diagram.

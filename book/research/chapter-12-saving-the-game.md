@@ -68,12 +68,12 @@ That gives the chapter its ladder:
 - The copied page in the player's bag is export/import.
 - The revised character sheet template is schema migration.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Adventurer and the Timekeeper** argue about a checkpoint.
+Open with a gamebook passage where **the Adventurer and the Timekeeper** argue about a checkpoint.
 
 The Adventurer says, "I saved the game." The Timekeeper asks, "Which game, which adventure, which
-schema, which version, and what happens if the dungeon map changed overnight?" Their exchange can
+schema, which version, and what happens if the dungeon map changed overnight?" The passage can
 dramatise versioned documents, validation errors, and migrations without turning the playable
 adventure itself into a lecture.
 

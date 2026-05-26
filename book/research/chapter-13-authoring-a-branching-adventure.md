@@ -65,13 +65,14 @@ This keeps the chapter grounded in craft:
 - A dramatic ending still needs a playable path.
 - A private draft must not appear in the public player build.
 
-## Dialogue Or Interlude Idea
+## Opening Passage Or Table Transcript
 
-**The Cartographer and the Playtester** argue over an impossible map.
+Open with a gamebook passage where **the Cartographer and the Playtester** discover an impossible
+map.
 
 The Cartographer sees every node at once and points to unreachable rooms. The Playtester sees only
-the current page and says the choices feel good. Their disagreement can dramatise the difference
-between local experience and whole-graph validation. The dialogue should end with both being right:
+the current page and says the choices feel good. The excerpt should dramatise the difference
+between local experience and whole-graph validation. It should end with both being right:
 good authoring needs local prose feel and global structural checks.
 
 ## Sources
