@@ -15,6 +15,7 @@ refreshed emphasis in the structure plan.
 
 ## Dossiers
 
+- [Chapter 01: From Spreadsheets To Spellcraft](chapter-01-from-spreadsheets-to-spellcraft.md)
 - [Chapter 02: Choose Your Node Adventure](chapter-02-choose-your-node-adventure.md)
 - [Chapter 03: Hypertext, HATEOAS, And The Gamebook Page](chapter-03-hypertext-hateoas-and-the-gamebook-page.md)
 - [Chapter 04: Character Sheets As Data Models](chapter-04-character-sheets-as-data-models.md)
@@ -28,6 +29,7 @@ refreshed emphasis in the structure plan.
 - [Chapter 12: Saving The Game](chapter-12-saving-the-game.md)
 - [Chapter 13: Authoring A Branching Adventure](chapter-13-authoring-a-branching-adventure.md)
 - [Chapter 14: Testing The Dungeon](chapter-14-testing-the-dungeon.md)
+- [Chapter 15: The Labyrinth Never Ends](chapter-15-the-labyrinth-never-ends.md)
 
 ## Dossier Template
 
