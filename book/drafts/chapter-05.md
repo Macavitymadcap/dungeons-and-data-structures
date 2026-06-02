@@ -1,307 +1,335 @@
-# Chapter 15: The Labyrinth Never Ends
+# Chapter 5: Classes, Composition, And The Limits Of Inheritance
 
 ---
 
 > **The Wizard and the Apprentice**
 >
-> The Apprentice found the Wizard at her desk again. The glowing tablet was still there, but
-> the spreadsheet was closed. In its place: something larger. Routes. Handlers. A passage
-> graph rendered in a diagram she had generated from code. Character records with closed
-> vocabularies and derived stats. A combat loop that resolved completely before yielding the
-> next choice.
+> "Everyone who works magic," said the Wizard, "traces their power back through a lineage of
+> teachers. My power comes from my master, who had it from her master, who received it from the
+> great Librarian of the Gilt Tower. The line is unbroken. The gift passes through the chain."
 >
-> "You finished it," said the Apprentice.
+> "What about her?" said the Apprentice, pointing through the window at a woman in white robes
+> who was, at that moment, closing a wound in a soldier's side with nothing but a murmured word
+> and an outstretched hand.
 >
-> "For now," said the Wizard.
+> The Wizard looked. "That is a Cleric of the Healer's Compact."
 >
-> The Apprentice looked more carefully at the screen. At the bottom: a verification report.
-> Five gates. All passing.
+> "She's doing magic."
 >
-> "It works," said the Apprentice.
+> "She is."
 >
-> "It is verified to do the things it claims to do," said the Wizard, in the way of someone
-> who had learned the difference. "That is not the same thing, but it is the honest version."
+> "Is she in your lineage?"
 >
-> The Apprentice pulled up a chair. The tablet now showed two windows side by side: the old
-> spreadsheet and the new gamebook. The same dungeon. Different implementations.
+> "She is not."
 >
-> "The spreadsheet was already this," the Apprentice said slowly. "Records. Rules. Choices.
-> State that changed when things happened."
+> "Then where does her power come from?"
 >
-> "Yes."
+> The Wizard was quiet for a moment in the way that scholars are quiet when they have an answer
+> that satisfies them professionally but admits too much for comfort.
 >
-> "You just made it more explicit."
+> "From her god," said the Wizard.
 >
-> The Wizard closed the first spellbook and set it beside the desk.
+> "And your lineage doesn't go through her god?"
 >
-> "The next one," she said, "will be yours to write."
+> "No."
+>
+> "So the power doesn't come from the lineage," said the Apprentice. "The power comes from
+> wherever it comes from. The lineage is just how *your kind* of power gets passed on."
+>
+> Another silence.
+>
+> "There is a tower," said the Wizard finally, "in which this distinction does not matter."
+>
+> "Where is the tower?"
+>
+> "Theoretical," said the Wizard, and turned back to her desk.
 
 ---
 
-The spreadsheet is still in a Google Drive folder somewhere, doing nothing in particular. The
-campaign it tracked ended years ago. The habit it started has not.
+In Chapter 4, we built a `Character` as a plain interface: a flat record of stored facts with
+separate pure functions to derive whatever the rules needed. The chapter ended with a deliberate
+loose thread. There is a temptation, when you notice that characters and monsters share a lot of
+vocabulary, to bundle the data and the behaviour together into a single structure. TypeScript
+supports this. Chapter 4 deferred the question of whether it should.
 
-Fourteen chapters back, that spreadsheet was the first room. A small problem with a cell
-formula that had run out of road, and a JavaScript tutorial open in the next tab, and a
-function that worked by the end of the evening. That was the door. What lay beyond it was not
-immediately visible from the threshold.
-
-This is what lay beyond it.
+This is that chapter.
 
 ---
 
-## What The Dungeon Taught Us
+## What A Class Actually Is
 
-The book has moved through fourteen connected ideas. They are worth naming together, once,
-now that all of them have been introduced.
+A **class** in TypeScript (and in most object-oriented languages) is a template for creating
+objects that bundle data and behaviour together. Where an interface describes only the *shape* of
+data, a class also provides *methods*: functions that operate on that data and belong to the
+object itself.
 
-**Chapter 2** put the word "graph" on the table. A gamebook is a directed graph: passages as
-nodes, choices as edges, endings as terminal nodes. Reachability is whether a path exists from
-the start to a given node. Validation is the automated check that the graph is structurally
-sound. The Five Room Dungeon is a small graph template with room roles as design constraints.
+```typescript
+class Character {
+  name: string;
+  level: number;
+  hitPoints: number;
 
-**Chapter 3** showed that a web page is also a graph: URLs as nodes, links and forms as edges,
-HTTP responses as state transitions. HATEOAS is the idea that a response should carry the
-controls for the next valid action. Progressive enhancement is the principle that those
-controls should work with or without JavaScript. Fragments update part of the page; full-page
-routes remain refreshable and shareable.
+  constructor(name: string, level: number, hitPoints: number) {
+    this.name = name;
+    this.level = level;
+    this.hitPoints = hitPoints;
+  }
 
-**Chapter 4** introduced the record. A character sheet is a data model: stored facts, derived
-facts, closed vocabularies, and a validation boundary between trusted application state and
-untrusted input. The ability modifier is a derived fact; the ability score is the stored one.
-TypeScript types protect contracts at compile time; runtime validation protects them at the
-storage boundary.
+  isAlive(): boolean {
+    return this.hitPoints > 0;
+  }
 
-**Chapter 5** asked what the word "class" means twice over. In D&D it is a capability bundle.
-In object-oriented programming it is a reusable shape for state and behaviour. The two do not
-automatically correspond. Composition assembles a character from templates and helpers.
-Inheritance promises that a subtype can stand in for its parent anywhere the parent is
-expected, a promise that is harder to keep than it looks.
+  takeDamage(amount: number): void {
+    this.hitPoints = Math.max(0, this.hitPoints - amount);
+  }
+}
+```
 
-**Chapter 6** made probability visible. A d20 roll is a uniform random variable. Expected
-value is the long-run average, not the next result. Advantage shifts the distribution without
-changing the die. The transparent roll log is the implementation of one value: the player
-should be able to follow the arithmetic.
+The `constructor` is a special function that runs when you create a new instance: `new Character("Brandavar", 1, 10)`. The methods `isAlive` and `takeDamage` belong to every `Character` object created from this template. Call `brandavar.isAlive()` and you get a boolean. Call `brandavar.takeDamage(3)` and the hit points change.
 
-**Chapter 7** named the combat loop. A round is a complete event: player action, possible
-damage, possible enemy response, outcome. Run to completion; render the result; offer the
-next choice. The reducer pattern makes state transitions testable: previous state plus event
-result produces next state.
-
-**Chapter 8** sorted the backpack. Membership is a Set question. Counting is a resource
-record with a current value and a maximum. Flags are permanent facts with no associated
-value. Gates are requirements checked before a choice is offered. None of these models is
-universal; each is the right shape for a different kind of thing.
-
-**Chapter 9** drew the boundary between what different users can see and do. Authentication
-identifies. Authorisation decides. Role names a responsibility; ownership ties a user to a
-specific resource; capability names a specific permitted action. The gate must be on the
-route, on the representation, and on the published artifact. Hiding a button is decoration,
-not access control.
-
-**Chapter 10** organised the source code. A module is a boundary around a design decision.
-High cohesion puts things that change together in the same place. Low coupling keeps things
-that change independently from knowing too much about each other. Dependency direction says
-that domain logic should not depend on the framework; the framework should depend on the
-domain. The import graph is structural access control: what is not imported cannot be reached.
-
-**Chapter 11** gave rules a provenance. A rule entity has a source, and the source has a
-licence, an attribution requirement, and a policy about what may be published. Structured
-rule data is the point where prose, schema, and policy meet. The attribution panel is
-generated from source records, not written by hand, because hand-written attribution drifts
-and automated attribution stays current.
-
-**Chapter 12** made persistence honest. A save file is not a serialised object; it is a
-versioned document with a schema, an adventure id, and a declared version number. Validation
-at the storage boundary rejects malformed input with readable errors. Migration is the
-promise to old players that progress made under an earlier format will survive a format
-change. Three storage strategies, localStorage, SQLite, and exported JSON, serve different
-needs and cannot substitute for each other.
-
-**Chapter 13** taught the authoring loop. A validator finds structural problems that prose
-quality cannot compensate for: broken targets, dead ends, unreachable passages, missing
-endings. The Mermaid export makes the global structure visible. Passage tags carry structural
-metadata for tooling without affecting the player's experience. The import pipeline stages,
-converts, warns, and previews before committing, because a mistake in authoring should be
-caught before it reaches the player.
-
-**Chapter 14** sent in the test party. Unit tests prove domain logic. Route tests prove the
-interface. Static build and artifact checks prove the publishing pipeline. Browser smoke
-proves real player behaviour with real browser storage. Accessibility checks widen the
-audience. Screenshots give reviewers visual evidence. Acceptance notes record what was
-delivered and what was deferred. The verification manifest is living documentation: not a
-CI configuration file nobody reads, but a named set of claims about what the system does.
+This is not inherently better or worse than the interface-and-helpers approach from Chapter 4. It is a different way of organising the same ideas. The data and the functions that operate on it travel together, which can be convenient. Whether that convenience is worth its costs depends on what the system needs to do next.
 
 ---
 
-## The Gamebook As A Mirror
+## The Inheritance Ladder
 
-Mt. Graphnor is a small, complete, static web adventure. It can be played in a browser.
-Its progress is saved in local storage, exported to a JSON file, and imported back. Its
-passages are validated. Its graph is sound. Its five-room structure is verified by a template
-checker. Its published build contains no author tooling.
+Classes become more interesting, and more dangerous, when they start inheriting from each other.
 
-It is also an explanation. Every piece of it is a teaching artefact: the passage graph
-explains directed graphs, the character record explains data modelling, the dice module
-explains transparent randomness, the combat loop explains event-driven state transitions,
-the save document explains persistence contracts, the graph validator explains structural
-testing, the artifact check explains access control at build time.
+**Inheritance** is the mechanism by which one class can be defined as a specialisation of another.
+The child class gets everything the parent class has, and can add or override behaviour on top.
+TypeScript expresses this with `extends`:
 
-The adventure and the explanation share the same source files. The gamebook is not a
-metaphor for the concepts; it is an instance of them. `validateAdventure` really does
-validate the adventure. `createPassageMap` really does build a lookup structure. `RollResult`
-really does carry the dice, the modifier, the total, and the outcome. The code is not
-illustrative of the ideas: the code is the ideas, running.
+```typescript
+class Fighter extends Character {
+  weaponProficiencies: string[];
 
-This was the promise from Chapter 1: not that the dungeon is a cute way of remembering what
-a directed graph is, but that a real dungeon, written in real TypeScript, with real tests, is
-a directed graph. The metaphor and the implementation point at the same thing.[^1]
+  constructor(name: string, level: number) {
+    super(name, level, 10 + level);
+    this.weaponProficiencies = ["simple", "martial"];
+  }
 
----
+  attack(target: Character): void {
+    const damage = Math.floor(Math.random() * 8) + 1;
+    target.takeDamage(damage);
+  }
+}
+```
 
-## Campaign Ledger As The Larger Map
+A `Fighter` is a `Character`. It has a name, a level, hit points, `isAlive`, and `takeDamage`,
+because those come from `Character` via `extends`. It also has `weaponProficiencies` and
+`attack`, which belong only to Fighters. The `super(...)` call passes the required arguments up
+to the `Character` constructor.
 
-Mt. Graphnor is short. Campaign Ledger is what the same ideas look like after several
-years of use by real people at a real table.
+This is the **inheritance** relationship: Fighter *is-a* Character. The type system enforces this:
+anywhere the code expects a `Character`, you can pass a `Fighter`, because a Fighter has
+everything a Character has, and then some.
 
-It has authentication and sessions. It has roles and campaign membership and ownership
-checks. It has character sheets with editable slices: abilities, skills, resources, equipment,
-armour class sources, defences, senses, and proficiencies. It has a rules reference that
-imports a structured SRD corpus with provenance tracking. It has an import pipeline for game
-master prep material, with staged conversion, warnings, preview, and player-safe publishing.
-It has a local play mode for players without accounts. It has a verification pipeline with
-Pa11y accessibility targets, MVP smoke tests, and screenshot evidence.
+The appeal is obvious. You write the shared logic once, in `Character`. Each subclass adds what it
+specifically needs. The four character options become:
 
-None of this is magic. All of it is the same ideas at different scale. The character record
-from Chapter 4 grew into a sheet with editable slices and a derived read model. The save
-document from Chapter 12 grew into a SQLite database with migrations and a backup procedure.
-The route guard from Chapter 9 grew into a guard library with campaign membership, ownership
-checks, and a test suite that documents the permission matrix.
+```typescript
+class Fighter extends Character { /* sword stuff */ }
+class Rogue   extends Character { /* stealth stuff */ }
+class Wizard  extends Character { /* spell stuff */ }
+class Cleric  extends Character { /* healing stuff */ }
+```
 
-The distance between the prototype and the product is not a different kind of knowledge. It
-is more of the same kind, applied more carefully, across a longer span of time.[^2]
+Four classes, one parent, clean lines of specialisation. It looks, at this scale, exactly right.
 
 ---
 
-## What We Have Not Built
+## Where It Breaks
 
-The honest version of a conclusion names what is incomplete.
+The problem is not visible yet. It appears when the system grows.
 
-The gamebook engine that runs Mt. Graphnor was built to prove the approach and support the
-teaching examples in this book. The larger adventure it was always pointing toward, the
-400-node narrative one where the story is the point rather than the mechanics, has not been
-written yet. That is the next spellbook: built on the same engine, using everything this book
-put together, but written for a reader rather than a developer.
+Wizards and Clerics both cast spells. Where does the spellcasting logic go? It could go in
+`Character`, so that all characters have it. But then Fighters and Rogues carry spell logic
+they can never use. It could go in both `Wizard` and `Cleric` separately. But then the same
+logic exists in two places, and when the rules change, both must be updated.[^1]
 
-The accessibility gate for the gamebook is described in Chapter 14 and not yet implemented.
-The intention is clear; the Pa11y command is clear; what remains is the work.
+The common response is a new level in the hierarchy: a `Spellcaster` class that sits between
+`Character` and the casting classes:
 
-The gamebook has one adventure. The module system in Chapter 10 was designed to support more.
-A second adventure would validate that the content boundary, the graph validation, and the
-template checker generalise to adventures that are not Mt. Graphnor.
+```typescript
+class Character { /* shared basics */ }
+class Spellcaster extends Character { /* spell stuff */ }
+class Wizard extends Spellcaster { /* wizard-specific */ }
+class Cleric extends Spellcaster { /* cleric-specific */ }
+class Fighter extends Character { /* sword stuff */ }
+class Rogue extends Character { /* stealth stuff */ }
+```
 
-Campaign Ledger will continue to grow. A combat tracker was the next planned feature as this
-book went to press. The ideas from Chapter 7 would find a more mature expression in a product
-that manages initiative order, participant resources, and encounter state for a whole table.[^3]
+This is coherent for as long as the categories stay clean. But D&D does not keep categories
+clean. Paladins are half Fighter, half Cleric. Rangers mix martial skill with a limited spell
+list. Eldritch Knights are Fighters who have learned some Wizard magic. The Arcane Trickster is
+a Rogue with spells. Every one of these breaks the hierarchy because they need capabilities
+from multiple branches that the single-inheritance ladder cannot combine.
 
-These are not failures. They are scope. A book that claimed to be finished would be lying.
-A book that names what remains is being accurate about what it has delivered and honest about
-what comes next.
-
----
-
-## The Reader's Next System
-
-The book taught its ideas through a dungeon. The dungeon is not the point.
-
-The point is the underlying shape: every interesting software system is a domain with its own
-vocabulary, rules, choices, constraints, and state. The domain might be a D&D campaign
-manager. It might be an e-commerce checkout. It might be a hospital scheduling system, a
-music library, a game, a financial ledger. The vocabulary changes. The shape recurs.
-
-A graph is not only a dungeon. It is any system of connected things: a social network,
-a supply chain, a dependency tree, a transit map, a conversation thread. A record is not
-only a character sheet. It is any structured representation of a thing in the world that
-has identity, attributes, and rules about valid states. A save document is not only a
-game save. It is any versioned, validated, migratable persistent contract.
-
-The dungeon was the teaching lens. Once the ideas are named, the lens can be set down.[^4]
-
-The next system will have its own vocabulary. The reader who has spent fourteen chapters
-naming nodes and edges, stored facts and derived facts, authentication and authorisation,
-cohesion and coupling, validation and migration, will find those names available when the
-new domain needs them. Not as decoration. As tools.
+The hierarchy either grows a new branch for every combination, which produces a class for every
+possible intersection of capabilities, or it pushes everything into the top-level `Character`
+class, which defeats the purpose of having specialised subclasses. Neither option scales.
 
 ---
 
-## The Labyrinth
+## The Liskov Problem
 
-The title of this chapter is a true statement. The labyrinth never ends.
+There is a more precise way to name what goes wrong. In 1987, Barbara Liskov articulated a
+principle that has since become a foundational test for inheritance:[^2] a subtype should be able
+to stand in for its parent type without breaking the behaviour that code relying on the parent
+expects.
 
-There is always a deeper room. There is always a rule the current model cannot express,
-a requirement the current architecture cannot accommodate, a player the current interface
-cannot serve. Software is not a problem to be solved but a medium to be worked in: shaped
-and reshaped as the domain evolves, as the users change, as the technology moves.
+This is called the **Liskov Substitution Principle**, and it is worth keeping in mind whenever
+you reach for `extends`. The question is not just "does this compile?" but "if I swap a parent
+for a child, does everything still work as expected?"
 
-This is not a counsel of despair. It is the thing that makes the work interesting. A domain
-that is fully understood and permanently settled is a domain with nothing left to learn. The
-labyrinth keeps going because the world keeps being more complicated than the current model,
-and the current model keeps needing to grow.
+A `Fighter` standing in for a `Character` passes this test. A `Character` has hit points; a
+`Fighter` has hit points. A `Character` can take damage; a `Fighter` can take damage. No
+surprises.
 
-What changes as you descend is not the difficulty. It is the quality of the map. In the first
-room, you have no map at all. You make choices without knowing where they lead. Choices lead
-to consequences you did not anticipate. The map grows slowly, room by room, passage by
-passage, every wrong turn a data point.
+A `SpellcastingCharacter` standing in for a `Character` might not. Code that works with
+characters generally, the combat system, the inventory system, the save/load layer, is now
+receiving objects that carry spell slot state, prepared spell lists, and a spellcasting ability
+score. That code didn't ask for any of that. If the spellcasting subclass overrides a method in
+a way that depends on spell slots being present, code that doesn't know about spell slots can
+produce unexpected results.
 
-By the end of this book, the map has fourteen rooms marked on it. They are not all there are.
-But they are enough to navigate by, and knowing how to make a map is more useful than any
-map that has already been drawn.
-
----
-
-## Closing
-
-The spreadsheet is still in the folder. The habit it started is still running.
-
-The Wizard closed the first spellbook. The Apprentice will write the next one. They will make
-mistakes the Wizard did not make and avoid mistakes the Wizard never thought of. The new
-spellbook will look different from the old one, because the domain is different, because the
-tools have changed, because the Apprentice is not the Wizard.
-
-This is the correct outcome. The book was never trying to hand the reader a finished map.
-It was trying to teach them how to read one, and how to draw one, so that when they arrive
-at a door the book did not cover, they can open it themselves.
-
-There's a door ahead.
-
-You know what to do.
+The test to ask before every `extends`: does the child truly keep all the promises the parent
+makes? If the child needs to override behaviour in ways that would surprise code expecting the
+parent, the inheritance relationship is probably wrong.
 
 ---
 
-[^1]: This is the distinction the book has been holding since the introduction: the dungeon is
-not a metaphor for graphs; the dungeon is a graph. A metaphor is a comparison between two
-separate things. An instance is a concrete example of a general principle. Mt. Graphnor is not
-being compared to a directed graph as a teaching aid and then set aside. It is a directed
-graph, with a real passage map, real reachability checks, and real validation results. The
-analogy does not explain the concept; the implementation embodies it.
+## Composition: Building From Parts
 
-[^2]: This is worth stating plainly because the gap between a teaching prototype and a
-production system can look, from the outside, like a different kind of knowledge. It is not.
-The extra knowledge is mostly: more edge cases, more explicit error handling, more careful
-attention to what breaks under load or adversarial input, more consideration for users who
-are not the developer, and more respect for the obligation to keep working after the author
-has stopped paying daily attention. These are extensions of the same ideas, not replacements
-for them.
+The gamebook does not use class hierarchies for characters. Instead it uses **composition**: the
+`Character` interface is assembled from smaller, independent pieces, and the pure functions
+operate on those pieces.
 
-[^3]: The Daggerheart combat system, which Chapters 6 and 7 discussed, makes a combat tracker
-particularly interesting from a data model perspective. Managing a GM Fear pool alongside
-per-character resources, Hope and Fear dice results alongside standard modifiers, and
-narrative-weighted outcomes alongside numeric results would exercise the event-loop and
-resource-management ideas from Chapters 7 and 8 in ways the current D&D-flavoured prototype
-does not. That is an invitation, not a commitment.
+Rather than a `Wizard` class that extends `Character` and adds spellcasting, there is a
+`CharacterTemplate` record that describes everything a starting Wizard needs:
 
-[^4]: This is the moment the book acknowledges its own structure. The dungeon was always a
-lens, not the subject. The subject was the ideas. The ideas were taught through the dungeon
-because the dungeon made them concrete and playable. A reader who leaves only knowing that
-D&D has graphs in it has missed the point. A reader who leaves knowing what a graph is, and
-having implemented one, and having written a validator for one, has not.
+```typescript
+interface CharacterTemplate {
+  class: CharacterClass;
+  maxHitPoints: number;
+  armourClass: number;
+  skillProficiencies: Skill[];
+  inventory: string[];
+  attack: AttackProfile;
+}
+
+const WIZARD_TEMPLATE: CharacterTemplate = {
+  class: "wizard",
+  maxHitPoints: 6,
+  armourClass: 11,
+  skillProficiencies: ["arcana", "history"],
+  inventory: ["spellbook", "quarterstaff"],
+  attack: { name: "Quarterstaff", bonus: 2, damageDice: "1d6", damageType: "bludgeoning" },
+};
+```
+
+There is no inheritance. There is no `extends`. There is data describing what a Wizard starts
+with, and a `createCharacter` function that combines a template with a name and a race to
+produce a `Character`. The function is pure: same inputs, same output, every time.
+
+The Cleric does not need to share a parent class with the Wizard just because both can eventually
+use magic. The Cleric has its own template with its own starting values. If a future character
+type needs both martial and magical capabilities, a new template can describe that combination
+directly, without restructuring what already exists.
+
+---
+
+## Polymorphism Without Inheritance
+
+Inheritance is not the only way to achieve **polymorphism**: the ability to write code that
+works with multiple different types through a shared contract.
+
+TypeScript uses **structural typing**: a value satisfies a type if it has the right shape,
+regardless of whether it was declared with `extends` or `implements`. Any object with a `name`
+field and an `abilityScores` record will satisfy the `Character` interface, whether it was
+created by `createCharacter`, built by hand in a test, or assembled from a save file.
+
+This means a function that operates on any character can be written against the interface:
+
+```typescript
+function describeCharacter(character: Character): string {
+  const str = abilityModifier(character.abilityScores.strength);
+  return `${character.name}, level ${character.level} ${character.class} (STR ${str > 0 ? "+" : ""}${str})`;
+}
+```
+
+This function works for Fighters, Rogues, Wizards, and Clerics without knowing which one it has.
+It works for any future character type that satisfies `Character`. No inheritance required.
+No class hierarchy required. The contract is the interface; the type system enforces it; the
+function doesn't care about the rest.
+
+---
+
+## A Mature Comparison
+
+Campaign Ledger handles the same problem at larger scale. A full character sheet in a shared
+campaign app has abilities, classes, skills, resources, equipment, defences, and proficiencies.
+These are not modelled as a deep class hierarchy. They are modelled as separate database tables,
+each with its own schema, assembled into a `CharacterSheetReadModel` when the sheet needs to be
+displayed.
+
+The `CharacterSheetReadModel` is not a subclass of anything. It is a composed view: a flat
+record assembled from related tables, shaped to match exactly what the UI needs. When the rules
+for armour class change, the armour class table changes. It does not cascade through a class
+hierarchy. The other tables are unaffected.
+
+This is composition at the persistence level, and it reflects the same instinct as the gamebook's
+template approach: model the axes of change independently, and assemble what you need when you
+need it.
+
+---
+
+## The Build Move
+
+By the end of this chapter, the gamebook has a working character creation system:
+
+- `CharacterTemplate` in `src/gamebook/rules/character.ts` describes what each starting class
+  provides: hit points, armour class, skill proficiencies, starting inventory, and attack
+  profile. It is data, not a class.
+- `RaceTemplate` describes what each ancestry adds: small ability score adjustments, optional
+  extra inventory, optional extra proficiencies.
+- `CHARACTER_TEMPLATES` and `RACE_TEMPLATES` are plain objects mapping class and race names to
+  their respective templates.
+- `createCharacter` takes a class, a race, a name, and a level, and returns a fully populated
+  `Character` by combining the template with derived values. It is a pure function.
+- The four options, Fighter, Rogue, Wizard, and Cleric, are implemented as templates without any
+  of them needing to know about the others.
+
+The character creator screen in the gamebook uses these templates to populate the selection UI.
+The player picks a class and a race, enters a name, and `createCharacter` does the rest. The
+result is a `Character` that satisfies the same interface the rest of the game has been using
+since Chapter 4. No class, no hierarchy, no `extends`.
+
+---
+
+The Wizard's lineage is real. Within the tower, the chain of transmission is unbroken and the
+rules are clear. The difficulty is that the world outside the tower contains Clerics, and Rangers,
+and Paladins, and people who learned three spells from a hedge witch and use them to light
+campfires. The lineage model is a good description of one kind of magic. It is a poor description
+of magic in general.
+
+Software inheritance works the same way. It is a precise and useful tool for one kind of
+relationship. When the relationship is genuinely hierarchical, use it. When the relationship is
+"these things share some vocabulary but diverge in ways I can't predict", reach for composition
+instead.
+
+In the next chapter, we'll add something the characters have been missing: the ability to fail.
+Dice, probability, and the particular relationship between a difficulty class and a modifier
+are the subject of Chapter 6.
+
+---
+
+[^1]: This is the **DRY principle**: Don't Repeat Yourself. When the same logic exists in two
+places, changes must be made twice, and eventually they won't be. The cure is worse than the
+disease only when the shared ancestor accumulates so much logic that it becomes impossible to
+understand. Finding the right level of abstraction is most of the craft.
+
+[^2]: Barbara Liskov, "Data Abstraction and Hierarchy", OOPSLA 1987. The principle is usually
+stated as: if S is a subtype of T, then objects of type T may be replaced with objects of type S
+without altering any of the desirable properties of the program. In plain English: a child class
+should not surprise code that was written expecting the parent.
