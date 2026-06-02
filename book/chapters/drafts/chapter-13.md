@@ -1,565 +1,407 @@
-# Chapter 13: Authoring A Branching Adventure
+# Chapter 13: The Name For What We've Been Doing
 
 ---
 
-> **The Cartographer and the Playtester**
+> **The Scribe and the Wizard**
 >
-> The Playtester had been through the dungeon three times. Each run had felt good: the choices
-> landed, the pacing was right, the final room carried weight. There was nothing to complain
-> about.
+> The Scribe had been modelling the campaign for three years. Character records with closed
+> vocabularies. Derived stats calculated from stored scores. A boundary between what the
+> players could see and what only the Game Master knew. A rule that said the campaign was the
+> source of truth for session history, and that the session was the source of truth for what
+> the characters had done, and that the characters' sheets were the source of truth for what
+> the characters could do.
 >
-> The Cartographer spread the map on the table.
+> The Scribe had arrived at all of this by instinct and necessity, without any particular
+> vocabulary for it.
 >
-> "There," said the Cartographer, pointing at a passage in the northeast corner. "The Silver
-> Gallery. Twelve rooms of original work, I might add. Best prose in the whole dungeon."
+> "There is a name for what you have been doing," said the Wizard.
 >
-> The Playtester looked at the map. Then at the Cartographer. "I've never been there."
+> "Is there."
 >
-> "No one has. There are no choices leading to it. I drew it after the main passages were
-> connected and forgot to wire it in."
+> "The model reflects the domain. The vocabulary of the code matches the vocabulary of the
+> game. The boundaries in the system match the boundaries that exist in the world the system
+> represents." The Wizard set a book on the desk. It was blue, and heavy. "You have been
+> speaking domain-driven design. You just didn't know the phrase."
 >
-> A silence.
+> The Scribe looked at the book, then at the ledger of campaign records, then at the Wizard.
 >
-> "The prose is very good," said the Cartographer.
+> "I've been doing it for three years without the book."
 >
-> "I believe you."
->
-> "The point is," said the Cartographer, with some dignity, "that the local experience and the
-> global structure are two different things. You felt the choices. I can see where the choices
-> point. Neither of us knew about the Silver Gallery until I looked at the whole map at once."
->
-> The Playtester considered this. "So the validator is not telling you your prose is bad."
->
-> "The surveyor cannot read prose. It can only ask: is this passage reachable? Does every
-> choice point somewhere? Are the endings actually endings? It is not a critic. It is a
-> surveyor."
+> "Most people do," said the Wizard. "The book is for when you want to talk to other people
+> about it."
 
 ---
 
-In Chapter 12, we looked at the player's side of persistence: saving progress, loading it
-back, migrating old formats, and validating the save file at the storage boundary. That chapter
-was about the state the player accumulates while running the adventure.
+In Chapter 12, we gave the save document a schema, a version, and an adventure id. The system
+is honest about what it knows. In Chapter 11, rules had provenance. In Chapter 9, every actor
+had a context-specific permission rather than a global role. In Chapter 4, the `Character`
+interface stored ability scores and derived modifiers from them, because that is what a
+character sheet actually does.
 
-This chapter is about the other side of the same coin: the adventure itself. How it is
-structured, how it is validated, how an author can inspect it before a player ever touches
-it, and how to keep the writing process honest about the difference between prose that feels
-good locally and structure that holds up globally.
+None of these decisions were arbitrary. They all followed from paying careful attention to
+what the domain, the game of D&D, the gamebook format, the campaign management problem, was
+actually like. The software modelled the real thing rather than inventing its own structures
+for the programmer's convenience.
 
-Authoring a branching adventure is not the same skill as writing linear prose. Linear prose
-has one path. A branching adventure has a graph, and writing the prose is only half the job.
-The other half is maintaining the graph: making sure every passage can be reached, every
-choice points somewhere, every requirement can be satisfied, and every ending is actually
-achievable. Without those guarantees, a beautiful corridor can sit in the data forever,
-visited by no one.
+There is a name for this approach. It is **domain-driven design**, and it is, more than any
+other single idea, what this book has been practising.
 
 ---
 
-## A Passage Is A Record
+## The Domain Is The Thing Being Modelled
 
-The Playtester experiences a passage as prose and choices. The software experiences it as
-a data structure.
+A **domain** is the subject matter a piece of software exists to serve. Not the technology,
+not the database schema, not the framework: the real-world activity the software represents.
 
-```typescript
-interface Passage {
-  id: string;
-  title: string;
-  body: string;
-  choices: Choice[];
-  ending?: EndingKind;
-  tags?: PassageTag[];
-  encounterId?: string;
-}
-```
+For Campaign Ledger, the domain is tabletop RPG campaign management. For Mt. Graphnor, the
+domain is a branching adventure gamebook. The vocabulary of those domains, hit points, armour
+class, passages, choices, conditions, saving throws, encounters, does not belong to software.
+It belongs to the game. The software borrows that vocabulary because the game is what it is
+modelling.
 
-`id` is the stable identifier. It is not a number, because numbers do not carry meaning and
-are easy to confuse. It is a short, descriptive string: `"entrance"`, `"keyboard-room"`,
-`"trap-hall"`, `"ending-victory"`. The id names the passage's role in the adventure.[^1]
+Eric Evans named and systematised this approach in 2003 in a book that practitioners
+call the blue book.[^1] His central argument is deceptively simple: the code should speak the
+same language as the domain experts. Not a translation. Not an approximation. The same words,
+used the same way, meaning the same things.
 
-`title` is what the player sees as a heading. `body` is the prose. These are the parts the
-author cares about most. They are also the parts the validator cares about least: it does not
-read prose, and it does not evaluate whether the title is appropriate.
+When a dungeon master talks about a character's hit points, they mean something precise: a
+number that tracks how much damage the character can absorb before falling unconscious. When
+`GameState.hitPoints` holds a number that tracks how much damage the character can absorb
+before falling unconscious, the code and the domain expert are speaking the same language.
+There is no translation layer, no impedance mismatch, no point where the code's concept of
+hit points diverges from the game's.
 
-`choices` is the list of actions available from this passage. It is where the graph edges
-live. `ending` marks a terminal node: a passage with an ending kind and no choices is a
-valid leaf. A passage with neither choices nor an ending kind is a dead end, and the
-validator will say so.
-
-`tags` carry metadata for tooling: room roles, content categories, facets the author tools
-use to filter and count coverage. They do not affect gameplay. `encounterId` links to a
-combat encounter defined in the adventure catalogue.
-
-The discipline of naming passages with stable ids and keeping their role clear in those ids
-is not about aesthetics. It is what makes the graph validator's output readable. When the
-validator reports `"missing target: silver-gallery"`, the author knows immediately which
-passage is broken and why.
+When they diverge, something has gone wrong. The divergence is a signal that the model has
+drifted from the domain it was supposed to represent.
 
 ---
 
-## Choices As Contracts
+## Ubiquitous Language
 
-A choice is a promise: if the player selects this option, they will arrive at this passage.
-The promise must be kept.
+Evans calls the shared vocabulary of a domain and its software the **ubiquitous language**:
+the set of terms that should appear identically in conversations, documents, diagrams, and
+code. When the domain experts say "saving throw" and the code says `savingThrowCheck`, the
+two are almost the same thing. When the domain experts say "saving throw" and the code says
+`defensiveRollOutcome`, they have started to diverge, and the divergence will widen over time
+as each side evolves independently.
 
-```typescript
-interface Choice {
-  id: string;
-  text: string;
-  targetId?: string;
-  check?: {
-    ability: Ability;
-    skill?: Skill;
-    dc: number;
-    onSuccess: string;
-    onFailure: string;
-  };
-  combat?: {
-    encounterId: string;
-    onVictory: string;
-    onDefeat: string;
-    onContinue: string;
-  };
-  requires?: ChoiceRequirement;
-  effects?: ChoiceEffect;
-}
-```
+The gamebook's ubiquitous language is visible in `src/gamebook/model.ts`. `Passage`,
+`Choice`, `Encounter`, `GameState`, `EncounterState`, `EndingKind`: these names were not
+chosen because they are good programming vocabulary. They were chosen because they are what
+a gamebook author would call these things. A passage is a passage. An encounter is an
+encounter. An ending is an ending. The code names them what the domain names them.
 
-A direct choice has a `targetId`. A check choice has success and failure targets. A combat
-choice has victory, defeat, and continue targets. Every branch names a passage. Every named
-passage must exist.
-
-This is where authoring becomes structural work. Writing the choice text is easy. Getting
-every target right, in every branch, across a graph that might have dozens of passages, is
-the part that benefits from tooling. The human author can hold the local passage in mind.
-The validator holds the whole graph.
+Compare this to the `src/nodes/` directory that existed in an earlier version of the project,
+with its `AdventureNode` and `nextNodeId` and `isEnding` flag. Technically equivalent. But
+a gamebook author would not call a passage a "node". They would not say "the next node id" to
+mean "where this choice leads". The vocabulary belonged to graph theory, not to gamebooks. The
+domain's language was being overwritten by the implementer's language. This is exactly the
+drift Evans warned against.[^2]
 
 ---
 
-## The Validator As Surveyor
+## Entities, Value Objects, And The Question Of Identity
 
-The graph validator in `src/gamebook/graph.ts` does not know whether the adventure is good.
-It knows whether it is structurally sound. The Cartographer was right: it is a surveyor,
-not a critic.
+Not everything in a domain has the same relationship to identity. Evans draws a line between
+two kinds of things.
 
-What the validator checks, for every adventure passed to it:
+An **entity** is something with a meaningful identity that persists through change. A
+character is an entity: Brandavar the Twice-Born is still Brandavar after losing hit points,
+gaining equipment, levelling up, or changing conditions. The identity is what matters; the
+attributes are what describe the current state of that identity. In code, entities have ids.
 
-```typescript
-function validateAdventure(adventure: Adventure): GraphIssue[] {
-  const issues: GraphIssue[] = [];
-  const passageMap = createPassageMap(adventure.passages);
+A **value object** is something defined entirely by its attributes, with no meaningful
+independent identity. A damage roll is a value object: `{ dice: 1, sides: 8, modifier: 3,
+type: "slashing" }`. Two damage rolls with the same values are interchangeable. There is no
+meaningful sense in which the damage roll from Tuesday's session is a different object from
+an identical damage roll on Wednesday. Value objects can be copied, compared by value, and
+replaced without ceremony.[^3]
 
-  // Start passage exists
-  if (!passageMap.has(adventure.startPassageId)) {
-    issues.push({
-      code: "missing-start",
-      message: `Start passage "${adventure.startPassageId}" does not exist.`,
-    });
-  }
+In the gamebook: `Character` is an entity. `AttackProfile` is a value object. `Passage` is
+an entity (it has a stable `id` that the graph, the save file, and the validator all reference
+by name). `Choice` is closer to a value object: its identity comes from its parent passage
+and its position, not from any independent id. `RollResult` is a value object: a snapshot of
+what happened on a roll, with no ongoing identity of its own.
 
-  // All choice targets exist
-  for (const passage of adventure.passages) {
-    for (const choice of passage.choices) {
-      for (const targetId of choiceTargets(choice)) {
-        if (!passageMap.has(targetId)) {
-          issues.push({
-            code: "missing-target",
-            passageId: passage.id,
-            choiceId: choice.id,
-            targetId,
-          });
-        }
-      }
-    }
-  }
-
-  // No dead ends among non-endings
-  for (const passage of adventure.passages) {
-    if (!passage.ending && passage.choices.length === 0) {
-      issues.push({
-        code: "dead-end",
-        passageId: passage.id,
-      });
-    }
-  }
-
-  // All passages reachable from start
-  const reachable = computeReachable(adventure.startPassageId, passageMap);
-  for (const passage of adventure.passages) {
-    if (!reachable.has(passage.id)) {
-      issues.push({
-        code: "unreachable",
-        passageId: passage.id,
-      });
-    }
-  }
-
-  // All endings reachable
-  const endings = adventure.passages.filter(p => p.ending);
-  for (const ending of endings) {
-    if (!reachable.has(ending.id)) {
-      issues.push({ code: "unreachable-ending", passageId: ending.id });
-    }
-  }
-
-  // Catalogue reference checks
-  checkItemReferences(adventure, issues);
-  checkEncounterReferences(adventure, issues);
-
-  return issues;
-}
-```
-
-Each issue has a code and enough context to act on it. `"missing-target"` reports the passage
-id, the choice id, and the target id that does not exist. `"unreachable"` reports the passage
-id. With these, the author can open the right file and fix the right line without searching
-through the whole adventure.[^2]
-
-The reachability check is the one that would have caught the Silver Gallery. It computes the
-set of passages reachable from the start passage by following all choice targets, then
-checks every passage in the adventure against that set. Passages not in the reachable set are
-reported. The validator does not ask whether the prose is good; it asks whether a player can
-ever reach it.
+The distinction matters because it determines how you handle change. When an entity changes,
+you update it in place and preserve its identity. When a value object changes, you replace it
+entirely with a new one. `applyChoiceEffects` in `src/gamebook/state.ts` works this way: it
+does not mutate the existing `GameState`; it produces a new `GameState` with the changed
+values. The old state was a value snapshot. The new state is a different snapshot of the same
+play session, which is the entity whose identity persists.
 
 ---
 
-## Room Roles As A Planning Scaffold
+## Aggregates: The Boundary Around Consistency
 
-The Five Room Dungeon template from Chapter 2 is not just a design concept in the book. In
-the gamebook's implementation it is an active constraint: a set of expectations the adventure
-data must satisfy, checked by a separate validator.
+Some entities do not stand alone. They exist in clusters where one entity is the root and the
+others are subordinates that only make sense within the cluster. Evans calls these
+**aggregates**, and the root entity is the **aggregate root**.
 
-```typescript
-// src/gamebook/content/five-room-template.ts
-export const FIVE_ROOM_ROLES: PassageTag[] = [
-  "room-1",
-  "room-2",
-  "room-3",
-  "room-4",
-  "room-5",
-];
+The `Adventure` type is an aggregate root. It owns its `passages`, its `encounters`, its
+`items`, its `discoveries`, and its `attribution`. None of those things has a meaningful
+existence outside an adventure. You do not look up a `Passage` independently; you look it up
+within an adventure via `createPassageMap`. The adventure enforces consistency across all of
+them: `validateAdventure` checks that every item reference, every passage target, every
+encounter id is coherent within the adventure's own catalogue. The aggregate root is the
+consistency boundary.
 
-export const REQUIRED_ENDINGS: EndingKind[] = [
-  "victory",
-  "failure",
-  "retreat",
-  "cliffhanger",
-];
+`GameState` is similarly an aggregate root for the play session. It owns the current passage
+id, the character, hit points, inventory, flags, encounter states, and log entries. The
+consistency rules that govern the save document, the schema, the version, the adventure id
+match, the passage id validity, operate across the whole aggregate. `parseGame` validates the
+whole `GameState`, not its parts in isolation, because consistency is a property of the whole.
 
-export function validateFiveRoomTemplate(
-  adventure: Adventure
-): TemplateResult[] {
-  const issues: TemplateResult[] = [];
-  const tags = new Set(adventure.passages.flatMap(p => p.tags ?? []));
-  const endingKinds = new Set(
-    adventure.passages
-      .filter(p => p.ending)
-      .map(p => p.ending as EndingKind)
-  );
-
-  for (const role of FIVE_ROOM_ROLES) {
-    if (!tags.has(role)) {
-      issues.push({ code: "missing-room-role", role });
-    }
-  }
-
-  for (const ending of REQUIRED_ENDINGS) {
-    if (!endingKinds.has(ending)) {
-      issues.push({ code: "missing-ending-kind", ending });
-    }
-  }
-
-  return issues;
-}
-```
-
-Room tags are not for display. The player never sees `room-1` or `room-4`. They are labels
-for the author and the tooling: this passage is the entrance challenge, this one is the
-climax. The template validator checks that each role is covered. The content audit in the
-author tools shows which passages carry which tags, so the author can see at a glance whether
-the structure is complete.[^3]
-
-The point of the template is not to constrain what the adventure can do. Mt. Graphnor is free
-to have more than five passages; it has many more. The template says: among all your passages,
-at least one should play the role of the entrance challenge, at least one the climax, at least
-one the resolution. If none does, the adventure may be missing something structurally
-important, and the validator will say so before a player discovers it by wandering.
+In Campaign Ledger, `Campaign` is an aggregate root. Characters, sessions, notes, NPCs,
+imports, and wiki pages are all owned within a campaign. The access control from Chapter 9
+follows directly from the aggregate boundary: checking `requireCampaignAccess` is checking
+whether an actor has permission to interact with this aggregate. The campaign boundary is the
+consistency boundary and the access boundary simultaneously, because the domain made them the
+same thing.[^4]
 
 ---
 
-## Passage Previews And The Author View
+## Bounded Contexts: Where One Model's Vocabulary Ends
 
-The gamebook's author tools in development mode include a passage preview page: a filtered
-view of every passage in the adventure, showing its id, title, tags, choices, requirements,
-and effects. The preview renders the content as the player would see it, alongside the
-structural metadata the player never sees.
+A large domain is rarely one coherent model. Different parts of the same organisation, or the
+same application, use the same words to mean subtly different things.
 
-This is the author's double vision: the prose and the plumbing simultaneously. A choice that
-looks compelling in prose but requires an item the player cannot yet acquire is visible in
-the preview as both the choice text and the `requires: { itemsAll: ["brass-key"] }` gate
-that controls it. The author sees the experience and the mechanism together.
+Evans calls these regions **bounded contexts**: areas within which a particular model and its
+vocabulary are consistent and authoritative. At the boundary between two contexts, translation
+is required.
 
-The preview page also supports filtering by tag and by ending kind. An author who wants to
-check only the room-4 passages, or only the failure endings, can filter to those and review
-them without navigating the whole adventure. This is the authoring equivalent of the
-access-control principle from Chapter 9: show only what is relevant to the current task.
+The gamebook has two bounded contexts. The **adventure context** knows about passages,
+choices, encounters, items, the graph, and validation. The **play context** knows about game
+state, save documents, inventory effects, dice checks, and persistence. `model.ts` defines
+the shared types that cross the boundary; `graph.ts` and `state.ts` are the domain logic of
+their respective contexts.
 
-The author tools are development-only. The published player build does not include them,
-for the same reasons as the debug panel and forced navigation: capabilities that belong to
-the author are not capabilities that belong to the player.
+The fact that both contexts use `Passage` does not mean they use it in the same way. The
+adventure context treats a `Passage` as a node in a static graph to be validated. The play
+context treats the current passage id as a pointer into that graph, looked up at runtime.
+The same word; different use. Keeping the contexts separate means each can evolve
+independently: tightening the validation rules in `graph.ts` does not require changes in
+`state.ts`.[^5]
 
----
-
-## Tags Are For Tools, Not Players
-
-Tags are a recurring pattern in the gamebook that is worth making explicit.
-
-A passage tag is a string carried in the `tags` array. It does not change the prose. It does
-not affect gameplay. It does not appear in the player-facing render. It exists exclusively
-for tooling: the template validator reads it, the content audit counts it, the preview
-filter uses it, the test assertions check for it.
-
-This is a useful design pattern wherever software must maintain two audiences simultaneously:
-the end user, who cares about the experience, and the author or operator, who cares about the
-structure. Tags carry structural meaning without cluttering the experience. They are a layer
-of metadata that lives alongside the content without interfering with it.
-
-The discipline required is in keeping tags accurate. A passage tagged `room-4` that is
-actually part of the entrance sequence is a misleading label. The tools trust the tags;
-if the tags are wrong, the tools give wrong answers. Tags should be added with the same care
-as ids: they are structural commitments, not decorative notes.[^4]
+Campaign Ledger's bounded contexts are more clearly separated. The `campaigns` context knows
+about sessions, prep, NPCs, wikis, and imports. The `characters` context knows about sheets,
+abilities, skills, resources, and equipment. The `rules` context knows about sources, entities,
+and mechanics. Each has its own repository, its own read models, and its own vocabulary for
+the same underlying domain concepts. A "character" in the characters context is a full sheet
+with abilities and resources. A "character" in the local play context is a summary with a
+name, a class, and a level. Same word, different shape, appropriate to each context's needs.
 
 ---
 
-## The Import Pipeline And Campaign Ledger
+## The Anti-Corruption Layer
 
-The gamebook's authoring tools are modest: a validator, a template checker, a preview page.
-The adventure content is TypeScript data, authored directly and committed to the repository.
-This is appropriate for a prototype where the author is also the developer.
+When a bounded context must import vocabulary or data from outside its own model, Evans
+recommends a translation boundary he calls an **anti-corruption layer**: a layer that converts
+the external representation into the internal domain language, preventing the external model's
+concepts from leaking into the internal one.
 
-Campaign Ledger shows what the same ideas look like when the author is a game master writing
-in Google Docs, a notes application, or a word processor, and the application must bring that
-content into a structured system without breaking it or leaking private material.
+Chapter 11 described this without naming it. The SRD import in Campaign Ledger converts SRD
+5.1 prose and structured JSON into the application's own `rules_entities` and `rule_mechanics`
+schema. The importer is the anti-corruption layer. It translates "this is what the SRD calls
+a Wizard" into "this is what the application's rules model calls a class entity with a
+d6 hit die and intelligence spellcasting". The SRD's vocabulary does not leak into the
+application's domain model. The application decides what it needs; the importer bridges the
+gap.
 
-The import pipeline works in stages. First, the content is received: pasted Markdown, pasted
-HTML, or a manually exported Google Docs file. Second, it is converted: HTML is filtered to
-a safe subset, Google Docs-specific markup is normalised, private URLs are removed with
-warnings. Third, a preview is generated: the converted Markdown, the detected title, the
-target type, and any warnings are shown to the author before anything is saved. Fourth, the
-author confirms: only after review does the content enter the database.
-
-```typescript
-// src/campaigns/imports.ts (simplified)
-interface ImportResult {
-  title: string | null;
-  markdown: string;
-  warnings: string[];
-  provider: "markdown" | "html" | "google-docs";
-}
-
-function prepareImport(raw: string, format: ImportFormat): ImportResult {
-  const warnings: string[] = [];
-
-  // Remove private Google Drive and Docs URLs before storage
-  const cleaned = stripPrivateUrls(raw, warnings);
-
-  // Convert HTML to a safe Markdown subset
-  const markdown =
-    format === "html" ? convertHtmlToMarkdown(cleaned, warnings) : cleaned;
-
-  const title = detectTitle(markdown);
-
-  return { title, markdown, warnings, provider: format };
-}
-```
-
-The warnings are part of the output. If a private URL was found and removed, the author
-sees that warning in the preview and can decide whether the removal was correct. The import
-does not silently discard information; it flags the decision and hands control back to the
-author.[^5]
-
-The staged design also prevents a specific class of error: publishing a draft that was not
-intended to be player-visible. Content imported to the database is given a visibility level:
-public, game-master-only, or draft. The player preview route, which shows the game master
-what the players currently see, uses the same visibility filter as the player routes. An
-import that is saved as game-master-only will not appear in the player preview, because the
-same filter that hides it from players hides it from the preview too. The preview is only
-trustworthy if it uses the same rules as production.
+The same pattern appears in the import pipeline for campaign content. A Game Master's Google
+Doc is translated into normalised Markdown, with private URLs stripped and source metadata
+preserved, before it enters the campaign domain. The importer prevents the Google Docs format,
+its headings, its link structure, its embedded content, from polluting the internal
+representation of campaign notes. The campaign domain speaks its own language; the importer
+speaks both.[^6]
 
 ---
 
-## Originality And Influence
+## Repositories: The Gateway To Persistence
 
-A branching adventure can be inspired by Fighting Fantasy without being a copy of it. This
-is worth saying plainly, because the line between inspiration and reproduction is not always
-obvious.
+A **repository** is a domain-language interface for retrieving and storing domain objects.
+The key word is "domain-language": the repository speaks in terms of the domain, not in terms
+of the storage technology.
 
-What the gamebook borrows from Fighting Fantasy is structural: numbered passages (though the
-gamebook uses named ids rather than numbers), choices at the end of each passage, dice-based
-checks, inventory as a gate, endings that can be reached by different paths. These are the
-forms of the genre. They are not protected expression; they are the shape that makes the
-genre what it is.
+Campaign Ledger defines repository interfaces like `CharacterRepository`, `CampaignRepository`,
+and `RulesRepository`. These interfaces say things like `getCharacter(id)`,
+`listNpcSummariesForCampaign(campaignId, viewerRole)`, and `updateResourceCurrent(resourceId,
+delta)`. They do not say `SELECT * FROM characters WHERE id = ?`. The domain logic knows what
+it needs; the repository knows how to get it. The SQLite implementation satisfies the
+repository interface without the routes or domain modules ever knowing SQLite is involved.
 
-What the gamebook does not borrow is specific: no passage text, no maps, no named characters,
-no puzzle solutions, no distinctive encounters, no trade dress. The adventure is original
-work that uses the genre's structural conventions, in the same way that a thriller novel uses
-the structural conventions of the thriller genre without copying any particular thriller.
-
-The validator, the template, and the authoring tools are neutral with respect to originality.
-They check structure, not expression. An adventure that passes all validation checks might
-still reproduce protected content; the tools cannot know. Originality is an authorial
-responsibility, not a technical one.[^6]
+The gamebook uses the same principle more simply. `StorageAdapter` from Chapter 12 is a
+repository interface for the save document: `getItem`, `setItem`, `removeItem`. The play
+session code knows it needs to load and save state; the browser provides `localStorage` and
+the tests provide an in-memory object. Neither the play logic nor the tests know about the
+other's storage reality.[^7]
 
 ---
 
-## The Authoring Loop
+## D&D As A Well-Designed Domain
 
-The practical workflow for building an adventure is a loop, not a linear process.
+The reason D&D maps onto these ideas so naturally is that D&D is itself a well-designed
+domain model. Decades of iteration by designers and millions of players have produced a
+vocabulary that is precise, stable, and widely understood.
 
-Write a passage. Run the validator. Fix the missing target the validator found. Write another
-passage. Check the template coverage. Add the room tag you forgot. Preview the passage to see
-how the choice requirements look alongside the prose. Notice that a gate requires an item
-that has not been placed in any previous passage. Add a choice that grants the item in an
-earlier room. Run the validator again.
+"Saving throw" does not mean "any roll to avoid something bad". It means a specific kind of
+roll against a specific ability score, triggered by a specific category of effect, with
+specific consequences for success and failure. The term is loaded with meaning. When the
+gamebook's `CheckDefinition` has a `kind: "savingThrow"` field, it is borrowing that
+precision without having to re-invent it.
 
-The loop is tight because the validator runs in seconds and produces specific, actionable
-output. An authoring process that requires a full playtesting session to discover structural
-problems is slower and more expensive than one that finds them automatically. The validator
-is not a substitute for playtesting, but it handles the structural errors that do not require
-human judgement, which frees playtesting time for the errors that do.
+The aggregate structure is visible in the published rulebooks. A character sheet is a
+character aggregate: the character is the root entity, and their abilities, skills, inventory,
+conditions, and resources are owned within it. The dungeon master's screen is a bounded
+context boundary made physical: on one side, the information available to players; on the
+other, the information the GM holds. The adventure module is an aggregate: encounters, rooms,
+NPCs, and maps are all owned by the adventure and meaningless outside it.
 
-Mermaid graph export is a complementary tool. At any point in the authoring process, the
-author can generate a directed graph diagram of the adventure, showing every passage as a
-node and every choice as a directed edge. This makes the global structure visible in a way
-that reading the passage data does not. The Silver Gallery would appear in the Mermaid output
-as a disconnected node: a box with no arrows pointing to it. Its isolation is immediately
-visible.
+Game designers made these structural decisions for the same reasons software architects make
+them. They needed consistency: a character's proficiency bonus should be the same everywhere
+it appears on the sheet. They needed bounded visibility: players should not know what the GM
+rolls behind the screen. They needed stable identity: Brandavar is still Brandavar regardless
+of which adventure they appear in. The game solved the same problems the software solves,
+independently, decades earlier, and called the solutions by different names.[^8]
 
-```typescript
-export function exportMermaid(adventure: Adventure): string {
-  const lines = ["flowchart TD"];
+---
 
-  for (const passage of adventure.passages) {
-    const label = passage.ending
-      ? `${passage.id}["${passage.title} [${passage.ending}]"]`
-      : `${passage.id}["${passage.title}"]`;
-    lines.push(`  ${label}`);
-  }
+## What This Means For How You Write Code
 
-  for (const passage of adventure.passages) {
-    for (const choice of passage.choices) {
-      for (const targetId of choiceTargets(choice)) {
-        lines.push(`  ${passage.id} --> ${targetId}`);
-      }
-    }
-  }
+Domain-driven design is not a collection of patterns to be applied mechanically. It is an
+attitude: the code's job is to represent the domain honestly. Every naming decision, every
+boundary, every interface is an opportunity to either reflect the domain faithfully or to
+obscure it under implementation concerns.
 
-  return lines.join("\n");
-}
-```
+Concretely, this means a few things.
 
-The diagram is generated from the same data the validator reads. It cannot lie about the
-structure, because it is derived from it. When the diagram shows a disconnected node, the
-passage is genuinely unreachable. The visual and the structural check say the same thing from
-different angles.[^7]
+When you are naming a type, ask: what does the domain expert call this thing? Not what is
+technically accurate, not what is convenient to type, but what does the person who understands
+the business call it. If they call it a "saving throw", call it a saving throw. If they call
+it a "campaign session", call it a campaign session. The name in the code is a claim about
+the domain, and it should be an honest claim.
+
+When you are drawing a module boundary, ask: where does the domain say the responsibility
+ends? The gamebook separates `graph.ts` from `state.ts` not because it is good module
+structure in the abstract, but because adventure validation and play-session management are
+genuinely different domain concerns. The domain's own boundaries suggest the code's
+boundaries.
+
+When you are writing validation, ask: what does the domain say is valid? The `Character`
+interface constrains `class` to four named values because the domain has four playable classes.
+The save document requires an `adventureId` because you cannot have a play session without an
+adventure. The validation rules are domain rules expressed in code, not arbitrary constraints
+invented by the programmer.
+
+The test of a good domain model is whether a domain expert, someone who knows D&D but not
+TypeScript, could read the type definitions and recognise the things they describe. Not the
+code, just the types. If `interface Character` with its `abilityScores`, `maxHitPoints`,
+`armourClass`, `skillProficiencies`, and `inventory` looks like a character sheet to a D&D
+player, the model is honest. If it looks like a data structure that could be anything, the
+model has lost the thread.[^9]
 
 ---
 
 ## The Build Move
 
-By the end of this chapter, the gamebook has a complete authoring surface:
+This chapter does not introduce new code. It introduces a vocabulary for code that already
+exists.
 
-- `validateAdventure(adventure)` in `src/gamebook/graph.ts` returns a list of structural
-  issues: missing start, missing targets, dead ends, unreachable passages, unreachable
-  endings, and catalogue reference errors. Each issue carries enough context to identify the
-  problem precisely.
-- `validateFiveRoomTemplate(adventure)` in `src/gamebook/content/five-room-template.ts`
-  checks that the required room roles and ending kinds are all present in the adventure data.
-- `exportMermaid(adventure)` in `src/gamebook/graph.ts` generates a Mermaid flowchart of
-  the passage graph, with ending kinds labelled on terminal nodes.
-- The author page at `/gamebook/author` (development only) surfaces validation results,
-  template coverage, the Mermaid diagram, a content audit by tag and ending kind, and passage
-  previews filterable by tag.
-- Passage tags (`room-1` through `room-5`, and content facet tags) carry structural metadata
-  without affecting player-facing renders.
-- `PassageTag` and `EndingKind` in `src/gamebook/model.ts` are the closed vocabularies for
-  tags and endings shown in the template validator.
+Looking back across the gamebook:
 
-The graph tests in `src/gamebook/graph.test.ts` assert that Mt. Graphnor passes full
-validation, that all required endings are present, that the Five Room template coverage is
-complete, and that the adventure content no longer contains placeholder prose. The last
-assertion is structural gatekeeping applied to content quality: the test fails until the
-prototype passages contain original working copy rather than development placeholders.
+- `Adventure`, `Passage`, `Choice`, `Encounter` in `src/gamebook/model.ts` are the **entities**
+  and **value objects** of the adventure domain, named in the domain's language.
+- `Adventure` and `GameState` are **aggregate roots**: each enforces consistency across its
+  owned objects through `validateAdventure` and `parseGame` respectively.
+- `src/gamebook/graph.ts` and `src/gamebook/state.ts` are two distinct domain services,
+  each representing a **bounded context**: adventure authoring and play session management.
+- `StorageAdapter` in `src/gamebook/state.ts` is a **repository interface**: the play logic
+  depends on the abstraction, not the browser storage implementation.
+- The SRD catalogue in `src/gamebook/rules/srd.ts` is the gamebook's small
+  **anti-corruption layer**: SRD vocabulary translated into the application's domain model,
+  with source attribution preserved.
+
+The ubiquitous language of the gamebook is `Passage`, `Choice`, `Encounter`, `GameState`,
+`EndingKind`, `RollResult`: words a gamebook author would use, not words a database
+administrator would use. That alignment was not accidental. It was the whole strategy.
 
 ---
 
-The Cartographer's Silver Gallery was not a failure of prose. It was a failure of connection.
-The writing existed; the path to it did not. The Playtester had a good experience precisely
-because they never encountered an unreachable passage, a broken choice, or an ending they
-could not reach. The validator is the reason those problems were fixed before the Playtester
-sat down.
+The Scribe's three years of instinctive modelling and the blue book on the Wizard's desk
+describe the same activity. The instinct comes first; the vocabulary comes when you want to
+talk to other people about it, read about what has worked for others, or recognise when you
+are about to make a well-documented mistake.
 
-Good authoring tools do not improve the prose. They find the structural problems that prose
-quality cannot compensate for, and they find them cheaply enough that fixing them is the
-work of minutes rather than sessions. The critic and the surveyor are both necessary. The
-validator is the surveyor, and it should be run early, run often, and trusted completely in
-the things it can actually check.
+Domain-driven design does not solve software problems. It names a way of thinking about them
+that keeps the code honest about what it represents. The domain is the dungeon. The software
+is the map. A good map does not impose its own structure on the territory; it follows the
+territory's structure faithfully enough that someone who knows the territory can read the map,
+and someone who can read the map can find their way through the territory.
 
-In Chapter 14, we'll widen the lens from validating the adventure content to verifying the
-whole system: routes, renders, static builds, browser behaviour, accessibility, and the
-evidence trail that tells a reviewer what was actually tested. The scouting party goes
-further than the surveyor, and it leaves better notes.
+In Chapter 14, we will send a test party through every door to verify that the map is
+accurate: that the code does what it claims, the published build contains what it should, and
+the access boundaries hold under pressure.
 
 ---
 
-[^1]: Numbered passage ids, the format used by printed Fighting Fantasy books, work because
-the author can see the number in print and navigate directly to it. In software, a number
-carries no meaning: passage 47 gives no indication of what it contains or where it sits in
-the adventure structure. A descriptive string id like `"trap-hall-dexterity-save"` tells the
-author, the validator output, and the test failure message exactly which passage is being
-discussed. The cost is that ids must be unique and stable, which requires the same discipline
-as database primary keys.
+[^1]: Eric Evans, *Domain-Driven Design: Tackling Complexity in the Heart of Software*
+(Addison-Wesley, 2003). The book is long, dense, and worth reading slowly. Its core
+arguments are clear; much of its bulk is examples and pattern catalogues. Martin Fowler's
+website at [martinfowler.com](https://martinfowler.com/tags/domain%20driven%20design.html)
+provides shorter, searchable treatments of the individual patterns. The blunt entry point is
+Fowler's article "UbiquitousLanguage", which makes the core claim in about six paragraphs.
 
-[^2]: The error report format is deliberately more like a structured object than a prose
-message. Each issue has a `code` that can be matched programmatically, and the supporting
-fields carry exactly the context needed to find and fix the problem. This means the author
-tools page can group issues by type, filter them, and present them alongside the relevant
-passage preview. A prose error message like "there is a problem with a choice in one of your
-passages" is almost useless. A structured issue with `passageId`, `choiceId`, and `targetId`
-is actionable immediately.
+[^2]: The `src/nodes/` directory and its `AdventureNode` model are visible in the project's
+early history. The migration to `src/gamebook/model.ts` with its `Passage` and `Choice`
+types was exactly the kind of refactoring Evans describes: not changing what the code does,
+but changing what the code says it is. The technical behaviour was equivalent. The model
+became honest.
 
-[^3]: The pattern of using tags as coverage metadata is common in test suites (test categories,
-test groups, labels) and in content management systems (taxonomy terms, content types). In
-both contexts the tag is a way of saying: this thing plays a particular role in a larger
-structure, and tools can use that role to check coverage, generate reports, or filter views.
-The key discipline is treating tags as structural commitments rather than loose annotations.
-A tag that is added without thought and never validated is noise. A tag that is defined in a
-closed vocabulary and checked by a validator is information.
+[^3]: The entity/value object distinction has a useful practical implication for equality.
+Two entities with the same attributes are still two different entities if they have different
+ids. Two value objects with the same attributes are the same thing. `AttackProfile`s with
+identical fields can be compared by value and swapped freely. Characters with identical fields
+but different ids are different characters. TypeScript does not enforce this distinction
+automatically; it is a design commitment, not a type-system feature. Making it explicit, naming
+it, helps the team maintain it consistently.
 
-[^4]: The relationship between tags and truth is an instance of a broader data integrity
-question: who is responsible for keeping metadata accurate when the underlying content
-changes? In the gamebook, the author is responsible: there is no automatic mechanism that
-updates a tag when a passage is moved to a different role. The validator can check that a
-tag exists but cannot check whether it is still appropriate. This is a known limitation, and
-the correct response is to treat tag-bearing passages with the same care as id-bearing ones:
-changes to role or position should prompt a review of the tags.
+[^4]: The aggregate root as consistency boundary is one of Evans' most practically useful
+ideas. It answers the question "what validates together?" The adventure validates as a whole
+because the consistency rules, passage targets, item references, encounter ids, span the whole
+adventure. You cannot validate a passage in isolation from the adventure that defines its
+items and encounters. The aggregate root is the boundary at which you can meaningfully ask
+"is this correct?"
 
-[^5]: The warning-preserving design of the import pipeline is a specific instance of a
-general principle: do not silently discard information when you can instead record a decision
-and present it for review. A private URL that is stripped without warning may have been
-intentional; a private URL that is stripped with a warning gives the author the chance to
-notice and correct the import source. Warnings that are shown and then ignored are the
-author's responsibility. Warnings that are silently swallowed are the system's failure.
+[^5]: This is Evans' concept of context mapping: understanding which contexts exist, where
+their boundaries are, and what translation is required at each boundary. Campaign Ledger's
+architecture documents describe this implicitly in the repository interfaces: each repository
+speaks its context's language, and the routes coordinate between contexts without the contexts
+directly knowing about each other.
 
-[^6]: The Creative Commons licence on the SRD specifically covers the mechanics: the rules,
-the stats, the vocabulary. It does not and cannot cover originality of expression. A
-gamebook that uses SRD-compatible ability scores but writes original passage prose is using
-the licence correctly. A gamebook that copies passage text from a commercial Fighting Fantasy
-title and adds SRD ability scores to the encounter is not protected by the SRD licence. The
-distinction is between mechanics (licenseable) and expression (protectable by copyright
-regardless of licence). When in doubt, write the prose yourself.
+[^6]: The anti-corruption layer pattern is one of Evans' more widely adopted ideas, partly
+because it solves a very practical problem: integrating with external systems without letting
+the external system's design choices infect the internal model. Every system that consumes an
+external API or imports from an external format benefits from an explicit translation layer.
+The alternative, letting the external vocabulary in directly, accumulates as technical debt:
+the code starts to speak the external system's language rather than the domain's language, and
+the two become harder to disentangle.
 
-[^7]: Mermaid is a text-based diagram language that renders in most Markdown viewers, GitHub,
-and many documentation tools. The choice to export in Mermaid format rather than a custom
-visual is deliberate: the output is human-readable text that can be committed to version
-control alongside the adventure data, diffed when the passage graph changes, and rendered
-in the same environment where the author is already working. A binary image cannot be
-diffed. A Mermaid diagram can.
+[^7]: The repository pattern also makes testing significantly easier, which is one practical
+argument for it that does not require any commitment to DDD philosophy. If the application
+logic depends on a `StorageAdapter` interface rather than directly on `localStorage`, tests
+can inject a simple in-memory object and verify behaviour without needing a browser. This is
+the same injectable dependency pattern used for `RandomSource` in Chapter 6: depend on the
+contract, not the implementation, and the tests can control the implementation.
+
+[^8]: This observation is not unique to D&D. Any sufficiently mature domain develops a rich
+and precise vocabulary over time. Legal systems have terms of art with exact meanings. Medical
+systems have clinical vocabulary. Financial systems have accounting terms. In each case,
+domain-driven design's advice is the same: use the domain's vocabulary, do not invent your
+own. The domain experts have usually spent considerably more time thinking about their domain
+than the developers have, and their vocabulary reflects that.
+
+[^9]: The "read the types" test is one I find genuinely useful. If the type definitions read
+like a description of the domain, the model is honest. If they read like a description of the
+database schema, or the API response format, or the programmer's convenience, the model has
+been built upside down. Types describe what things are; the domain already knows what things
+are; the code should agree.

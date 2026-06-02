@@ -37,8 +37,10 @@
 
 ---
 
-In Chapter 13, the validator checked the adventure content: reachability, broken targets, dead
-ends, missing endings. That is one member of the test party. The scout who checks whether
+In Chapter 13, we named the approach the book has been taking: domain-driven design. The
+domain has its own vocabulary; the code uses that vocabulary. The adventure is an aggregate
+root; its consistency rules span the whole adventure. The validator is the domain service
+that checks those rules. That is one member of the test party. The scout who checks whether
 doors open.
 
 This chapter sends in the rest. Route tests check what the player sees when they navigate the

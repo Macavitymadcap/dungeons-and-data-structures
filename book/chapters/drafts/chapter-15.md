@@ -118,12 +118,13 @@ promise to old players that progress made under an earlier format will survive a
 change. Three storage strategies, localStorage, SQLite, and exported JSON, serve different
 needs and cannot substitute for each other.
 
-**Chapter 13** taught the authoring loop. A validator finds structural problems that prose
-quality cannot compensate for: broken targets, dead ends, unreachable passages, missing
-endings. The Mermaid export makes the global structure visible. Passage tags carry structural
-metadata for tooling without affecting the player's experience. The import pipeline stages,
-converts, warns, and previews before committing, because a mistake in authoring should be
-caught before it reaches the player.
+**Chapter 13** named the approach. Domain-driven design is the discipline of building software
+that models a real domain faithfully: using the domain's vocabulary in the code, drawing
+module boundaries where the domain draws them, naming entities and value objects what the
+domain names them. The gamebook had been doing this throughout; Chapter 13 gave it the
+vocabulary to recognise itself. Ubiquitous language, aggregate roots, bounded contexts,
+repositories, and anti-corruption layers are not abstract patterns to be applied from above.
+They are what naturally emerges when you take the domain seriously.
 
 **Chapter 14** sent in the test party. Unit tests prove domain logic. Route tests prove the
 interface. Static build and artifact checks prove the publishing pipeline. Browser smoke
@@ -155,7 +156,9 @@ illustrative of the ideas: the code is the ideas, running.
 
 This was the promise from Chapter 1: not that the dungeon is a cute way of remembering what
 a directed graph is, but that a real dungeon, written in real TypeScript, with real tests, is
-a directed graph. The metaphor and the implementation point at the same thing.[^1]
+a directed graph. The metaphor and the implementation point at the same thing. Chapter 13 gave
+that alignment a name: domain-driven design. The code speaks the domain's language because the
+domain is worth speaking honestly.[^1]
 
 ---
 

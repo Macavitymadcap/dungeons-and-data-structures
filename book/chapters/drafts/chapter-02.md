@@ -277,6 +277,15 @@ A `Passage` is a node. Its `id` is its identity in the graph. Its `choices` are 
 edges, each pointing to another passage via `targetId`. An optional `ending` marks a passage as
 terminal: no choices necessary because the story concludes here.
 
+The `id` field deserves a moment's attention. It is a string rather than a number, and the
+strings in Mt. Graphnor are descriptive: `"entrance"`, `"keyboard-room"`, `"trap-hall"`,
+`"ending-victory"`. Numbers are fine for a printed gamebook where the author navigates by
+turning to the right page. In code, a number carries no meaning. When a validator reports a
+broken target, "missing passage: 47" tells you nothing; "missing passage: silver-gallery" tells
+you exactly what went wrong. The id should name the passage's role in the adventure, because
+the id is what every other part of the system uses to refer to it. It is a contract, and
+contracts should be legible.
+
 The full `Passage` and `Choice` types in `src/gamebook/model.ts` are more detailed than this
 sketch, because they need to handle checks, combat outcomes, item requirements, and conditional
 effects. But the structural core is exactly what's above: an id, some content, and a list of
