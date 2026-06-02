@@ -265,6 +265,40 @@ function doesn't care about the rest.
 
 ---
 
+## How Other Systems Solve The Same Problem
+
+D&D is not the only game to run into this issue, and its inheritance-or-composition tension is
+not the only way to carve up the problem.
+
+Powered by the Apocalypse (PbtA) games, *Apocalypse World*, *Dungeon World*, and their
+descendants, dissolve the problem almost entirely by making character type a document rather than
+a hierarchy. Each type is a **playbook**: a self-contained sheet that defines the character's
+moves, resources, and special rules all in one place. There is no parent class. There is no
+shared code. A Wizard playbook and a Fighter playbook have no programmatic relationship at all;
+they simply happen to share some vocabulary because they exist in the same game. The software
+equivalent is a template object rather than a subclass, which is exactly the direction the
+gamebook takes.[^3]
+
+*Daggerheart* goes further. Character class, background, and ancestry each contribute to the
+character independently as composable data layers. A Ranger's card loadout comes from their
+class; their cultural traits come from their community; a special ability might come from a
+heritage. These are separate tables in the data model, each with its own schema, assembled into
+a character sheet when the display layer needs them. The system is designed from the start to
+avoid the moment where adding a new ancestry requires changing every existing class.
+
+The *Elder Scrolls* games, beginning with *Morrowind*, took a different view again: the character
+model has almost no fixed class at all. Skills are the only data; class is a starting
+configuration that determines which skills level quickly. The software implication is that a
+"Fighter" and a "Mage" are not subtypes of the same `Character` class. They are the same type,
+with different initial values in the same fields. The hierarchy is flat because there is nothing
+to inherit.
+
+What these approaches share is the same instinct the gamebook reaches for: the differences
+between character types are best expressed as *data* rather than as *code*. The rules engine is
+the same. What varies is the record it operates on.
+
+---
+
 ## A Mature Comparison
 
 Campaign Ledger handles the same problem at larger scale. A full character sheet in a shared
@@ -286,24 +320,24 @@ need it.
 
 ## The Build Move
 
-By the end of this chapter, the gamebook has a working character creation system:
+By the end of this chapter, the gamebook's character creation model is built on composition
+rather than inheritance:
 
-- `CharacterTemplate` in `src/gamebook/rules/character.ts` describes what each starting class
-  provides: hit points, armour class, skill proficiencies, starting inventory, and attack
-  profile. It is data, not a class.
-- `RaceTemplate` describes what each ancestry adds: small ability score adjustments, optional
-  extra inventory, optional extra proficiencies.
-- `CHARACTER_TEMPLATES` and `RACE_TEMPLATES` are plain objects mapping class and race names to
-  their respective templates.
-- `createCharacter` takes a class, a race, a name, and a level, and returns a fully populated
-  `Character` by combining the template with derived values. It is a pure function.
-- The four options, Fighter, Rogue, Wizard, and Cleric, are implemented as templates without any
-  of them needing to know about the others.
+- `CharacterTemplate` in `src/gamebook/rules/character.ts` is a plain data record describing
+  what each starting class provides: hit points, armour class, skill proficiencies, starting
+  inventory, and attack profile. It is introduced in this chapter's code examples.
+- `CHARACTER_TEMPLATES` maps class names to their respective templates. The Wizard, Fighter,
+  Rogue, and Cleric are four entries in a plain object, not four subclasses of a common ancestor.
+- The `describeCharacter` function illustrates polymorphism through the `Character` interface:
+  any object with the right shape satisfies the contract, regardless of which class produced it.
+- The `CharacterTemplate` pattern extends naturally to `RaceTemplate` in the same file,
+  applying a second independent axis of variation through ability bonuses and optional extra
+  inventory or proficiencies.
 
 The character creator screen in the gamebook uses these templates to populate the selection UI.
 The player picks a class and a race, enters a name, and `createCharacter` does the rest. The
 result is a `Character` that satisfies the same interface the rest of the game has been using
-since Chapter 4. No class, no hierarchy, no `extends`.
+since Chapter 4. No class hierarchy, no `extends`, no tower.
 
 ---
 
@@ -333,3 +367,10 @@ understand. Finding the right level of abstraction is most of the craft.
 stated as: if S is a subtype of T, then objects of type T may be replaced with objects of type S
 without altering any of the desirable properties of the program. In plain English: a child class
 should not surprise code that was written expecting the parent.
+
+[^3]: *Powered by the Apocalypse* is a game design framework originating with *Apocalypse World*
+(2010) by D. Vincent Baker and Meguey Baker. The playbook model, one document per character
+archetype, each complete and self-contained, has been widely adopted because it makes adding a
+new character type a matter of writing a new document rather than extending an existing hierarchy.
+*Dungeon World* (2012) by Sage LaTorra and Adam Koebel adapted the framework for fantasy
+adventure; hundreds of games have followed.

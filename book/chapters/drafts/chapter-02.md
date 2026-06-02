@@ -42,12 +42,34 @@ to turn to. Read as intended, starting at the first passage and following your c
 becomes an interactive story in which you are the protagonist. You succeed or fail through your
 decisions.
 
-The books generally move forward from choice to choice towards one of several endings, though in
-rare cases adventurers must return to earlier scenes and choose differently to progress. More
-complex gamebooks layer in RPG mechanics: simple stat systems in the *Fighting Fantasy* tradition,
-all the way up to the intricate multi-book accounting of the *Lone Wolf* series. These stats give
-the dice something to push against. They fluctuate throughout an adventure and can be supplemented
-by finding items: enchanted weapons, potions of healing, trinkets of uncertain provenance.
+Not all gamebooks organise their graphs the same way. The core *Fighting Fantasy* titles are
+mostly discrete: each numbered passage is a distinct node, and the adventure visits them in
+whatever order your choices dictate. Some of the more ambitious entries in the genre experiment
+with continuity. Steve Jackson's *Sorcery!* tetralogy tracks state across four separate books,
+carrying gold, items, injuries, and spell knowledge from one volume to the next; each book is a
+subgraph that connects to the next at specific transition points. Joe Dever's *Lone Wolf* series
+goes further: a campaign spanning over thirty books, where a persistent character sheet grows
+from book to book and the graph of the whole series is too large to map on any sensible piece
+of paper. The underlying idea, nodes and edges, stays constant; the scope of what it can describe
+turns out to have no obvious ceiling.[^3]
+
+Meanwhile, before any of this was happening in print, a different medium was exploring the same
+structure on a computer screen. The first text adventure games, *Colossal Cave Adventure* from
+1976 and *Zork* from 1977, placed the player inside a directed graph of locations connected by
+exits, described in second-person prose.[^4] You typed your commands rather than selecting from
+a numbered list, but the underlying structure was the same: nodes, edges, reachability, and the
+possibility of writing beautiful locations that could never actually be reached. The dungeon and
+the data structure were the same thing.
+
+In 2010, comedian John Robertson took the concept somewhere unexpected. *The Dark Room* began as
+a series of interconnected YouTube videos: each clip ended with a set of options, and typing
+the right one into YouTube's search bar sent you to the next node in the adventure.[^5] The
+player navigated by searching rather than clicking, using YouTube's infrastructure as a hypertext
+engine it was never designed to be. Robertson later adapted the piece into a live show, with
+himself as the omniscient narrator and the audience shouting choices. In the original YouTube form
+the game is no longer playable as Robertson intended — the platform evolved in ways that broke the
+edge structure — which makes it an accidental illustration of a real software concern: a graph
+whose edges depend on a service you don't control can become disconnected without warning.
 
 Gamebooks reached their peak of popularity in the 1980s, then faded as home computers caught up
 and could render these adventures with graphics and mechanics that didn't require a pencil and an
@@ -57,12 +79,12 @@ though, hasn't. Hidetaka Miyazaki, creator of the *Dark Souls* series, has cited
 Fantasy* as a significant influence, and his games are often compared to gamebooks precisely for
 their interconnected geography and punishing consequences. The format became a template for a
 generation of designers who may never have held a paperback with a dice-rolling section at the
-back.[^3]
+back.[^6]
 
 The structure is not limited to games. Jorge Luis Borges wrote *The Garden of Forking Paths* in
 1941, an intricate short story built around branching choices and nested narratives. The
 *TutorText* series applied similar principles to learning in the 1950s. *Bandersnatch*, Charlie
-Brooker's 1984-set episode of *Black Mirror*, used the form for television.[^4] And a basic
+Brooker's 1984-set episode of *Black Mirror*, used the form for television.[^7] And a basic
 website works, in some ways, like a gamebook. The user navigates each page like an adventurer
 working through a dungeon: instead of fighting monsters and avoiding traps, they battle cookie
 consent banners and hunt for the contact form. Each page contains text and links to other pages,
@@ -155,7 +177,7 @@ A **tree** is a special kind of graph where every node except the root has exact
 Family trees are trees in this sense. So are file systems. A pure tree has no converging paths:
 every branch stays separate. Many gamebooks are close to trees, but not quite, because paths often
 reconverge. Two different routes through the dungeon might both arrive at the same antechamber
-before the final boss. When paths reconverge, you have a DAG rather than a tree.[^5]
+before the final boss. When paths reconverge, you have a DAG rather than a tree.[^8]
 
 **Reachability** is the question of whether you can get from one node to another by following
 edges. In a gamebook, the critical reachability question is: can the player get from the start
@@ -169,7 +191,7 @@ node to the nodes it connects to: for each passage, you record which other passa
 can reach. An **adjacency matrix** stores the same information as a grid, with a row and column
 for every node and a mark at each intersection representing a connection. Adjacency lists are
 usually more practical for gamebooks because most passages connect to only a small number of
-others; a full matrix would be mostly empty.[^6]
+others; a full matrix would be mostly empty.[^9]
 
 The gamebook engine in this book uses a variation of the adjacency list approach: each `Passage`
 directly embeds its `Choice` objects, and each `Choice` carries a `targetId`. The graph is encoded
@@ -180,7 +202,7 @@ structural problems.
 
 ## Five Rooms, Many Shapes
 
-One useful frame for thinking about small adventure graphs is the **Five Room Dungeon**,[^7] a
+One useful frame for thinking about small adventure graphs is the **Five Room Dungeon**,[^10] a
 compact design template that gives each room a distinct mechanical role. The five rooms are not
 necessarily literal rooms; they are structural beats in a short adventure:
 
@@ -217,7 +239,7 @@ into something larger. The adventure resolves, one way or another.
 The reason this template is useful for our purposes is not adventure design, though it's valuable
 for that too. It's that a Five Room Dungeon makes graph structure *visible*. You have five nodes,
 each with a defined role and a defined mechanical purpose. The edges between them can be arranged
-in many configurations. Steve Lawford has shown[^8] that five nodes can be connected in twenty-one
+in many configurations. Steve Lawford has shown[^11] that five nodes can be connected in twenty-one
 distinct ways. Twenty-one different dungeons from the same five rooms, depending only on how you
 draw the edges.
 
@@ -270,7 +292,7 @@ function createPassageMap(passages: Passage[]): Map<string, Passage> {
 ```
 
 From there, reachability is a traversal: start at the start passage, follow choices, mark
-everything you visit, and report everything you didn't.[^9]
+everything you visit, and report everything you didn't.[^12]
 
 ---
 
@@ -301,7 +323,7 @@ type ValidationIssue =
 An empty validation result means the adventure is structurally sound: every passage can be
 reached, every choice leads somewhere real, and every ending has a path to it. It doesn't mean the
 prose is good. It doesn't mean the difficulty is balanced or the adventure is fun. Structural
-validity is a necessary condition, not a sufficient one.[^10]
+validity is a necessary condition, not a sufficient one.[^13]
 
 The author tools in the development build surface this validation on a dedicated page. You can also
 export a Mermaid diagram of the full passage graph directly from the tooling, which makes it easy
@@ -340,6 +362,11 @@ history, social networks, dependency trees: the same structure, the same vocabul
 questions about reachability and cycles and connectivity. Once you start seeing graphs, you find
 them everywhere. They were there before you had a name for them.
 
+The Chamber of Answered Questions is still on the map. The corridors leading in are still
+beautiful, and the room still has walls and a floor and presumably some answers. The validator
+just won't let you start there. Whether to cut it, connect it, or leave it as a monument to an
+authoring decision that didn't survive contact with the graph is a question for the Cartographer.
+
 In the next chapter, we'll look at how a passage in Mt. Graphnor becomes a web page: how choices
 become links and forms, how the server responds, and what it means for a gamebook to live on the
 web rather than in a paperback.
@@ -358,42 +385,61 @@ largely omitted RPG mechanics in favour of pure narrative branching, which made 
 and considerably less likely to end with the dice betraying you at a crucial moment. The series
 official site is at [cyoa.com](https://www.cyoa.com/).
 
-[^3]: Miyazaki has discussed the *Fighting Fantasy* influence in several interviews over the years.
+[^3]: The *Sorcery!* books are Steve Jackson's (the British one; there are two). They are
+significantly more complex than standard *Fighting Fantasy*, tracking items, spells, and choices
+across all four volumes. *Lone Wolf* by Joe Dever ran to twenty-eight original books plus twelve
+further volumes in the New Order series; the full adventure graph of the series represents
+something like thirty years of a character's life. The digital versions are available at
+[projectaon.org](https://www.projectaon.org/).
+
+[^4]: *Colossal Cave Adventure* (1976) by Will Crowther and Don Woods is generally considered the
+first text adventure. *Zork* (1977), developed at MIT and later published by Infocom, brought the
+form to a wider audience. Nick Montfort's *Twisty Little Passages* (MIT Press, 2003) is the
+definitive scholarly treatment of both games and the tradition they founded.
+
+[^5]: *The Dark Room* was created by John Robertson and launched as a YouTube project around 2010.
+The live show version toured internationally and became considerably more successful than the
+original platform experiment. The YouTube version's edges have since broken as the platform
+changed its search and recommendation behaviour; what was once a playable hypertext adventure is
+now a collection of disconnected clips. Robertson has discussed the project and its
+platform-dependency problem in various interviews.
+
+[^6]: Miyazaki has discussed the *Fighting Fantasy* influence in several interviews over the years.
 The connection is most visible in the environmental storytelling of *Dark Souls*: a world that
 exists completely regardless of whether the player understands it, full of readable history for
 those who look carefully and entirely opaque to those who don't.
 
-[^4]: *Bandersnatch* (2018), dir. David Slade, written by Charlie Brooker. Netflix's interactive
+[^7]: *Bandersnatch* (2018), dir. David Slade, written by Charlie Brooker. Netflix's interactive
 episode was genuinely interesting as a structural achievement, whatever you think of the
 meta-commentary. The production required building custom branching-video infrastructure and
 reportedly involved a staggering number of possible paths through the story. Borges' story, for
 the record, predates it by 77 years and is considerably shorter.
 
-[^5]: The distinction matters for certain algorithms. Depth-first search on a tree is simpler
+[^8]: The distinction matters for certain algorithms. Depth-first search on a tree is simpler
 than on a general DAG because you can't accidentally revisit a node via a different route. For
 gamebooks this is mostly a theoretical note; the practical validation concern is reachability,
 not tree-ness.
 
-[^6]: If your adventure has 200 passages and most passages have three choices, an adjacency list
+[^9]: If your adventure has 200 passages and most passages have three choices, an adjacency list
 stores roughly 600 connections. An adjacency matrix stores 200 x 200 = 40,000 cells, most of them
 empty. For sparse graphs, which most gamebooks are, the list wins on both memory and lookup time.
 
-[^7]: The Five Room Dungeon template is widely attributed to Johnn Four at
+[^10]: The Five Room Dungeon template is widely attributed to Johnn Four at
 [roleplayingtips.com](https://www.roleplayingtips.com/5-room-dungeons/), though the underlying
 shape is older. It's less a formula than a useful pressure: five distinct beats force you to think
 about pacing in a way that a vague "write some rooms" instruction simply doesn't.
 
-[^8]: Steve Lawford, *Five-Room Dungeons*, available via HAL open science at
+[^11]: Steve Lawford, *Five-Room Dungeons*, available via HAL open science at
 [enac.hal.science/hal-03097484/document](https://enac.hal.science/hal-03097484/document). The
 paper is a proper graph-theoretic treatment: Lawford enumerates all non-isomorphic connected
 digraphs on five vertices, which is where the twenty-one figure comes from. It's a short paper and
 worth a read if you find yourself caring about this more than is strictly necessary.
 
-[^9]: The traversal in `src/gamebook/graph.ts` uses a simple iterative breadth-first approach:
+[^12]: The traversal in `src/gamebook/graph.ts` uses a simple iterative breadth-first approach:
 a queue of passage ids to visit, a set of visited ids, and a loop that adds unvisited choice
 targets to the queue. Anything not in the visited set at the end is unreachable. One of those
 algorithms that looks intimidating in a textbook and obvious in thirty lines of code.
 
-[^10]: This is a useful general principle worth carrying forward. A type-correct program can still
+[^13]: This is a useful general principle worth carrying forward. A type-correct program can still
 be wrong. A structurally valid gamebook can still be unfun. A passing test suite can still ship a
 broken feature. Validation is a floor, not a ceiling.

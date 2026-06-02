@@ -226,6 +226,12 @@ advance. It presents exactly the actions available from this point in the curren
 knock, force, retreat. The adventurer's knowledge of what's possible comes from the response
 itself, not from out-of-band information.
 
+This idea is not new. The text adventure games of the 1970s and 1980s worked exactly this way:
+the program described the current location, and the player was expected to ask what they could do
+there rather than having a persistent menu of all possible commands. `>GO NORTH` either worked or
+it didn't, and finding out which was the point of the exercise. The brass plate is just a
+prettier interface for the same principle: the representation itself carries the valid next moves.
+
 A gamebook passage embodies this naturally. The passage presents:
 - The current state: where you are, what just happened, what you're carrying.
 - The available actions: the choices you can currently take.
@@ -310,6 +316,10 @@ AJAX, fragments, redirects, hypermedia constraints, has been an attempt to make 
 expressive without abandoning what made it work in the first place. The gamebook is a useful
 lens for this history because it has always been, at heart, the same thing: a document with links,
 asking you what you want to do next.
+
+The door on the dungeon panel did not lie. It offered exactly the choices available from that
+position, in that state, at that moment. That is, when you think about it, exactly how a good web
+response ought to work.
 
 In the next chapter, we'll step back from the passage and look at who's standing in front of it.
 Before a player can make a choice, they need a character: a structured record of facts that the

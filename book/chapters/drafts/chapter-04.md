@@ -164,7 +164,7 @@ function abilityModifier(score: number): number {
 ```
 
 Four lines. No state to go wrong. The same is true of the proficiency bonus, which in the
-SRD[^3] follows a stepped table by level, and skill modifiers, which are the sum of an ability
+SRD[^5] follows a stepped table by level, and skill modifiers, which are the sum of an ability
 modifier and an optional proficiency bonus:
 
 ```typescript
@@ -226,7 +226,7 @@ form, when a URL parameter is parsed, the type checker is not present. The incom
 a string. It might be a valid serialised `GameState`, or it might be the corrupted remnant of an
 earlier version, or the save file from a different adventure, or something a curious player hand-
 edited to give themselves a thousand hit points. The program needs to handle all of these
-gracefully.[^4]
+gracefully.[^6]
 
 The validation layer in `src/gamebook/state.ts` does this explicitly. When a save is loaded, it
 checks:
@@ -246,6 +246,47 @@ is a small thing and also the right thing.
 
 The rule of thumb is: trust the type system inside the application, and trust nothing that arrives
 from outside it. The gate between them is where validation lives.
+
+---
+
+## Characters Across Systems
+
+The D&D character sheet is one answer to the question "what does the software need to know about
+a character?" but it is not the only one, and looking at the alternatives is instructive.
+
+*Fighting Fantasy* takes the most minimal approach: three numbers. **Skill** measures combat
+ability and luck; **Stamina** is hit points with a different name; **Luck** is a resource you can
+spend to modify outcomes, decreasing each time you use it. That is the entire model. It is small
+enough to hold in one hand, fast to generate, and sufficient to run a complete adventure. The
+character sheet for a *Fighting Fantasy* hero fits on a bookmark.
+
+*Daggerheart*, a 2024 tabletop RPG from Darrington Press, takes a different approach to the core
+task of resolving uncertain actions. Rather than a single d20, players roll two twelve-sided dice
+of different colours: the Hope die and the Fear die. The total still determines success against a
+difficulty class, but which die is higher determines the *flavour* of that success. Roll higher
+on Hope and the scene tilts in the player's favour; roll higher on Fear and the GM earns a Fear
+token they can spend to drive the story toward trouble, regardless of whether the player succeeded.
+The character model that sits behind this system needs to track not just ability scores and hit
+points but a Hope and Fear economy at the table level: two parallel resource pools that belong
+partly to the player and partly to the GM.[^3]
+
+Video games face a version of the same problem. Skyrim's character model derives almost all of
+its numbers from a single stored fact: the level of each individual skill. One-handed, Archery,
+Sneak, Restoration: each skill increases with use, and the character's effective level follows
+from the skill totals. There is no separate ability score system. The model is not a record of
+who the character is at creation; it is a record of what the character has done. This means the
+software must constantly recalculate derived values from accumulated skill experience rather than
+from a fixed roll made at character creation.[^4]
+
+Each of these models reflects a different answer to the same design question: what should the
+character record store, and what should the rules derive? Fighting Fantasy minimises the record.
+D&D stores base scores and derives modifiers. Skyrim stores skill histories and derives
+everything else. Daggerheart stores per-character resources and connects them to a shared table
+economy. These are not better or worse models in the abstract; they are different fits for
+different play experiences.
+
+The gamebook's model is closest to the D&D approach, for reasons of familiarity and SRD
+availability. But the principle, store the minimum and derive the rest, is common to all of them.
 
 ---
 
@@ -275,7 +316,7 @@ suited to local storage and a single-player browser game. A `CharacterSheetReadM
 Campaign Ledger is a composed view across a relational schema suited to a shared application
 with multiple users, concurrent sessions, and a need to update individual slices of the sheet
 without rewriting the whole thing. The concepts are identical; the requirements determine the
-shape.[^5]
+shape.[^7]
 
 ---
 
@@ -328,20 +369,35 @@ truth: every piece of information should have one authoritative location. Duplic
 synchronisation problems. Synchronisation problems create bugs. Bugs create the specific variety
 of despair that comes from debugging a character sheet at eleven o'clock on a Thursday night.
 
-[^3]: The proficiency bonus progression in SRD 5.1 is: +2 at levels 1-4, +3 at levels 5-8,
+[^3]: *Daggerheart* was designed by Spenser Starke and Rowan Hall and published by Darrington
+Press in 2024. The Hope/Fear dual-die system is the game's most distinctive mechanical feature:
+it replaces the D&D pass/fail binary with a four-quadrant outcome space (succeed/fail combined
+with hope/fear), which gives the GM a resource economy even when players succeed. The character
+model includes domains, subclasses, ancestry, community, experiences, and a card-based loadout
+for abilities, all of which the data layer needs to track.
+
+[^4]: Skyrim's skill-based model is a descendant of the *Elder Scrolls* series' earlier approach,
+which went even further: *Morrowind* (2002) made almost every roll explicit, with chance-to-hit
+numbers that produced the notorious situation where a beginning character could swing a sword
+directly at an enemy and miss because the underlying skill value was too low. Skyrim smoothed
+this out by making skill improvements felt through ability unlocks rather than raw chance, but
+the underlying data model, accumulated skill experience rather than assigned base stats, remains
+the same.
+
+[^5]: The proficiency bonus progression in SRD 5.1 is: +2 at levels 1-4, +3 at levels 5-8,
 +4 at levels 9-12, +5 at levels 13-16, +6 at levels 17-20. The formula `floor((level - 1) / 4) + 2`
 produces the same result for all twenty levels. It is the kind of elegant compact formula that
 makes you feel obscurely proud of whoever designed the underlying table, even though they probably
 didn't design it from the formula.
 
-[^4]: A thousand hit points is actually easy to handle. The interesting case is the player who
+[^6]: A thousand hit points is actually easy to handle. The interesting case is the player who
 edits the save to give themselves a `currentPassageId` that points to a passage they haven't
 reached yet. The validation layer should catch this because it checks passage existence. But it
 raises the question of whether *preventing* this is the right call in a single-player browser
 game with no server verification. That is a game design question as much as a software question,
 and this book has opinions about both.
 
-[^5]: This is one of the core arguments of domain-driven design: the model should fit the domain's
+[^7]: This is one of the core arguments of domain-driven design: the model should fit the domain's
 actual requirements, not a theoretical ideal. A model that perfectly represents every possible
 D&D character across all editions, supplements, and house rules would be a genuinely impressive
 piece of engineering. It would also be completely wrong for a small solo gamebook running in a
