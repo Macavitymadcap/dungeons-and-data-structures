@@ -201,7 +201,7 @@ The guard runs at the top of the route handler, before anything else. If it fail
 handler returns the appropriate response and stops. Nothing downstream runs. The rendering
 code, the database query, the mutation: none of it executes when the guard does not pass.
 
-The three failure modes map to distinct HTTP status codes. **401 Unauthorized** is the correct
+The three failure modes map to distinct HTTP status codes.[^2a] **401 Unauthorized** is the correct
 response when the actor is not authenticated at all: they haven't logged in, or their session
 has expired. **403 Forbidden** is for an authenticated actor who is not allowed to access this
 resource: they are known to the system but not permitted here. **404 Not Found** is sometimes
@@ -506,6 +506,11 @@ can manage user accounts and system configuration but has no more claim on the c
 specific campaign than a stranger who wanders in off the street. Role-based access control in
 multi-tenant applications almost always makes this distinction; it is surprising how often
 first implementations accidentally collapse it.
+
+[^2a]: HTTP status codes are divided into five families explained in a footnote in Chapter 3:
+1xx informational, 2xx success, 3xx redirection, 4xx client error, 5xx server error. The
+full tour, including the celebrated 418 I'm a Teapot, is there. The three codes that matter
+most for access control are 401, 403, and 404, addressed here.
 
 [^2]: The choice between 403 and 404 for private resources is a genuine design decision with
 security implications. Returning 403 when a player asks for a private NPC page tells them that

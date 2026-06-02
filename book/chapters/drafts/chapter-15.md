@@ -161,7 +161,7 @@ a directed graph. The metaphor and the implementation point at the same thing.[^
 
 ## Campaign Ledger As The Larger Map
 
-Mt. Graphnor is a prototype. Campaign Ledger is what the same ideas look like after several
+Mt. Graphnor is short. Campaign Ledger is what the same ideas look like after several
 years of use by real people at a real table.
 
 It has authentication and sessions. It has roles and campaign membership and ownership
@@ -187,10 +187,11 @@ is more of the same kind, applied more carefully, across a longer span of time.[
 
 The honest version of a conclusion names what is incomplete.
 
-Mt. Graphnor's adventure prose is functional but not literary. The passages work. The
-mechanics are demonstrated. The setting is coherent. A final literary pass would take the
-gamebook from prototype to something a player would read for pleasure rather than for
-education. That pass has not been written. It is the next spellbook.
+The gamebook engine that runs Mt. Graphnor was built to prove the approach and support the
+teaching examples in this book. The larger adventure it was always pointing toward, the
+400-node narrative one where the story is the point rather than the mechanics, has not been
+written yet. That is the next spellbook: built on the same engine, using everything this book
+put together, but written for a reader rather than a developer.
 
 The accessibility gate for the gamebook is described in Chapter 14 and not yet implemented.
 The intention is clear; the Pa11y command is clear; what remains is the work.

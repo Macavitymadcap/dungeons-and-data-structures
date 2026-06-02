@@ -143,10 +143,9 @@ twenty die faces that produce a winning total.[^4] There is no mystery here, onl
 
 ## Uniform Does Not Mean Kind
 
-A d20's probability is *uniform*: every face is equally likely. But a uniform distribution over
-twenty values is, in practice, a volatile one. Each face represents a 5% swing. A single missed
-roll at a critical moment feels catastrophic in a way that doesn't match the statistical
-frequency of being 5% unfortunate.
+A d20's probability is *uniform*: every face is equally likely, and each face represents a 5%
+swing in any threshold comparison. This is a volatile distribution in practice. The distance
+between a roll of 1 and a roll of 20 is 19, and every position in between is equally reachable.
 
 The reason is not the mathematics. The reason is context. A missed roll during a casual
 exploration check is forgettable. The same roll to hold a bridge against a charging troll, with
@@ -212,20 +211,24 @@ function rollD20Check({
 
   const rolls = rollB !== undefined ? [rollA, rollB] : [rollA];
 
-  const kept =
-    mode === "advantage"
-      ? Math.max(rollA, rollB!)
-      : mode === "disadvantage"
-        ? Math.min(rollA, rollB!)
-        : rollA;
+  let kept: number;
+  if (mode === "advantage") {
+    kept = Math.max(rollA, rollB!);
+  } else if (mode === "disadvantage") {
+    kept = Math.min(rollA, rollB!);
+  } else {
+    kept = rollA;
+  }
 
   const total = kept + modifier;
   const success = dc !== undefined ? total >= dc : undefined;
 
+  const modeCode = mode === "advantage" ? "kh" : "kl";
+  const modifierStr = modifier >= 0 ? `+${modifier}` : `${modifier}`;
   const notation =
     mode !== "normal"
-      ? `2d20${mode === "advantage" ? "kh" : "kl"}1${modifier >= 0 ? "+" : ""}${modifier}`
-      : `1d20${modifier >= 0 ? "+" : ""}${modifier}`;
+      ? `2d20${modeCode}1${modifierStr}`
+      : `1d20${modifierStr}`;
 
   return { notation, rolls, kept, modifier, total, dc, success, mode, reason };
 }
@@ -308,7 +311,7 @@ not a threshold comparison, but a quantity. When a fighter hits with a longsword
 ```typescript
 interface DamageRollResult {
   notation: string;
-  dice: number[];
+  rolls: number[];
   modifier: number;
   total: number;
 }
@@ -323,10 +326,12 @@ function rollDamage(
 
   const count = parseInt(match[1], 10);
   const sides = parseInt(match[2], 10);
-  const dice = Array.from({ length: count }, () => rollDie(sides, rng));
-  const total = dice.reduce((sum, d) => sum + d, 0) + modifier;
+  // Array.from with a length and a mapping function creates an array of `count` items,
+  // each produced by calling the function once. It is the standard way to roll a pool of dice.
+  const rolls = Array.from({ length: count }, () => rollDie(sides, rng));
+  const total = rolls.reduce((sum, d) => sum + d, 0) + modifier;
 
-  return { notation: `${notation}${modifier >= 0 ? "+" : ""}${modifier}`, dice, modifier, total };
+  return { notation: `${notation}${modifier >= 0 ? "+" : ""}${modifier}`, rolls, modifier, total };
 }
 ```
 
@@ -411,8 +416,10 @@ By the end of this chapter, the gamebook has a working dice layer:
   counted, the modifier, the total, the DC if there was one, the success flag, the mode, and a
   human-readable reason.
 - `rollD20Check(options)` produces a `RollResult` from a modifier, an optional DC, an optional
-  mode, and an injectable random source.
-- `DamageRollResult` records the dice, modifier, and total for a damage roll.
+  mode, and an injectable random source. The `notation` field uses standard dice notation:
+  `1d20+3` for a normal check, `2d20kh1+3` for advantage (two d20s, keep highest), and
+  `2d20kl1+3` for disadvantage (two d20s, keep lowest).
+- `DamageRollResult` records the dice rolls, modifier, and total for a damage roll.
 - `rollDamage(notation, modifier, rng)` parses notation like `"1d8"` or `"2d6"`, rolls the
   specified dice, and returns a `DamageRollResult`.
 

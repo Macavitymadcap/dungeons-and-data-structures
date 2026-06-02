@@ -290,11 +290,15 @@ let someone else provide the thing that satisfies the name.[^5]
 Coupling does not always come from direct imports. Sometimes it comes from a shared library
 updating in a way that changes its public surface.
 
-Campaign Ledger uses a set of shared UI primitives from a library called Hyper-Dank. These
-primitives handle common UI patterns: buttons, form fields, breadcrumbs, HTMX attribute
-wiring. At some point, the library exports changed: components were renamed, props were
-adjusted, new primitives were added that overlapped with local components Campaign Ledger
-had already built.
+Campaign Ledger uses a set of shared UI primitives from a library called Hyper-Dank, a
+collection of pre-built interface components (buttons, form fields, breadcrumbs, HTMX wiring)
+that the application depends on for its standard interface elements. A compatibility shim in
+this context is something like a translation layer between two editions of the same rulebook
+at the same table: both are playing the same game, but one set of procedures has been updated
+and the old character sheets need a conversion guide rather than a full rewrite.
+
+At some point, the library exports changed: components were renamed, props were adjusted, new
+primitives were added that overlapped with local components Campaign Ledger had already built.
 
 The migration strategy was an **adapter**, sometimes called a compatibility shim: a thin local
 module that re-exports the library primitive under the local name the rest of the application
@@ -373,26 +377,24 @@ tests `state.ts` directly. Moving the file does not change what the test imports
 
 ---
 
-## What The Gamebook Does Not Yet Do
+## The Rendering Split As A Named Decision
 
-There is a planned `src/gamebook/ui/` directory mentioned in the architecture notes. It does
-not yet exist. The rendering logic currently lives in `render.ts` and `player-render.ts`,
-alongside the application shell in `app.tsx`. At some point, if the gamebook grows, it will
-make sense to give rendering its own boundary: a module that owns the HTML templates, knows
-the component names, and can be changed without touching the routing logic.
+There is a deliberate trade-off in the current module structure worth naming explicitly: the
+rendering logic lives in `render.ts` and `player-render.ts` alongside the application shell
+in `app.tsx`, rather than in a fully separated `src/gamebook/ui/` directory. This is not an
+oversight; it is a scale decision.
 
-This kind of future module boundary is worth naming, not because the code needs it today, but
-because naming it is how you notice when the current arrangement becomes a problem. Right now,
-`render.ts` and `app.tsx` are coupled enough that changing one often requires reading the
-other. That coupling is manageable at the current scale. It becomes unmanageable at larger
-scale. When the discomfort of the current arrangement exceeds the cost of the restructuring,
-the module boundary should be drawn.
+At the current size of the gamebook, `render.ts` and `app.tsx` are coupled enough that
+changing one often means reading the other. That coupling is manageable: the files are short,
+their relationship is clear, and the tests cover the rendered output through `src/app.test.tsx`.
+The cost of the coupling is low. The benefit of separating it into another layer would be
+modest. At this scale, the current arrangement is the right one.
 
-That moment is not today. The point is to notice the signals: when you find yourself reading
-more code than you expected to understand a change you want to make, that is the smell of
-coupling that has grown too strong. The cure is not always immediate; sometimes the cure is
-simply recognising that the problem exists and making a note to address it before the next
-major feature.[^9]
+The signals that would suggest the time had come to draw a clearer boundary would be: finding
+yourself reading more rendering code than expected to make a routing change, or more routing
+code than expected to adjust a component's markup. When those costs arrive reliably and
+repeatedly, the separation earns its keep. Right now it does not, and adding structure before
+the pain justifies it is its own kind of technical debt.[^9]
 
 ---
 

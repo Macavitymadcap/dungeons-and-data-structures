@@ -105,9 +105,11 @@ if the player's inventory contains the right id:
 ```typescript
 interface ChoiceRequirement {
   itemsAll?: string[];
-  flags?: string[];
+  flagsAll?: string[];
+  flagsNone?: string[];
   minHitPoints?: number;
-  conditions?: string[];
+  conditionsAll?: string[];
+  conditionsNone?: string[];
 }
 ```
 
@@ -208,12 +210,23 @@ When the gamebook renders the inventory for the player, it looks up each id in t
 to find the display name:
 
 ```typescript
-function buildItemCatalogue(
+function createItemCatalogue(
   items: ItemDefinition[]
 ): Map<string, ItemDefinition> {
   return new Map(items.map(item => [item.id, item]));
 }
+
+function itemDisplayName(
+  catalogue: Map<string, ItemDefinition>,
+  id: string
+): string {
+  return catalogue.get(id)?.name ?? id;
+}
 ```
+
+The actual gamebook uses `itemName` and `itemList` helpers in `src/gamebook/catalog.ts`,
+which look up each id against the adventure's item definitions and fall back to the raw id
+if a definition is missing.
 
 This is a **lookup by key**: the operation that turns an identifier into the record it names.
 It is the most common data-structure operation in application code, and the reason it appears
@@ -271,8 +284,7 @@ available.
 ```typescript
 function isChoiceAvailable(
   choice: Choice,
-  state: GameState,
-  adventure: Adventure
+  state: GameState
 ): boolean {
   const req = choice.requires;
   if (!req) return true;
@@ -282,9 +294,14 @@ function isChoiceAvailable(
     if (!req.itemsAll.every(id => inv.has(id))) return false;
   }
 
-  if (req.flags) {
+  if (req.flagsAll) {
     const flags = new Set(state.flags);
-    if (!req.flags.every(f => flags.has(f))) return false;
+    if (!req.flagsAll.every(f => flags.has(f))) return false;
+  }
+
+  if (req.flagsNone) {
+    const flags = new Set(state.flags);
+    if (req.flagsNone.some(f => flags.has(f))) return false;
   }
 
   if (req.minHitPoints !== undefined) {
@@ -387,9 +404,9 @@ interface ChoiceEffect {
   addItems?: string[];
   removeItems?: string[];
   setFlags?: string[];
-  addHitPoints?: number;
-  removeHitPoints?: number;
-  addTemporaryHitPoints?: number;
+  heal?: number;
+  damage?: number;
+  temporaryHitPoints?: number;
 }
 ```
 
@@ -448,8 +465,8 @@ By the end of this chapter, the gamebook has a working inventory and flags layer
 - `applyChoiceEffects(state, effects)` in `src/gamebook/state.ts` converts the inventory to
   a `Set`, applies additions and removals, serialises back to an array, sets flags, and
   applies hit point changes.
-- `buildItemCatalogue(items)` produces a `Map<string, ItemDefinition>` for display name
-  lookup during rendering.
+- `itemName(adventure, id)` and `itemList(adventure, ids)` in `src/gamebook/catalog.ts`
+  look up display names from the adventure's item catalogue for rendering the inventory.
 - Adventure validation in `src/gamebook/graph.ts` checks for undefined item references,
   undefined flag references, and duplicate item definitions.
 

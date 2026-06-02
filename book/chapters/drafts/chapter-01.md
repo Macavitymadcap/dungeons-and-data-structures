@@ -197,15 +197,18 @@ format without reproducing it.
 Every chapter in this book produces something: a diagram, a type definition, a helper function,
 or a feature that advances one of the two running examples.
 
-**Mt. Graphnor** is a static TypeScript gamebook that runs in a browser, stores progress in
+**Mt. Graphnor** is a short, complete, playable gamebook that runs in a browser, stores progress in
 local storage, and grows chapter by chapter from a bare passage model into a branching adventure
 with character creation, dice checks, combat, inventory, authoring tools, and a verification suite.
-It is built to be understood, not to be admired. Mt. Graphnor is a teaching vehicle: an example
-I can draw on to explain concepts and a codebase the reader can inspect and run. It is not built
-for entertainment; the prose is functional rather than literary, and the adventure exists to
-exercise the mechanics, not to tell a compelling story. The real gamebook, the proper finished
-adventure with a full narrative, is a separate endeavour that comes *after* the mechanics have
-been proven. Mt. Graphnor is the scaffold, not the building.[^5]
+It is a real gamebook: every passage is reachable, every ending is achievable, the mechanics work,
+and you can play it. It is short by design, built to be small enough that every feature the book
+discusses can be traced back to a specific piece of working code. Building it is also how the engine
+got built in the first place, which turns out to be the same thing as writing this book.
+
+A larger adventure using the same engine is planned once the mechanics are proven here. That one
+will be a proper 400-or-so node narrative adventure, the kind where the story is the point. Mt.
+Graphnor came first because a short gamebook is a better teaching example than a long one, and
+because you need a working engine before you can fill it with story.[^5]
 
 **Campaign Ledger** is the application the original D&D campaign spreadsheet eventually became,
 after many years, many tutorials, and a career change. It is a private, locally hosted web app I
@@ -234,11 +237,11 @@ make use of both, briefly, as context and formal precedent. The historical and c
 on interactive fiction is richer than this book needs; readers who want to go deeper are pointed
 towards Nick Montfort's *Twisty Little Passages*[^6] and the recommended reading list at the end.
 
-It is not a promise that Mt. Graphnor is finished literary work. It is explicitly not. The
-mechanics are complete and the adventure is playable, but the prose is functional rather than
-polished and the adventure exists to demonstrate the code, not to entertain the reader. If you
-come to Mt. Graphnor expecting a gripping story, you've come to the wrong part of the dungeon.
-The right part is further in, and it's not in this book.
+It is not a promise that Mt. Graphnor is a long or ambitious adventure. It is a short, complete
+gamebook whose mechanics work as described and whose code a reader can inspect, run, and learn
+from. The adventure is genuine; it is just compact. If you finish it in ten minutes and want
+something with a hundred more passages and a proper narrative arc, that is the other book, the
+one that gets built after this one, on the same engine.
 
 It is not neutral on the subject of evidence. The book has a preference for visible proof over
 confident assertion. It likes tests, validation reports, and acceptance notes, not because those
@@ -258,6 +261,25 @@ subjects that matter most, or return to earlier chapters once later ones have ch
 looking for. The code examples are written in TypeScript[^7] and run on the Bun runtime,[^8]
 but the concepts don't require TypeScript. If you read JavaScript, most examples will translate
 without difficulty.
+
+A reasonable question at this point is why a gamebook at all. Text adventures were some of the
+earliest computer games precisely because of technical constraints, but what they demonstrated,
+even in their constraints, was something a physical Fighting Fantasy book could never show: complex
+conditional logic, persistent state, node-chaining across hundreds of locations, outcomes that
+depended on what you'd done three passages ago. The hypertext gamebook is a natural teaching
+vehicle because it *is* software in its most legible form. What the player experiences as story,
+the developer experiences as a graph traversal over a state machine with a persistence layer. Put
+it that way and the comparison sounds dry. Play it and it doesn't. I grew up with Fighting Fantasy
+before graduating to D&D and computers, and as I approach middle age I believe I am allowed a
+certain amount of nostalgia. It is, at any rate, considerably cheaper than a sports car.
+
+A second reasonable question is why this particular stack: TypeScript, Bun, Hono, htmx, SQLite.
+They are not the objectively optimal tools for any specific task, and I wouldn't claim they are.
+They are the tools I know best, having spent several years using them professionally. In practice,
+"best" in software development most often means "the set of tools the team is most comfortable
+with". This is a web project, so the stack is web-native. The concepts are not stack-specific;
+they travel. If you use a different framework, a different runtime, or a different language, the
+ideas in each chapter remain the same. The code just looks a little different.
 
 The gamebook grows as the book progresses. By the final chapter, Mt. Graphnor contains every
 feature described in the preceding pages: passage graphs, a hypermedia renderer, a character
@@ -309,9 +331,12 @@ for this.
 under Creative Commons Attribution 4.0 International. You can use it, build on it, and publish
 with it, as long as you include the attribution notice. This book does.
 
-[^5]: The metaphor may be tortured, but the distinction is genuine. Campaign Ledger is a building.
-Mt. Graphnor is the scaffold I built to learn how to build a building. The two have different
-success criteria.
+[^5]: Mt. Graphnor is short by design. A short gamebook is a better teaching example than a long
+one: you can hold the whole graph in your head, trace every mechanic back to a specific passage,
+and understand the full save state without a PhD in the subject. The plan is to build a much
+larger narrative adventure on the same engine once this book has proven the approach. That
+adventure is not this book's concern. This book's concern is proving the engine works, which
+Mt. Graphnor does.
 
 [^6]: Nick Montfort, *Twisty Little Passages: An Approach to Interactive Fiction* (MIT Press,
 2003). The title comes from a famously disorienting room description in *Adventure*, the 1976

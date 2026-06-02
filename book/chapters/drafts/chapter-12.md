@@ -125,7 +125,7 @@ interface GameState {
   inventory: string[];
   flags: string[];
   encounters: Record<string, EncounterState>;
-  log: string[];
+  log: GameLogEntry[];
   updatedAt: string;
 }
 ```
@@ -252,7 +252,12 @@ function migrateV1ToV2(doc: SaveV1, adventure: Adventure): GameState {
     // V2 added temporaryHitPoints; default to zero for old saves
     temporaryHitPoints: 0,
     // V2 added encounter state; rebuild from adventure definition
-    encounters: buildInitialEncounterState(adventure),
+    encounters: Object.fromEntries(
+      (adventure.encounters ?? []).map(encounter => [
+        encounter.id,
+        { hitPoints: encounter.hitPoints, defeated: false, rounds: 0 },
+      ])
+    ),
     // V2 added the updatedAt timestamp
     updatedAt: new Date().toISOString(),
   };

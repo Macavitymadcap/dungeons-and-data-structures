@@ -132,7 +132,7 @@ no browser, no database connection.
 
 ```typescript
 // src/gamebook/graph.test.ts
-it("reports an unreachable passage", () => {
+test("reports an unreachable passage", () => {
   const adventure = makeAdventure({
     startPassageId: "entrance",
     passages: [
@@ -165,17 +165,17 @@ For the full Mt. Graphnor adventure, the tests assert structural facts that the 
 must maintain:
 
 ```typescript
-it("Mt. Graphnor passes full validation", () => {
+test("Mt. Graphnor passes full validation", () => {
   const issues = validateAdventure(mtGraphnorAdventure);
   expect(issues).toHaveLength(0);
 });
 
-it("Mt. Graphnor has all required Five Room endings", () => {
+test("Mt. Graphnor has all required Five Room endings", () => {
   const result = validateFiveRoomTemplate(mtGraphnorAdventure);
   expect(result).toHaveLength(0);
 });
 
-it("Mt. Graphnor no longer contains placeholder prose", () => {
+test("Mt. Graphnor no longer contains placeholder prose", () => {
   const placeholders = ["TODO", "PLACEHOLDER", "lorem ipsum"];
   for (const passage of mtGraphnorAdventure.passages) {
     for (const placeholder of placeholders) {
@@ -199,7 +199,7 @@ the routes that return 404 when they should.
 
 ```typescript
 // src/app.test.tsx
-it("renders the gamebook passage page", async () => {
+test("renders the gamebook passage page", async () => {
   const app = createApp({ authorToolsEnabled: false });
   const response = await app.request("/gamebook");
 
@@ -209,13 +209,15 @@ it("renders the gamebook passage page", async () => {
   expect(html).not.toContain("Debug state");
 });
 
-it("applies a choice and returns the next passage", async () => {
-  const state = createInitialState(mtGraphnorAdventure, fighterCharacter);
-  const stored = JSON.stringify(state);
+test("applies a choice and returns the next passage", async () => {
+  const app = createApp();
+  const state = createInitialState(mtGraphnorAdventure, createCharacter("hero", "Adventurer", "fighter"));
+  const body = new URLSearchParams({ state: JSON.stringify(state) });
 
-  const response = await app.request("/gamebook/choices/sneak-past", {
+  const response = await app.request("/gamebook/choices/sneak-guard", {
     method: "POST",
-    headers: { Cookie: `dads-gamebook-save=${encodeURIComponent(stored)}` },
+    body,
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
   });
 
   expect(response.status).toBe(200);
@@ -223,7 +225,7 @@ it("applies a choice and returns the next passage", async () => {
   expect(html).toContain("keyboard-room");
 });
 
-it("returns 404 for author routes when author tools are disabled", async () => {
+test("returns 404 for author routes when author tools are disabled", async () => {
   const app = createApp({ authorToolsEnabled: false });
   const response = await app.request("/gamebook/author");
   expect(response.status).toBe(404);
@@ -234,6 +236,11 @@ Route tests are more expensive than domain tests: they instantiate an applicatio
 HTTP requests, and parse HTML responses. They catch a different class of bug: not "is the
 combat logic correct" but "does the route wire the correct logic to the correct URL" and
 "does the rendered HTML contain what the player needs to see."
+
+Note that state is submitted to the server in the form body as serialised JSON, not in a
+session or cookie. The gamebook is stateless at the server level: each request carries the
+current game state with it, and the server applies the choice and returns the next passage.
+This architecture is what makes the static publishing in Chapter 9 possible.
 
 The access control tests deserve special attention. A route that should return 404 in player
 mode must be tested to verify that it returns 404. The test in the third example above is not
@@ -532,7 +539,7 @@ export interface CoverageArea {
   gates: string[];
 }
 
-export const COVERAGE_AREAS: CoverageArea[] = [
+export const TEST_COVERAGE_AREAS: CoverageArea[] = [
   {
     id: "passage-graph",
     title: "Passage graph and content",
@@ -572,7 +579,7 @@ By the end of this chapter, the gamebook has an explicit, layered verification p
 - `VERIFICATION_GATES` in `src/gamebook/testing.ts` defines the five gates shown in this
   chapter: typecheck, unit tests, static build, static artifact check, and static browser
   smoke. Each carries the command and a prose statement of what it proves.
-- `COVERAGE_AREAS` in `src/gamebook/testing.ts` maps the gamebook's test suite to the risks
+- `TEST_COVERAGE_AREAS` in `src/gamebook/testing.ts` maps the gamebook's test suite to the risks
   it addresses, naming the evidence files and the gates that cover each area.
 - `bun run verify` in `scripts/verify.ts` runs all five gates in order, reports the result
   of each, and exits non-zero on the first failure. A single command produces the full

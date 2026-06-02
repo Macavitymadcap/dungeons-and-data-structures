@@ -161,9 +161,8 @@ The gamebook keeps these at the level of detail it actually needs. The SRD catal
 ```typescript
 interface ClassRule extends NamedRule {
   kind: "class";
-  hitDie: number;
+  hitDie: DamageRoll;
   primaryAbility: Ability;
-  savingThrows: Ability[];
   spellcastingAbility?: Ability;
 }
 
@@ -173,29 +172,26 @@ const CLASS_RULES: ClassRule[] = [
     name: "Fighter",
     sourceId: "srd-5-1-cc",
     kind: "class",
-    hitDie: 10,
+    hitDie: { dice: 1, sides: 10, modifier: 0, type: "hit points" },
     primaryAbility: "strength",
-    savingThrows: ["strength", "constitution"],
   },
   {
     id: "wizard",
     name: "Wizard",
     sourceId: "srd-5-1-cc",
     kind: "class",
-    hitDie: 6,
+    hitDie: { dice: 1, sides: 6, modifier: 0, type: "hit points" },
     primaryAbility: "intelligence",
-    savingThrows: ["intelligence", "wisdom"],
     spellcastingAbility: "intelligence",
   },
   // ... Rogue and Cleric
 ];
 ```
 
-`CLASS_RULES` is not a copy of the Player's Handbook. It is the smallest record that supports
-the gamebook's character creation screen: the hit die for calculating starting hit points, the
-saving throw proficiencies for the save validator, the spellcasting ability for any future
-spell check mechanics. The descriptive prose, the class features, the subclass options: these
-are absent, because the software does not need them.[^2]
+The `hitDie` field uses `DamageRoll` from Chapter 6 rather than a bare number, because the
+same dice notation type is used consistently throughout the gamebook's rules. The catalogue
+contains the minimum the code actually reads: the hit die for calculating starting hit points,
+the spellcasting ability for any future spell mechanics.[^2]
 
 Campaign Ledger separates this more formally into two database tables. `rules_entities` stores
 the named thing: its source, its entity type, its slug. `rule_mechanics` stores typed JSON
@@ -397,8 +393,9 @@ By the end of this chapter, the gamebook has an explicit, attributed rules catal
   entity types shown in this chapter.
 - `ABILITY_RULES`, `SKILL_RULES`, `CLASS_RULES`, `RACE_RULES`, and `EQUIPMENT_RULES` are the
   structured catalogues in `src/gamebook/rules/srd.ts`. Each entry carries a `sourceId`.
-- `getAttributionList(adventure)` generates the attribution text for all sources used by the
-  current adventure, suitable for the published gamebook's legal page.
+- `gamebookRuleAttributions()` generates the attribution strings for all sources used by
+  the current adventure, suitable for the published gamebook's legal section. It derives
+  this from the `RULE_SOURCES` catalogue automatically.
 - `ItemDefinition.sourceId` in `src/gamebook/model.ts` connects items in the adventure
   catalogue to their rule source.
 

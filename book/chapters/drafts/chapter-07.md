@@ -133,7 +133,8 @@ The player's relevant state already lives in `GameState` from Chapter 4: `hitPoi
 first, and only when they are exhausted does normal hit point damage begin.
 
 The encounter definition, the enemy's statistics, lives in the adventure content rather
-than in the save state. It is authored data, not mutable play state.
+than in the save state. It is authored data, not mutable play state. **Armour class** is the
+threshold an attack roll must meet or beat to land: higher means harder to hit.
 
 ```typescript
 interface Encounter {
@@ -141,9 +142,7 @@ interface Encounter {
   name: string;
   armourClass: number;
   hitPoints: number;
-  attackBonus: number;
-  damageDice: string;
-  damageBonus: number;
+  attack: AttackProfile;
 }
 ```
 
@@ -181,38 +180,38 @@ Nothing in `CombatRoundResult` is opaque: a caller can inspect every die result,
 damage total, every hit-point change, and the final outcome.
 
 The function that produces this result is `resolveCombatRound`. Its job is to run one
-complete exchange:
+complete exchange. It takes its arguments as an object, which keeps the call site readable
+when the number of parameters grows:
 
 ```typescript
-function resolveCombatRound(
-  encounter: Encounter,
-  encounterState: EncounterState,
-  character: Character,
-  gameState: GameState,
-  rng: RandomSource
-): CombatRoundResult {
-  const round = encounterState.rounds + 1;
+function resolveCombatRound({
+  encounter,
+  state,
+  rng,
+}: {
+  encounter: Encounter;
+  state: GameState;
+  rng: RandomSource;
+}): CombatRoundResult {
+  const encounterState = state.encounters[encounter.id];
+  const round = (encounterState?.rounds ?? 0) + 1;
   const log: string[] = [];
 
   // Player attacks
-  const playerAttackRoll = rollD20Check({
-    modifier: character.attackProfile.bonus,
+  const playerAttack = rollD20Check({
+    modifier: state.character.attack.attackBonus,
     dc: encounter.armourClass,
-    reason: `${character.name} attacks ${encounter.name}`,
+    reason: state.character.attack.name,
     rng,
   });
 
-  let monsterHitPoints = encounterState.hitPoints;
+  let monsterHitPoints = encounterState?.hitPoints ?? encounter.hitPoints;
 
-  if (playerAttackRoll.success) {
-    const playerDamage = rollDamage(
-      character.attackProfile.damageDice,
-      character.attackProfile.damageBonus,
-      rng
-    );
+  if (playerAttack.success) {
+    const playerDamage = rollDamage(state.character.attack.damage, rng);
     monsterHitPoints = Math.max(0, monsterHitPoints - playerDamage.total);
     log.push(
-      `${character.name} hits for ${playerDamage.total} ${character.attackProfile.damageType} damage.`
+      `${state.character.attack.name} hits ${encounter.name} for ${playerDamage.total} ${state.character.attack.damage.type} damage.`
     );
 
     if (monsterHitPoints === 0) {
@@ -220,46 +219,43 @@ function resolveCombatRound(
       return {
         encounterId: encounter.id,
         round,
-        playerAttackRoll,
+        playerAttack,
         playerDamage,
         monsterHitPoints: 0,
-        playerHitPoints: gameState.hitPoints,
-        playerTemporaryHitPoints: gameState.temporaryHitPoints,
+        playerHitPoints: state.hitPoints,
         outcome: "victory",
         log,
       };
     }
   } else {
-    log.push(`${character.name} misses.`);
+    log.push(`${state.character.attack.name} misses ${encounter.name}.`);
   }
 
   // Monster attacks back
-  const monsterAttackRoll = rollD20Check({
-    modifier: encounter.attackBonus,
-    dc: character.armourClass,
-    reason: `${encounter.name} attacks ${character.name}`,
+  const monsterAttack = rollD20Check({
+    modifier: encounter.attack.attackBonus,
+    dc: state.character.armourClass,
+    reason: encounter.attack.name,
     rng,
   });
 
-  let playerHitPoints = gameState.hitPoints;
-  let playerTemporaryHitPoints = gameState.temporaryHitPoints;
+  let playerHitPoints = state.hitPoints;
+  let playerTemporaryHitPoints = state.temporaryHitPoints;
 
-  if (monsterAttackRoll.success) {
-    const monsterDamage = rollDamage(encounter.damageDice, encounter.damageBonus, rng);
+  if (monsterAttack.success) {
+    const monsterDamage = rollDamage(encounter.attack.damage, rng);
     const absorbed = Math.min(playerTemporaryHitPoints, monsterDamage.total);
     playerTemporaryHitPoints -= absorbed;
     playerHitPoints = Math.max(0, playerHitPoints - (monsterDamage.total - absorbed));
-    log.push(
-      `${encounter.name} hits for ${monsterDamage.total} damage.`
-    );
+    log.push(`${encounter.attack.name} hits for ${monsterDamage.total} ${encounter.attack.damage.type} damage.`);
 
     if (playerHitPoints === 0) {
-      log.push(`${character.name} falls.`);
+      log.push(`${state.character.name} falls.`);
       return {
         encounterId: encounter.id,
         round,
-        playerAttackRoll,
-        monsterAttackRoll,
+        playerAttack,
+        monsterAttack,
         monsterDamage,
         monsterHitPoints,
         playerHitPoints: 0,
@@ -269,14 +265,14 @@ function resolveCombatRound(
       };
     }
   } else {
-    log.push(`${encounter.name} misses.`);
+    log.push(`${encounter.attack.name} misses.`);
   }
 
   return {
     encounterId: encounter.id,
     round,
-    playerAttackRoll,
-    monsterAttackRoll,
+    playerAttack,
+    monsterAttack,
     monsterHitPoints,
     playerHitPoints,
     playerTemporaryHitPoints,
@@ -384,7 +380,7 @@ combat passage again with an updated encounter state. The loop is in the data, n
 
 ---
 
-## Combat Across Systems (Continued)
+## What The Gamebook Deliberately Omits
 
 The structure above handles the D&D-adjacent case well, but it is worth noting what it
 deliberately omits.
@@ -417,13 +413,14 @@ By the end of this chapter, the gamebook has a working one-round combat system:
 - `EncounterState` is the mutable state of a single in-progress fight: the enemy's current
   hit points, whether it has been defeated, and the round count.
 - `Encounter` is the authored definition of an enemy: its name, armour class, starting hit
-  points, attack bonus, damage dice, and damage bonus.
+  points, and an `attack: AttackProfile` containing the attack bonus, damage dice, damage
+  modifier, damage type, and attack name.
 - `CombatRoundResult` is the complete record of one resolved round: both attack rolls (as
   `RollResult` from Chapter 6), both damage rolls (as `DamageRollResult` from Chapter 6),
   the resulting hit point values, the outcome, and a list of human-readable log entries.
-- `resolveCombatRound(encounter, encounterState, character, gameState, rng)` runs a single
-  round to completion and returns a `CombatRoundResult`. It uses `rollD20Check` and
-  `rollDamage` from Chapter 6 for all rolls.
+- `resolveCombatRound({ encounter, state, rng })` runs a single round to completion and
+  returns a `CombatRoundResult`. It uses `rollD20Check` and `rollDamage` from Chapter 6
+  for all rolls, and references `state.character.attack` for the player's attack profile.
 - `applyCombatRound(state, result)` applies a `CombatRoundResult` to the current `GameState`
   and returns the next `GameState`. It performs no calculation.
 

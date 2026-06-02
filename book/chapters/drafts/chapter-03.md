@@ -197,10 +197,11 @@ performance benefits while restoring the page's shareability and refreshability.
 The companion problem is what happens after an action that changes significant server-side state:
 a rest, a save, a purchase, something that should not be re-submitted if the player hits refresh.
 For these cases, the correct pattern is a **redirect after action**: the POST is processed, the
-state changes, and the response is not the new content but an instruction to fetch the new content
-via GET from a canonical URL. This is sometimes called the **Post/Redirect/Get** pattern,[^5] and
-it solves the double-submission problem that has plagued form-heavy web applications since roughly
-the moment form-heavy web applications were invented.
+state changes, and the response is not the new content but a `303 See Other`[^5a] response
+instructing the client to fetch the new content via GET from a canonical URL. This is sometimes
+called the **Post/Redirect/Get** pattern,[^5] and it solves the double-submission problem that
+has plagued form-heavy web applications since roughly the moment form-heavy web applications were
+invented.
 
 In Campaign Ledger, this pattern appears throughout the sheet and campaign routes. After a player
 updates a resource, adjusts their armour class, or adds a condition, the server applies the change
@@ -351,6 +352,17 @@ and idempotent, was well-established before that incident and has been worth rep
 thorough and occasionally combative examination of how the web drifted away from its hypermedia
 roots and how to drift back. Required reading if any part of this chapter makes you want to argue
 about JavaScript frameworks.
+
+[^5a]: HTTP status codes are organised into five families, each covering a different kind of
+server response. 1xx codes are informational (the server is thinking; rarely encountered in
+practice). 2xx codes signal success: `200 OK` is the standard response for a page that exists
+and could be served. 3xx codes are redirections: the thing you asked for is over there. 4xx
+codes mean the client made a mistake: `404 Not Found` is the classic case; `403 Forbidden` means
+the resource exists but you're not allowed to see it. 5xx codes mean the server made a mistake.
+The full list, maintained by IANA, contains many entries, including the eternally beloved
+[418 I'm a Teapot](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/418), which was
+introduced in a 1998 April Fools' RFC and has survived every subsequent cleanup effort through
+sheer force of collective affection.
 
 [^5]: The Post/Redirect/Get pattern is described in the Web Application Architecture literature
 and in Fowler's *Patterns of Enterprise Application Architecture*. The problem it solves is

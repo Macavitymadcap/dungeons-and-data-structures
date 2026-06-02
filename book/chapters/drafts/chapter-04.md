@@ -65,9 +65,14 @@ That record is a **data model**. Building one is the subject of this chapter.
 
 A character sheet in D&D is a form. A physical, paper form: boxes for numbers, space for names,
 a section for equipment, somewhere to tick off spell slots. It organises a character's attributes
-into a known shape so that any rule in the game can find what it needs quickly. The Fighter's
-attack roll modifier is here. The Wizard's spell save DC is calculated from that. The current
-hit points are there, next to the maximum.
+into a known shape so that any rule in the game can find what it needs quickly. The six **ability
+scores** (Strength, Dexterity, Constitution, Intelligence, Wisdom, and Charisma) measure a
+character's fundamental capacities; from each score, a **modifier** is derived, which is the
+number added to relevant dice rolls. **Hit points** represent how much punishment a character can
+absorb before going down. **Armour class**, often abbreviated AC, is the target number an attack
+roll must meet or exceed to land. The Fighter's attack roll modifier is here. The Wizard's spell
+save DC, the difficulty a target must beat to resist a spell's effect, is calculated from that.
+The current hit points are there, next to the maximum.
 
 Software has the same problem and uses the same solution. A **record** is a named collection of
 related fields: each field has a name, a type, and an allowed set of values. TypeScript expresses
@@ -263,12 +268,12 @@ character sheet for a *Fighting Fantasy* hero fits on a bookmark.
 *Daggerheart*, a 2024 tabletop RPG from Darrington Press, takes a different approach to the core
 task of resolving uncertain actions. Rather than a single d20, players roll two twelve-sided dice
 of different colours: the Hope die and the Fear die. The total still determines success against a
-difficulty class, but which die is higher determines the *flavour* of that success. Roll higher
-on Hope and the scene tilts in the player's favour; roll higher on Fear and the GM earns a Fear
-token they can spend to drive the story toward trouble, regardless of whether the player succeeded.
-The character model that sits behind this system needs to track not just ability scores and hit
-points but a Hope and Fear economy at the table level: two parallel resource pools that belong
-partly to the player and partly to the GM.[^3]
+difficulty class (the target number the roll must meet), but which die is higher determines the
+*flavour* of that success. Roll higher on Hope and the scene tilts in the player's favour; roll
+higher on Fear and the GM earns a Fear token they can spend to drive the story toward trouble,
+regardless of whether the player succeeded. The character model that sits behind this system needs
+to track not just ability scores and hit points but a Hope and Fear economy at the table level:
+two parallel resource pools that belong partly to the player and partly to the GM.[^3]
 
 Video games face a version of the same problem. Skyrim's character model derives almost all of
 its numbers from a single stored fact: the level of each individual skill. One-handed, Archery,
@@ -296,9 +301,11 @@ It is worth stepping back briefly to see what this model looks like when it grow
 
 Campaign Ledger's `CharacterSheetReadModel` assembles a full character sheet from several related
 database tables: a `characters` row for the summary, `character_abilities` for the six ability
-scores, `character_classes` for multi-class support, `character_resources` for hit dice and spell
-slots and custom counters, `character_equipment` for the inventory, `character_defences` for
-damage resistances and immunities, `character_skills` for proficiencies, and a handful of others.
+scores, `character_classes` for multi-class support, `character_resources` for hit dice (the dice
+a character rolls when spending a short rest to recover hit points) and spell slots (limited-use
+resources that power magic) and custom counters, `character_equipment` for the inventory,
+`character_defences` for damage resistances and immunities, `character_skills` for proficiencies,
+and a handful of others.
 The ability modifier calculation, the proficiency bonus, and the skill modifier formulae are the
 same functions; they just operate on data retrieved from a relational database rather than a flat
 TypeScript object.

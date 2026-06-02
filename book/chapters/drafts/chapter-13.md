@@ -30,7 +30,7 @@
 >
 > The Playtester considered this. "So the validator is not telling you your prose is bad."
 >
-> "The validator cannot read prose. It can only ask: is this passage reachable? Does every
+> "The surveyor cannot read prose. It can only ask: is this passage reachable? Does every
 > choice point somewhere? Are the endings actually endings? It is not a critic. It is a
 > surveyor."
 
@@ -143,8 +143,8 @@ not a critic.
 What the validator checks, for every adventure passed to it:
 
 ```typescript
-function validateAdventure(adventure: Adventure): ValidationResult[] {
-  const issues: ValidationResult[] = [];
+function validateAdventure(adventure: Adventure): GraphIssue[] {
+  const issues: GraphIssue[] = [];
   const passageMap = createPassageMap(adventure.passages);
 
   // Start passage exists
@@ -158,7 +158,7 @@ function validateAdventure(adventure: Adventure): ValidationResult[] {
   // All choice targets exist
   for (const passage of adventure.passages) {
     for (const choice of passage.choices) {
-      for (const targetId of extractTargetIds(choice)) {
+      for (const targetId of choiceTargets(choice)) {
         if (!passageMap.has(targetId)) {
           issues.push({
             code: "missing-target",
@@ -446,7 +446,7 @@ export function exportMermaid(adventure: Adventure): string {
 
   for (const passage of adventure.passages) {
     for (const choice of passage.choices) {
-      for (const targetId of extractTargetIds(choice)) {
+      for (const targetId of choiceTargets(choice)) {
         lines.push(`  ${passage.id} --> ${targetId}`);
       }
     }
