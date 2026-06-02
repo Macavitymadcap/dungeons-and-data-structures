@@ -1,4 +1,4 @@
-# Chapter 15: The Labyrinth Never Ends
+# Conclusion: The Labyrinth Never Ends
 
 ---
 
