@@ -22,6 +22,12 @@ bun run dev
 4. **Access the App:**
 Open your web browser and navigate to [http://localhost:8000](http://localhost:8000) to see the app in action.
 
+
+## Get word count in folder
+```bash
+wc -w *.md | grep total | awk '{print $1}'
+```
+
 ## Scripts
 
 - `build`: Build the static site.
