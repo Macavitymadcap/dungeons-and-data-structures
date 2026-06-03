@@ -9,46 +9,45 @@
 >
 > "I need to know what I can carry," said the Adventurer.
 >
-> The Quartermaster produced a ledger and opened it to a fresh page. "Name of each item. Whether
-> it's carried or stowed. Whether it's in hand or packed. How many, if there are multiples. And
-> the purpose, so I know whether we're counting it as kit or as cargo."
+> The Quartermaster produced a ledger and opened it to a fresh page. "Ok Chief, name of each item; 
+> whether it's carried or stowed; whether it's in hand or packed; how many, if there are multiples, 
+> and the purpose, so I know whether we're counting it as kit or as cargo."
 >
 > "I have a rope," said the Adventurer.
 >
 > The Quartermaster wrote *rope*. "One length or several?"
 >
-> "One. And a lantern. And three torches. And some rations, I'm not sure how many, I've been
+> "One. And a lantern, three torches, some rations. Not sure how many, I've been
 > eating them."
 >
-> The Quartermaster set the quill down. "You've been eating them."
+> The Quartermaster pull the quill behind his ear. "Eating them?"
 >
 > "On the road."
 >
-> "So the rations are a counted resource. We track how many remain, we track how many you spend,
-> and we track whether there are any left." A pause. "Are there any left?"
+> "Ah. See, trouble is, rations are a counted resource. We track how many remain, how many you spend, 
+> and whether there are any left." A pause. "Are there?"
 >
 > "Two, I think. Maybe one."
 >
-> "Maybe," said the Quartermaster, and did not write anything. "Is the rope enchanted, or
+> "Maybe, ok." said the Quartermaster, and did not write anything. "That rope enchanted, or
 > standard issue?"
 >
 > "Standard. Why?"
 >
-> "Because enchanted rope is listed differently. It is not rope; it is a specific rope. The
-> difference matters when you're asking whether someone has *a* rope versus whether they have
-> *the* rope."
+> "Enchanted rope's listed differently. It's not rope; it's a specific rope. The difference matters 
+> when you're asking whether someone has *a* rope versus whether they have *the* rope."
 >
-> The Adventurer considered this. "My sword is specific. It has a name."
+> The Adventurer considered this. "My sword's specific. I named it 'Rib Slicer'."
 >
-> "Then we will list it by name. Its weight, its condition, whether it is drawn or sheathed." The
+> "Then we will list by name. Its weight, its condition, whether it is drawn or sheathed." The
 > Quartermaster retrieved the quill. "We will also note that you cannot carry the chest you
-> found in the crypt, because you have already told me you have a sword, a shield, a pack with
-> the lantern and torches and rope and maybe-one-maybe-two rations, and a partridge in a pear
-> tree. The chest stays in the crypt."
+> found in the crypt, because you have already told me you have a sword, sorry, Rib Slicer, a shield, 
+> a pack with the lantern, torches, rope, maybe-one-maybe-two rations, and a partridge in a 
+> pear tree. The chest stays in the crypt."
 >
 > "I didn't say anything about a partridge."
 >
-> "No," said the Quartermaster, "but I find it better to anticipate these things."
+> "Aye Chief," said the Quartermaster, "but I've found it's better to anticipate these things."
 
 ---
 
@@ -348,13 +347,6 @@ and you are heavily encumbered. Neither version appears in most actual play, bec
 pounds at the table is more bookkeeping than most groups want. The system exists, but its
 enforcement is mostly a matter of table taste.[^7]
 
-*Daggerheart* uses a card-based loadout. A character has a fixed number of primary and
-secondary slots for their equipped abilities, and the inventory question is about which cards
-to hold rather than how much weight to carry. The constraint is conceptual (you can equip
-this many things) rather than physical (your carrying capacity is that many pounds). The
-slots create meaningful tension during character building and between encounters without
-requiring any arithmetic during play.
-
 Each of these is a different answer to the same design question: what should the constraint
 on carrying be, and how much cognitive overhead is the player willing to accept to track it?
 The gamebook's current model follows *Fighting Fantasy* in being deliberately minimal. The
@@ -489,8 +481,7 @@ constraint: those are the next room.
 In Chapter 9, we'll look at a different kind of constraint entirely. Not what a player is
 allowed to carry, but what different kinds of users are allowed to see. The Dungeon Master's
 screen, the author tools, the debug panel, and the published player-only build are all the same
-system with different visibility rules. That is access control, and it is the subject of
-Chapter 9.
+system with different visibility rules. That is access control, and it's the subject of Chapter 9.
 
 ---
 

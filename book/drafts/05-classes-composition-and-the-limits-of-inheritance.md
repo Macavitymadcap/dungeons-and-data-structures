@@ -4,19 +4,20 @@
 
 > **The Wizard and the Apprentice**
 >
-> "Everyone who works magic," said the Wizard, "traces their power back through a lineage of
-> teachers. My power comes from my master, who had it from her master, who received it from the
-> great Librarian of the Gilt Tower. The line is unbroken. The gift passes through the chain."
+> "All practitioners the great Art," said the Wizard, "trace their power back through a 
+> lineage of teachers. My power comes from my master, Blorgana the Mysterious, who had it from 
+> her master, Afrohorse Of Wyrmshire, who received it from the great Librarian of the Gilt Tower, 
+> Dewey the Decimaliser. The line is unbroken; the gift passes through the chain."
 >
 > "What about her?" said the Apprentice, pointing through the window at a woman in white robes
 > who was, at that moment, closing a wound in a soldier's side with nothing but a murmured word
 > and an outstretched hand.
 >
-> The Wizard looked. "That is a Cleric of the Healer's Compact."
+> The Wizard looked, eyeing the amulet around the woman's robes. "That is a Cleric of Heria."
 >
 > "She's doing magic."
 >
-> "She is."
+> "Indeed."
 >
 > "Is she in your lineage?"
 >
@@ -24,12 +25,12 @@
 >
 > "Then where does her power come from?"
 >
-> The Wizard was quiet for a moment in the way that scholars are quiet when they have an answer
-> that satisfies them professionally but admits too much for comfort.
+> The Wizard was quiet for a moment, chewing over an answer that satisfied her professionally but 
+> admitted too much for comfort.
 >
 > "From her god," said the Wizard.
 >
-> "And your lineage doesn't go through her god?"
+> "And your lineage doesn't go through Heria?"
 >
 > "No."
 >
@@ -68,7 +69,7 @@ it. The chapter you're reading is what I wish I'd understood first.
 
 ## What A Class Actually Is
 
-A **class** in TypeScript (and in most object-oriented languages) is a template for creating
+A **class** in TypeScript (and in most object-oriented languages[^1]) is a template for creating
 objects that bundle data and behaviour together. Where an interface describes only the *shape* of
 data, a class also provides **methods**: functions that operate on that data and belong to the
 object itself.
@@ -221,7 +222,7 @@ That code didn't ask for any of that. If the spellcasting subclass overrides a m
 way that depends on spell slots being present, code that doesn't know about spell slots can
 produce unexpected results.
 
-The DRY principle,[^1] Liskov, and the combinatorial explosion of the D&D multiclass problem
+The DRY principle,[^3] Liskov, and the combinatorial explosion of the D&D multiclass problem
 are all pointing at the same thing. They arrive via different routes, but the destination is
 identical: inheritance is a good fit for genuinely hierarchical relationships, and a poor fit
 for everything else. Before every `extends`, ask whether the child truly keeps all the promises
@@ -268,7 +269,7 @@ character type needs both martial and magical capabilities, a new template can d
 combination directly, without restructuring what already exists. The Eldritch Knight is not a
 design problem; it is a new constant in a file.
 
-This is also how games outside D&D handle the same problem. Powered by the Apocalypse games
+This is also how games outside D&D handle the same problem. Powered by the Apocalypse[^4] games
 use **playbooks**: a character's class is a bundle of starting stats, special moves, and
 equipment, chosen at creation, composable rather than hierarchical. Daggerheart's class/ancestry
 /community layers work on the same principle: three independent axes of character definition,
@@ -377,15 +378,25 @@ Dice, probability, and the particular relationship between a difficulty class an
 are the subject of Chapter 6.
 
 ---
+[^1]: Strictly speaking, Type/Java/ECMAScript is not a true OO language. The `class` primitive
+offered by the language's specification is simply syntactic sugar for creating an object, which
+can behave in some funky ways that irk OO purists and web developers alike. For the purpose of 
+this book's discussion of Object Oriented Programming (and to the eternal chagrin of the purists),
+TypeScript will suffice.
 
-[^1]: This is the **DRY principle**: Don't Repeat Yourself. When the same logic exists in two
+[^2]: This is the **DRY principle**: Don't Repeat Yourself. When the same logic exists in two
 places, changes must be made twice, and eventually they won't be. The cure is worse than the
 disease only when the shared ancestor accumulates so much logic that it becomes impossible to
 understand. Finding the right level of abstraction is most of the craft.
 
-[^2]: Barbara Liskov, "Data Abstraction and Hierarchy", OOPSLA 1987. The principle is usually
-stated as: if S is a subtype of T, then objects of type T may be replaced with objects of type S
-without altering any of the desirable properties of the program. In plain English: a child class
-should not surprise code that was written expecting the parent. The formal publication appeared
-in SIGPLAN Notices 23(5), 1988, as a revised version of the keynote; both sources are cited in
-the bibliography.
+[^3]: Barbara Liskov, "Data Abstraction and Hierarchy", OOPSLA 1987. The principle is usually
+stated as: if `S` is a subtype of `T`, then objects of type `T` may be replaced with objects of
+type `S` without altering any of the desirable properties of the program. In plain English: a child 
+class should not surprise code that was written expecting the parent. The formal publication appeared
+in SIGPLAN Notices 23(5), 1988, as a revised version of the keynote; both sources are cited in the 
+bibliography.
+
+[^4] Powered by the Apocalypse (PbtA) is not so much a set of game rules as it is a design framework 
+for TTRPGs that focuses on playing a role rather than rolling to play. Its mechanics are storytelling
+and narrative-driven, and it has provided the gaming world with amazing titles, including but not 
+limited to *Monster of the Week* and *Thirsty Sword Lesbians*.

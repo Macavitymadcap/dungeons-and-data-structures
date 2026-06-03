@@ -4,27 +4,26 @@
 
 > **The Dungeon Master and the Hourglass**
 >
-> The Hourglass had been standing at the back of the room, and now it spoke.
+> The Hourglass had been standing at the back of the room. Impressive, given it didn't have legs.
 >
-> "You're doing it wrong," said the Hourglass.
+> "You're doing it wrong," it said.
 >
 > The Dungeon Master turned. Around the table, the fight had descended into pleasant chaos: a
 > player was mid-gesture demonstrating how her character would sweep the goblin's legs, two
-> others were arguing about who had gone last, and the fourth had wandered off to find crisps
-> and had not returned.
+> others were arguing about who had gone last, and the fourth off on a grand quest to find tortilla
+> chips and guacamole.
 >
 > "Time," said the Hourglass, "moves through events, not through people shouting."
 >
 > "Yes," said the Dungeon Master, "but..."
 >
-> "One event. Resolved completely. Then the next. Nothing overlaps. Nothing is left half done.
-> Petra declares her action. The action resolves. We learn the outcome. *Then* it is Rowan's
-> turn."
+> "One event. Resolved completely. Then the next. Nothing overlaps. Nothing left half done.
+> Petra declares her action. The action resolves. We learn the outcome. *Then* Rowan's turn."
 >
-> "That's exactly what I've been..."
+> "That's what I've been..."
 >
 > "The goblin is currently mid-swing, mid-fall, mid-shout, and mid-negotiation simultaneously.
-> This is not a coherent state."
+> Not exactly a coherent state of affairs, is it?"
 >
 > The Dungeon Master looked at the table. The goblin miniature had, through incremental
 > repositioning during the argument, ended up somehow behind the cart it had been standing in
@@ -108,7 +107,7 @@ completely, then the next.
 
 This is run-to-completion processing, and it is the right choice for a server-rendered
 gamebook. The alternative, streaming partial updates as each step resolves, would be more
-technically interesting and considerably more confusing to play.
+technically interesting but considerably more confusing to play.
 
 ---
 
@@ -181,8 +180,10 @@ damage total, every hit-point change, and the final outcome.
 
 The function that produces this result is `resolveCombatRound`. The full listing is shown
 here because understanding the shape of the whole thing is the point: one round, two attacks,
-three possible outcomes, no hidden state. The simplicity is intentional, and the chapter's
-later section on what the gamebook deliberately omits will explain what was left out and why.
+three possible outcomes, no hidden state. It has been broken up into a function that calls
+other functions to simplify the reading of it and because Uncle Bob says it is good practice.
+The simplicity is intentional, and the chapter's later section on what the gamebook deliberately 
+omits will explain what was left out and why.
 
 ```typescript
 function resolveCombatRound({
@@ -196,89 +197,219 @@ function resolveCombatRound({
 }): CombatRoundResult {
   const encounterState = state.encounters[encounter.id];
   const round = (encounterState?.rounds ?? 0) + 1;
-  const log: string[] = [];
 
-  // Player attacks
-  const playerAttack = rollD20Check({
-    modifier: state.character.attack.attackBonus,
-    dc: encounter.armourClass,
-    reason: state.character.attack.name,
+  const monsterHitPoints = encounterState?.hitPoints ?? encounter.hitPoints;
+
+  const playerResult = resolvePlayerAttack({
+    encounter,
+    state,
+    monsterHitPoints,
     rng,
   });
 
-  let monsterHitPoints = encounterState?.hitPoints ?? encounter.hitPoints;
-
-  if (playerAttack.success) {
-    const playerDamage = rollDamage(state.character.attack.damage, rng);
-    monsterHitPoints = Math.max(0, monsterHitPoints - playerDamage.total);
-    log.push(
-      `${state.character.attack.name} hits ${encounter.name} for ${playerDamage.total} ${state.character.attack.damage.type} damage.`
-    );
-
-    if (monsterHitPoints === 0) {
-      log.push(`${encounter.name} is defeated.`);
-      return {
-        encounterId: encounter.id,
-        round,
-        playerAttack,
-        playerDamage,
-        monsterHitPoints: 0,
-        playerHitPoints: state.hitPoints,
-        outcome: "victory",
-        log,
-      };
-    }
-  } else {
-    log.push(`${state.character.attack.name} misses ${encounter.name}.`);
+  if (playerResult.outcome === "victory") {
+    return {
+      encounterId: encounter.id,
+      round,
+      playerAttack: playerResult.attack,
+      playerDamage: playerResult.damage,
+      monsterHitPoints: 0,
+      playerHitPoints: state.hitPoints,
+      outcome: "victory",
+      log: playerResult.log,
+    };
   }
 
-  // Monster attacks back
-  const monsterAttack = rollD20Check({
-    modifier: encounter.attack.attackBonus,
-    dc: state.character.armourClass,
-    reason: encounter.attack.name,
+  const monsterResult = resolveMonsterAttack({
+    encounter,
+    state,
+    rng,
+  });
+
+  const log = [...playerResult.log, ...monsterResult.log];
+
+  if (monsterResult.outcome === "defeat") {
+    return {
+      encounterId: encounter.id,
+      round,
+      playerAttack: playerResult.attack,
+      monsterAttack: monsterResult.attack,
+      monsterDamage: monsterResult.damage,
+      monsterHitPoints: playerResult.monsterHitPoints,
+      playerHitPoints: 0,
+      playerTemporaryHitPoints: 0,
+      outcome: "defeat",
+      log,
+    };
+  }
+
+  return {
+    encounterId: encounter.id,
+    round,
+    playerAttack: playerResult.attack,
+    monsterAttack: monsterResult.attack,
+    monsterHitPoints: playerResult.monsterHitPoints,
+    playerHitPoints: monsterResult.playerHitPoints,
+    playerTemporaryHitPoints: monsterResult.playerTemporaryHitPoints,
+    outcome: "continue",
+    log,
+  };
+}
+
+function resolvePlayerAttack({
+  encounter,
+  state,
+  monsterHitPoints,
+  rng,
+}: {
+  encounter: Encounter;
+  state: GameState;
+  monsterHitPoints: number;
+  rng: RandomSource;
+}) {
+  const result = resolveAttack({
+    attack: state.character.attack,
+    targetArmourClass: encounter.armourClass,
+    targetName: encounter.name,
+    rng,
+  });
+
+  if (!result.damage) {
+    return {
+      attack: result.attack,
+      monsterHitPoints,
+      outcome: "continue" as const,
+      log: result.log,
+    };
+  }
+
+  const remainingHitPoints = Math.max(
+    0,
+    monsterHitPoints - result.damage.total
+  );
+
+  if (remainingHitPoints === 0) {
+    return {
+      attack: result.attack,
+      damage: result.damage,
+      monsterHitPoints: 0,
+      outcome: "victory" as const,
+      log: [...result.log, `${encounter.name} is defeated.`],
+    };
+  }
+
+  return {
+    attack: result.attack,
+    damage: result.damage,
+    monsterHitPoints: remainingHitPoints,
+    outcome: "continue" as const,
+    log: result.log,
+  };
+}
+
+function resolveMonsterAttack({
+  encounter,
+  state,
+  rng,
+}: {
+  encounter: Encounter;
+  state: GameState;
+  rng: RandomSource;
+}) {
+  const result = resolveAttack({
+    attack: encounter.attack,
+    targetArmourClass: state.character.armourClass,
     rng,
   });
 
   let playerHitPoints = state.hitPoints;
   let playerTemporaryHitPoints = state.temporaryHitPoints;
 
-  if (monsterAttack.success) {
-    const monsterDamage = rollDamage(encounter.attack.damage, rng);
-    const absorbed = Math.min(playerTemporaryHitPoints, monsterDamage.total);
-    playerTemporaryHitPoints -= absorbed;
-    playerHitPoints = Math.max(0, playerHitPoints - (monsterDamage.total - absorbed));
-    log.push(`${encounter.attack.name} hits for ${monsterDamage.total} ${encounter.attack.damage.type} damage.`);
+  if (!result.damage) {
+    return {
+      attack: result.attack,
+      playerHitPoints,
+      playerTemporaryHitPoints,
+      outcome: "continue" as const,
+      log: result.log,
+    };
+  }
 
-    if (playerHitPoints === 0) {
-      log.push(`${state.character.name} falls.`);
-      return {
-        encounterId: encounter.id,
-        round,
-        playerAttack,
-        monsterAttack,
-        monsterDamage,
-        monsterHitPoints,
-        playerHitPoints: 0,
-        playerTemporaryHitPoints: 0,
-        outcome: "defeat",
-        log,
-      };
-    }
-  } else {
-    log.push(`${encounter.attack.name} misses.`);
+  const absorbed = Math.min(
+    playerTemporaryHitPoints,
+    result.damage.total
+  );
+
+  playerTemporaryHitPoints -= absorbed;
+  playerHitPoints = Math.max(
+    0,
+    playerHitPoints - (result.damage.total - absorbed)
+  );
+
+  if (playerHitPoints === 0) {
+    return {
+      attack: result.attack,
+      damage: result.damage,
+      playerHitPoints: 0,
+      playerTemporaryHitPoints: 0,
+      outcome: "defeat" as const,
+      log: [...result.log, `${state.character.name} falls.`],
+    };
   }
 
   return {
-    encounterId: encounter.id,
-    round,
-    playerAttack,
-    monsterAttack,
-    monsterHitPoints,
+    attack: result.attack,
+    damage: result.damage,
     playerHitPoints,
     playerTemporaryHitPoints,
-    outcome: "continue",
-    log,
+    outcome: "continue" as const,
+    log: result.log,
+  };
+}
+
+function resolveAttack({
+  attack,
+  targetArmourClass,
+  targetName,
+  rng,
+}: {
+  attack: {
+    name: string;
+    attackBonus: number;
+    damage: DamageExpression;
+  };
+  targetArmourClass: number;
+  targetName?: string;
+  rng: RandomSource;
+}) {
+  const attackRoll = rollD20Check({
+    modifier: attack.attackBonus,
+    dc: targetArmourClass,
+    reason: attack.name,
+    rng,
+  });
+
+  if (!attackRoll.success) {
+    return {
+      attack: attackRoll,
+      log: [
+        targetName
+          ? `${attack.name} misses ${targetName}.`
+          : `${attack.name} misses.`,
+      ],
+    };
+  }
+
+  const damage = rollDamage(attack.damage, rng);
+
+  return {
+    attack: attackRoll,
+    damage,
+    log: [
+      targetName
+        ? `${attack.name} hits ${targetName} for ${damage.total} ${attack.damage.type} damage.`
+        : `${attack.name} hits for ${damage.total} ${attack.damage.type} damage.`,
+    ],
   };
 }
 ```
@@ -340,11 +471,22 @@ pipeline: compute the result, then apply it.
 The possible states of an encounter form a small **state machine**: a finite set of
 configurations and the transitions between them.
 
-```
-ready → resolving → continue → resolving → ...
-                  ↘ victory
-                  ↘ defeat
-                  ↘ retreat
+```mermaid
+stateDiagram-v2
+    [*] --> Ready
+
+    Ready --> Resolving : start combat
+
+    Resolving --> Continue
+    Continue --> Resolving : next round
+
+    Resolving --> Victory
+    Resolving --> Defeat
+    Resolving --> Retreat
+
+    Victory --> [*]
+    Defeat --> [*]
+    Retreat --> [*]
 ```
 
 An encounter starts as `ready` (the player hasn't engaged yet). Once the first combat choice
@@ -394,15 +536,12 @@ need. The `rounds` counter in `EncounterState` exists as a hook for future devel
 if a later design requires initiative-ordered turns, that counter becomes the baseline for
 tracking where in a full round the encounter sits.[^8]
 
-The Daggerheart approach of making the GM's combat resource a pool rather than a roll
-also points at something interesting: the current implementation always gives the monster
-a retaliatory attack. In a more sophisticated model, the GM (or the game engine acting as
-GM) might choose when to spend Fear tokens on monster actions rather than automatically
-retaliating. That would require the combat state machine to grow a "GM resource" dimension,
-and the event loop to have a way of deciding whether to spend it. That is a much larger
-feature, and it lives in the game design space rather than the software architecture space.
-The point is that the architecture chosen here is a particular set of tradeoffs, not the only
-possible set.
+Daggerheart, on the other hand, does not have an initiative system that determines the precise 
+order of each player and GM. It leans into it's 'theatre kid' origins and goes for an approach
+more like improvised comedy. Each player acts when it feels right to them, one after the other,
+And the Gm is able to make moves based on their accumulated Fear and whenever a player fails 
+with Fear. This all sounds good in principle, but it depends on all the players being aware of
+each other, being chivalrous[^9] and ensuring that everyone at the table gets their time to shine.
 
 ---
 
@@ -511,3 +650,11 @@ for software purposes, a sorted queue that needs to be constructed at the start 
 maintained as participants are added, removed, incapacitated, or delayed. Adding it to the
 gamebook is a well-defined future extension; omitting it now is a deliberate scope decision
 rather than an architectural limitation.
+
+[^9]: 'Chivalry' in this context has nothing to do with knights of old and borderline misogyny.
+It's a concept from improvised theatre and comedy which means being sensitive to all players on
+stage, not steam-rollering over any offers they make, making sure everyone contributes and gets
+seen. Improv is, after all, a team sport. If one player stands out amongst the troupe during 
+a performance, the team has lost at the expense of the show-boater. Chivalry is something more 
+gaming groups should be mindful of, given that, when you think about it, D&D is just improvised 
+comedy with tactical wargaming thrown in. 
