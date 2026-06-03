@@ -4,9 +4,9 @@
 
 > **The Adventurer and the Door**
 >
-> The door did not look like a particularly significant door. It was stone, old, fitted with iron
-> bands gone rough with rust, and it had the settled air of something that had been refusing entry
-> for longer than the surrounding dungeon had been interesting.
+> The door didn't look particularly significant. It was stone, old, fitted with iron bands gone rough 
+> with rust, and it had the settled air of something that had been refusing entry for longer than the 
+> surrounding dungeon had been interesting.
 >
 > The Adventurer raised a torch. There was no handle, but there was a slot, and beside it a panel
 > of small brass plates, each engraved with a single option.
@@ -21,14 +21,14 @@
 >
 > "That's it?" said the Adventurer.
 >
-> "That's it," said the door, or rather the panel, since doors do not typically speak. The
-> available options are the available options. The rest of the dungeon is not this door's
-> business.
+> "That's it," said the door, or rather the panel, since doors are not generally known as great
+> conversationalists. The available options are the available options. The rest of the dungeon 
+> is not this door's business.
 >
-> The Adventurer looked beyond the door, into the darkness, trying to determine what lay further
-> in. The panel offered nothing on the subject. It did not need to. The dungeon would reveal
-> itself at the appropriate pace, one valid action at a time, as the adventurer moved through it.
-> That was, when you thought about it, exactly how dungeons ought to work.
+> The Adventurer looked into the darkness, trying to determine what lay further in. The panel 
+> offered nothing on the subject. It did not need to. The dungeon would reveal itself at the 
+> appropriate pace, one valid action at a time, as the adventurer moved through it. Exactly how 
+> dungeons ought to work.
 >
 > The Adventurer considered the brass plates. Then slid a coin into the slot below *LISTEN AT
 > THE DOOR* and waited to see what the dungeon would say next.
@@ -142,7 +142,7 @@ This is where htmx[^4] comes in.
 htmx is a small JavaScript library built on a single observation: most of what JavaScript
 frameworks do to make web interfaces feel responsive could be expressed directly as HTML
 attributes, if HTML were willing to let any element make HTTP requests and swap responses into
-the page. htmx makes HTML willing.
+the page[^5]. htmx makes HTML willing.
 
 The key attributes for gamebook choices are `hx-post`, `hx-target`, and `hx-swap`:
 
@@ -198,8 +198,8 @@ The companion problem is what happens after an action that changes significant s
 a rest, a save, a purchase, something that should not be re-submitted if the player hits refresh.
 For these cases, the correct pattern is a **redirect after action**: the POST is processed, the
 state changes, and rather than returning the new content directly, the server sends a `303 See
-Other`[^5] response instructing the client to fetch that content via GET from a canonical URL. This is sometimes
-called the **Post/Redirect/Get** pattern,[^6] and it solves the double-submission problem that
+Other`[^6] response instructing the client to fetch that content via GET from a canonical URL. This is sometimes
+called the **Post/Redirect/Get** pattern,[^7] and it solves the double-submission problem that
 has plagued form-heavy web applications since roughly the moment form-heavy web applications were
 invented.
 
@@ -214,10 +214,10 @@ the form twice doesn't corrupt the data.
 ## HATEOAS Without The Fog Machine
 
 There is a grander idea lurking behind all of this, and it has an acronym that sounds like a minor
-deity of bureaucracy: **HATEOAS**.
+deity of bureaucratic rage: **HATEOAS**.
 
 It stands for Hypermedia As The Engine Of Application State, and it is one of the constraints Roy
-Fielding described in his 2000 doctoral dissertation defining REST.[^7] The core idea, stripped of
+Fielding described in his 2000 doctoral dissertation defining REST.[^8] The core idea, stripped of
 the architectural scaffolding around it, is this: a response should tell the client what it can do
 next.
 
@@ -230,8 +230,8 @@ itself, not from out-of-band information.
 This idea is not new. The text adventure games of the 1970s and 1980s worked exactly this way:
 the program described the current location, and the player was expected to ask what they could do
 there rather than having a persistent menu of all possible commands. `>GO NORTH` either worked or
-it didn't, and finding out which was the point of the exercise. The brass plate is just a
-prettier interface for the same principle: the representation itself carries the valid next moves.
+it didn't, and finding out was half the fun. The brass plate is just a prettier interface for the 
+same principle: the representation itself carries the valid next moves.
 
 A gamebook passage embodies this naturally. The passage presents:
 - The current state: where you are, what just happened, what you're carrying.
@@ -281,8 +281,8 @@ GET  /sheet/:ref/abilities               → abilities tab (full or fragment)
 ```
 
 The same ideas. A different scope. The beginner version proves the concept; the production version
-proves it survives contact with real users, real data, and real complexity. That is the purpose of
-having two running examples in this book.
+proves it survives contact with real users, real data, and real complexity. This is why having two
+examples to pick from is useful.
 
 ---
 
@@ -299,7 +299,7 @@ By the end of this chapter, the gamebook has a working web surface:
 - The server returns a full page when the request doesn't come from htmx, and a fragment when it
   does. The distinction lives in a single header check.
 
-These live primarily in `src/app.tsx`, which is the Hono[^8] application shell: routes, request
+These live primarily in `src/app.tsx`, which is the Hono[^9] application shell: routes, request
 handling, and the composition of the domain modules from the previous chapter into HTTP responses.
 The rendering itself is split between `src/gamebook/render.ts` for the author-capable development
 build and `src/gamebook/player-render.ts` for the published player-only build. We'll look at why
@@ -308,19 +308,18 @@ that split exists in Chapter 9, when we talk about what different users are allo
 The domain modules from Chapter 2, `model.ts` and `graph.ts`, don't know anything about HTTP.
 They don't know about Hono or htmx or HTML. They know about passages, choices, validation, and
 graphs. The application shell knows about HTTP. The rendering layer bridges the two. This
-separation is not accidental; it is, in a small way, the whole point.
+separation is not accidental; it is, in a not insignificant way, the point.
 
 ---
 
-The web was built on a simple idea: documents with links. Every elaboration since then, forms,
-AJAX, fragments, redirects, hypermedia constraints, has been an attempt to make that idea more
+The web was built on a simple idea: documents with links. Every elaboration since then; forms;
+AJAX; fragments; redirects and hypermedia constraints, has been an attempt to make that idea more
 expressive without abandoning what made it work in the first place. The gamebook is a useful
 lens for this history because it has always been, at heart, the same thing: a document with links,
 asking you what you want to do next.
 
 The door on the dungeon panel did not lie. It offered exactly the choices available from that
-position, in that state, at that moment. That is, when you think about it, exactly how a good web
-response ought to work.
+position, in that state, at that moment; precisely how a good web response ought to work.
 
 In the next chapter, we'll step back from the passage and look at who's standing in front of it.
 Before a player can make a choice, they need a character: a structured record of facts that the
@@ -353,7 +352,16 @@ thorough and occasionally combative examination of how the web drifted away from
 roots and how to drift back. Required reading if any part of this chapter makes you want to argue
 about JavaScript frameworks.
 
-[^5]: HTTP status codes are organised into five families, each covering a different kind of
+[^5]: htmx does let you make any HTML element send requests, but just because you can, doesn't
+mean you should. `<button>`, `<a>`, `<form>` and similar elements are designed to trigger requests,
+and semantically they indicate this. `<div>`, `<span>`, `<tr>` and other elements are semantically
+inert. They are not intended to to call an API and do not signify this accordingly. Ideally htmx
+should only be applied to those elements that are intended to make requests, and this is what the
+maintainers of the library recommend. In fact, their 
+[proposal to update native HTML elements](https://triptychproject.org/?utm_source=chatgpt.com)
+only mentions updating the `<form>` and `<button>` elements.
+
+[^6]: HTTP status codes are organised into five families, each covering a different kind of
 server response. 1xx codes are informational (the server is thinking; rarely encountered in
 practice). 2xx codes signal success: `200 OK` is the standard response for a page that exists
 and could be served. 3xx codes are redirections: the thing you asked for is over there. 4xx
@@ -364,18 +372,19 @@ The full list, maintained by IANA, contains many entries, including the eternall
 introduced in a 1998 April Fools' RFC and has survived every subsequent cleanup effort through
 sheer force of collective affection.
 
-[^6]: The Post/Redirect/Get pattern is described in the Web Application Architecture literature
+[^7]: The Post/Redirect/Get pattern is described in the Web Application Architecture literature
 and in Fowler's *Patterns of Enterprise Application Architecture*. The problem it solves is
 sometimes called the double-submit problem: if the browser is sitting on a POST response and the
-user refreshes, the browser will ask whether to resubmit the form. PRG replaces the POST response
-with a redirect to a GET endpoint, so the page the user ends up on is safe to refresh.
+user refreshes, the browser will ask whether to resubmit the form. PRG (you read that right, we're
+not talking about Role Playing Games) replaces the POST response with a redirect to a GET endpoint,
+so the page the user ends up on is safe to refresh.
 
-[^7]: Roy Fielding, *Architectural Styles and the Design of Network-based Software
+[^8]: Roy Fielding, *Architectural Styles and the Design of Network-based Software
 Architectures*, Chapter 5, University of California Irvine, 2000. Available at
 [roy.gbiv.com/pubs/dissertation/rest_arch_style.htm](https://roy.gbiv.com/pubs/dissertation/rest_arch_style.htm).
 The dissertation is genuinely readable, which is unusual for academic work that spawned two decades
 of heated conference-talk disagreement.
 
-[^8]: Hono: [hono.dev](https://hono.dev/). A fast, lightweight web framework that runs on Bun,
+[^9]: Hono: [hono.dev](https://hono.dev/). A fast, lightweight web framework that runs on Bun,
 Node, Cloudflare Workers, and several other runtimes. Mt. Graphnor uses it as the application
 shell: routing, middleware, and request/response handling. The domain modules don't depend on it.

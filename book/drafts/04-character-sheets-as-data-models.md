@@ -5,7 +5,7 @@
 > **The Scribe and the Hero**
 >
 > The Scribe uncapped the ink pot, straightened the vellum, and set the quill where it would be
-> easy to reach. Then looked up.
+> easy to reach. Then, everything in its right place, looked up at the next client.
 >
 > "Right," said the Scribe. "Let's start with your name."
 >
@@ -13,17 +13,16 @@
 > the other knee before the Scribe had finished asking. "Redeemed servant of the Pale Flame.
 > Wanderer of the Sunken Roads. Bearer of the Sorrow-Glass."
 >
-> "That's very good." The Scribe wrote *Brandavar*. "And your calling? Sword, shadow, or
-> scripture?"
+> "Very good." The Scribe wrote *Brandavar*. "And your calling? Sword, shadow, or scripture?"
 >
 > "I am beyond such distinctions," said the Hero. "I contain multitudes."
 >
 > The Scribe set the quill down.
 >
-> "I need to know your calling," said the Scribe, "because it tells me what arms you've trained
-> with, what armour your body knows, what oaths you've made and to whom, and how far you've
-> walked the road that made you. I have columns for sword-sworn, for shadow-walkers, and for
-> those who carry the word of gods. I do not have a column for *multitudes*."
+> "I need to know your calling," said the Scribe, "it tells me what arms you've trained with,
+> what armour your body knows, what oaths you've made and to whom, and how far you've walked the
+> road that made you. I have columns for sword-sworn, for shadow-walkers, and for  those who 
+> carry the word of gods. I do not have a column for *multitudes*."
 >
 > A pause.
 >
@@ -35,15 +34,15 @@
 > "I have endured wounds that would fell lesser mortals," said the Hero. "I am, for practical
 > purposes, unkillable."
 >
-> "That will not fit in the ledger," said the Scribe. "I need something I can write next to the
-> others, so the healers know when to worry and the commanders know how hard to push. How many
-> sword-cuts before you go down?"
+> "That's not going to fit in the ledger," said the Scribe. "I need something I can write next
+> to the others, so the healers know when to worry and the commanders know how hard to push. How
+> many sword-cuts before you go down?"
 >
 > The Hero thought about it seriously for the first time.
 >
 > "Ten," they said.
 >
-> "Ten," said the Scribe, and wrote it down.
+> "Good" said the Scribe, and wrote it down.
 
 ---
 
@@ -53,9 +52,9 @@ opens. But who walks through it?
 
 Before a player can make a choice that has mechanical weight, before a Stealth check can succeed
 or fail, before a sword can deal damage or a goblin can deal it back, we need a character. Not
-a story, not a backstory, not a personality: those come later, and they are wonderful, and the
-rules can manage without them. What the rules need is a structured record of specific facts that
-can be looked up, calculated from, and updated when something happens.
+a story; backstory or personality: those come later. They're wonderful, the very heart of 
+*role*playing codified, but the rules can manage without them. What the rules do need is a structured 
+record of specific facts that can be looked up, calculated from, and updated when something happens.
 
 That record is a **data model**. Building one is the subject of this chapter.
 
@@ -102,7 +101,7 @@ The discipline of keeping a model small is harder than it sounds. The temptation
 character record, is to reach immediately for the full player's handbook: backgrounds, spell
 slots, condition immunities, languages, carrying capacity in pounds. All of that is real and
 useful. None of it is needed to unlock the first door in the dungeon. A model should fit the
-rules it currently serves, and grow when the rules require it.
+rules it currently serves, growing when the rules require it.
 
 ---
 
@@ -152,7 +151,7 @@ are **stored facts** and others are **derived facts**, and they should be treate
 A stored fact is a value that must be recorded because nothing else can produce it. Ability scores
 are stored facts: you rolled them, or you chose them with a point-buy system, or your dungeon
 master handed them to you. They do not follow from any other field in the record. If you don't
-write them down, they are lost.
+write them down, they're lost.
 
 A derived fact is a value that can be calculated from stored facts whenever it's needed. The
 ability modifier for a Strength score of 14 is always +2, by the formula `floor((score - 10) / 2)`.
@@ -169,7 +168,7 @@ function abilityModifier(score: number): number {
 ```
 
 Four lines. No state to go wrong. The same is true of the proficiency bonus, which in the
-SRD[^5] follows a stepped table by level, and skill modifiers, which are the sum of an ability
+SRD[^3] follows a stepped table by level, and skill modifiers, which are the sum of an ability
 modifier and an optional proficiency bonus:
 
 ```typescript
@@ -230,7 +229,7 @@ form, when a URL parameter is parsed, the type checker is not present. The incom
 a string. It might be a valid serialised `GameState`, or it might be the corrupted remnant of an
 earlier version, or the save file from a different adventure, or something a curious player hand-
 edited to give themselves a thousand hit points. The program needs to handle all of these
-gracefully.[^6]
+gracefully.[^4]
 
 The validation layer in `src/gamebook/state.ts` does this explicitly. When a save is loaded, it
 checks:
@@ -264,15 +263,15 @@ spend to modify outcomes, decreasing each time you use it. That is the entire mo
 enough to hold in one hand, fast to generate, and sufficient to run a complete adventure. The
 character sheet for a *Fighting Fantasy* hero fits on a bookmark.
 
-*Daggerheart*, a 2024 tabletop RPG from Darrington Press, takes a different approach to the core
-task of resolving uncertain actions. Rather than a single d20, players roll two twelve-sided dice
-of different colours: the Hope die and the Fear die. The total still determines success against a
-difficulty class (the target number the roll must meet), but which die is higher determines the
-*flavour* of that success. Roll higher on Hope and the scene tilts in the player's favour; roll
-higher on Fear and the GM earns a Fear token they can spend to drive the story toward trouble,
-regardless of whether the player succeeded. The character model that sits behind this system needs
-to track not just ability scores and hit points but a Hope and Fear economy at the table level:
-two parallel resource pools that belong partly to the player and partly to the GM.[^3]
+*Daggerheart*, a 2024 tabletop RPG from Darrington Press, is similar to D&D but with one key 
+difference. A character sheet in Daggerheart is specific to a class, showing the relevant rules 
+and core features, and like Dungeons and Dragons offers empty lines that can be filled with 
+equipment, notes on personality, bonds and so on. Features and traits derived from the character's
+species, background and class are not written on the sheet in cramped handwriting to fit them into
+a neat space. Instead, each is a card that comes with the full set of the game, or available to
+print  online for the less economically endowed. This allows the player to manage a load out of
+abilities, each a separate item that can be shared between the table easily rather than having
+to look it up in a book or decipher someone's handwriting.
 
 Video games face a version of the same problem. Skyrim's character model derives almost all of
 its numbers from a single stored fact: the level of each individual skill. One-handed, Archery,
@@ -280,7 +279,7 @@ Sneak, Restoration: each skill increases with use, and the character's effective
 from the skill totals. There is no separate ability score system. The model is not a record of
 who the character is at creation; it is a record of what the character has done. This means the
 software must constantly recalculate derived values from accumulated skill experience rather than
-from a fixed roll made at character creation.[^4]
+from a fixed roll made at character creation.[^5]
 
 Each of these models reflects a different answer to the same design question: what should the
 character record store, and what should the rules derive? Fighting Fantasy minimises the record.
@@ -322,7 +321,7 @@ suited to local storage and a single-player browser game. A `CharacterSheetReadM
 Campaign Ledger is a composed view across a relational schema suited to a shared application
 with multiple users, concurrent sessions, and a need to update individual slices of the sheet
 without rewriting the whole thing. The concepts are identical; the requirements determine the
-shape.[^7]
+shape.[^6]
 
 ---
 
@@ -357,9 +356,9 @@ the game mechanics. The two things can coexist: a character can be unknowable an
 story while being a `CharacterClass` and ten hit points in the code.
 
 In the next chapter, we'll look at what happens when that `CharacterClass` field starts to feel
-insufficient: when the Fighter wants to cast a spell, when the Cleric needs to carry a sword,
-when the record's clean taxonomy starts to buckle under the weight of what the game can actually
-do. That is the chapter about classes, composition, and the limits of inheritance.
+insufficient; when the Fighter wants to cast a spell; the Cleric needs to carry a sword and when 
+the record's clean taxonomy starts to buckle under the weight of what the game can actually do. 
+That is the chapter about classes, composition, and the limits of inheritance.
 
 ---
 
@@ -375,14 +374,20 @@ truth: every piece of information should have one authoritative location. Duplic
 synchronisation problems. Synchronisation problems create bugs. Bugs create the specific variety
 of despair that comes from debugging a character sheet at eleven o'clock on a Thursday night.
 
-[^3]: *Daggerheart* was designed by Spenser Starke and Rowan Hall and published by Darrington
-Press in 2024. The Hope/Fear dual-die system is the game's most distinctive mechanical feature:
-it replaces the D&D pass/fail binary with a four-quadrant outcome space (succeed/fail combined
-with hope/fear), which gives the GM a resource economy even when players succeed. The character
-model includes domains, subclasses, ancestry, community, experiences, and a card-based loadout
-for abilities, all of which the data layer needs to track.
+[^3]: The proficiency bonus progression in SRD 5.1 is: +2 at levels 1-4, +3 at levels 5-8,
++4 at levels 9-12, +5 at levels 13-16, +6 at levels 17-20. The formula `floor((level - 1) / 4) + 2`
+produces the same result for all twenty levels. It is the kind of elegant compact formula that
+makes you feel obscurely proud of whoever designed the underlying table, even though they probably
+didn't design it from the formula.
 
-[^4]: Skyrim's skill-based model is a descendant of the *Elder Scrolls* series' earlier approach,
+[^4]: A thousand hit points is actually easy to handle. The interesting case is the player who
+edits the save to give themselves a `currentPassageId` that points to a passage they haven't
+reached yet. The validation layer should catch this because it checks passage existence. But it
+raises the question of whether *preventing* this is the right call in a single-player browser
+game with no server verification. That is a game design question as much as a software question,
+and this book has opinions about both.
+
+[^5]: Skyrim's skill-based model is a descendant of the *Elder Scrolls* series' earlier approach,
 which went even further: *Morrowind* (2002) made almost every roll explicit, with chance-to-hit
 numbers that produced the notorious situation where a beginning character could swing a sword
 directly at an enemy and miss because the underlying skill value was too low. Skyrim smoothed
@@ -390,20 +395,7 @@ this out by making skill improvements felt through ability unlocks rather than r
 the underlying data model, accumulated skill experience rather than assigned base stats, remains
 the same.
 
-[^5]: The proficiency bonus progression in SRD 5.1 is: +2 at levels 1-4, +3 at levels 5-8,
-+4 at levels 9-12, +5 at levels 13-16, +6 at levels 17-20. The formula `floor((level - 1) / 4) + 2`
-produces the same result for all twenty levels. It is the kind of elegant compact formula that
-makes you feel obscurely proud of whoever designed the underlying table, even though they probably
-didn't design it from the formula.
-
-[^6]: A thousand hit points is actually easy to handle. The interesting case is the player who
-edits the save to give themselves a `currentPassageId` that points to a passage they haven't
-reached yet. The validation layer should catch this because it checks passage existence. But it
-raises the question of whether *preventing* this is the right call in a single-player browser
-game with no server verification. That is a game design question as much as a software question,
-and this book has opinions about both.
-
-[^7]: This is one of the core arguments of domain-driven design: the model should fit the domain's
+[^6]: This is one of the core arguments of domain-driven design: the model should fit the domain's
 actual requirements, not a theoretical ideal. A model that perfectly represents every possible
 D&D character across all editions, supplements, and house rules would be a genuinely impressive
 piece of engineering. It would also be completely wrong for a small solo gamebook running in a
