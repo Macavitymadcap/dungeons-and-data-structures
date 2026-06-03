@@ -16,7 +16,7 @@
 > "And they have all been fine."
 >
 > "The third one had a secret door that opened into a wall. The fifth one had a puzzle whose
-> answer was impossible to derive from the available clues. The seventh one—"
+> answer was impossible to derive from the available clues. The seventh one..."
 >
 > "The test party," said the Dungeon Master, "can go in."
 >
@@ -135,6 +135,7 @@ no browser, no database connection.
 ```typescript
 // src/gamebook/graph.test.ts
 test("reports an unreachable passage", () => {
+  // Arrange
   const adventure = makeAdventure({
     startPassageId: "entrance",
     passages: [
@@ -144,7 +145,10 @@ test("reports an unreachable passage", () => {
     ],
   });
 
+  // Act
   const issues = validateAdventure(adventure);
+
+  // Assert
   expect(issues).toContainEqual(
     expect.objectContaining({ code: "dead-end", passageId: "orphan" })
   );
@@ -168,17 +172,26 @@ must maintain:
 
 ```typescript
 test("Mt. Graphnor passes full validation", () => {
+  // Act
   const issues = validateAdventure(mtGraphnorAdventure);
+
+  // Assert
   expect(issues).toHaveLength(0);
 });
 
 test("Mt. Graphnor has all required Five Room endings", () => {
+  // Act
   const result = validateFiveRoomTemplate(mtGraphnorAdventure);
+
+  // Assert
   expect(result).toHaveLength(0);
 });
 
 test("Mt. Graphnor no longer contains placeholder prose", () => {
+  // Arrange
   const placeholders = ["TODO", "PLACEHOLDER", "lorem ipsum"];
+
+  // Act & Assert
   for (const passage of mtGraphnorAdventure.passages) {
     for (const placeholder of placeholders) {
       expect(passage.body).not.toContain(placeholder);
@@ -189,7 +202,7 @@ test("Mt. Graphnor no longer contains placeholder prose", () => {
 
 The last test is structural gatekeeping on content. It cannot check whether the prose is good.
 It can check whether it is still placeholder text. A test that fails until the author has
-written real content is a useful forcing function when the prototype is nearing release.[^2]
+written real content is a useful forcing function in the run-up to a release.[^2]
 
 ---
 
@@ -202,9 +215,13 @@ the routes that return 404 when they should.
 ```typescript
 // src/app.test.tsx
 test("renders the gamebook passage page", async () => {
+  // Arrange
   const app = createApp({ authorToolsEnabled: false });
+
+  // Act
   const response = await app.request("/gamebook");
 
+  // Assert
   expect(response.status).toBe(200);
   const html = await response.text();
   expect(html).toContain("Mt. Graphnor");
@@ -212,24 +229,32 @@ test("renders the gamebook passage page", async () => {
 });
 
 test("applies a choice and returns the next passage", async () => {
+  // Arrange
   const app = createApp();
   const state = createInitialState(mtGraphnorAdventure, createCharacter("hero", "Adventurer", "fighter"));
   const body = new URLSearchParams({ state: JSON.stringify(state) });
 
+  // Act
   const response = await app.request("/gamebook/choices/sneak-guard", {
     method: "POST",
     body,
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
   });
 
+  // Assert
   expect(response.status).toBe(200);
   const html = await response.text();
   expect(html).toContain("keyboard-room");
 });
 
 test("returns 404 for author routes when author tools are disabled", async () => {
+  // Arrange
   const app = createApp({ authorToolsEnabled: false });
+
+  // Act
   const response = await app.request("/gamebook/author");
+
+  // Assert
   expect(response.status).toBe(404);
 });
 ```
@@ -304,22 +329,24 @@ important session:
 ```typescript
 // scripts/test-static-gamebook.ts
 test("full player session", async ({ page }) => {
-  // Clear any saved state
+  // Arrange: clear any saved state
   await page.goto(baseUrl);
   await page.evaluate(() => localStorage.clear());
   await page.reload();
 
-  // Start a new game and select class
+  // Act: start a new game and select class
   await page.click('[data-action="new-game"]');
   await page.click('[data-class="fighter"]');
   await page.click('[data-race="human"]');
   await page.click('[data-action="confirm-character"]');
 
-  // Make a choice
+  // Act: make a choice
   await page.click('button:has-text("Creep past the guardian")');
+
+  // Assert: the next passage rendered
   await expect(page.locator(".passage-title")).toContainText("The Keyboard Room");
 
-  // Verify local storage was written
+  // Assert: local storage was written
   const saved = await page.evaluate(() =>
     localStorage.getItem("dads-gamebook-save")
   );
@@ -327,18 +354,24 @@ test("full player session", async ({ page }) => {
   const state = JSON.parse(saved!);
   expect(state.currentPassageId).toBe("keyboard-room");
 
-  // Export save
+  // Act: export the save
   await page.click('[data-action="export-save"]');
   const exportedJson = await page.inputValue('[data-role="save-export"]');
+
+  // Assert: the export carries the expected schema
   expect(JSON.parse(exportedJson).schema).toBe("dads-gamebook-save");
 
-  // Reset progress
+  // Act: reset progress
   await page.click('[data-action="reset-game"]');
+
+  // Assert: the player is back at the start
   await expect(page.locator(".passage-title")).toContainText("Mt. Graphnor");
 
-  // Import the saved game back
+  // Act: import the saved game back
   await page.fill('[data-role="save-import"]', exportedJson);
   await page.click('[data-action="import-save"]');
+
+  // Assert: the imported state is restored
   await expect(page.locator(".passage-title")).toContainText("The Keyboard Room");
 });
 ```

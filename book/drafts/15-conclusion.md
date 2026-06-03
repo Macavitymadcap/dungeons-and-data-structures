@@ -5,10 +5,10 @@
 > **The Wizard and the Apprentice**
 >
 > The Apprentice found the Wizard at her desk again. The glowing tablet was still there, but
-> the spreadsheet was closed. In its place: something larger. Routes. Handlers. A passage
-> graph rendered in a diagram she had generated from code. Character records with closed
-> vocabularies and derived stats. A combat loop that resolved completely before yielding the
-> next choice.
+> the spreadsheet was closed. In its place: something larger. Pathways. The bound rules for each
+> doorway. A map of the dungeon's connections she had rendered from her own calculations.
+> Character records with closed vocabularies and derived stats. A combat loop that resolved
+> completely before yielding the next choice.
 >
 > "You finished it," said the Apprentice.
 >
@@ -181,8 +181,9 @@ document from Chapter 12 grew into a SQLite database with migrations and a backu
 The route guard from Chapter 9 grew into a guard library with campaign membership, ownership
 checks, and a test suite that documents the permission matrix.
 
-The distance between the prototype and the product is not a different kind of knowledge. It
-is more of the same kind, applied more carefully, across a longer span of time.[^2]
+The distance between the small example and the production application is not a different kind
+of knowledge. It is more of the same kind, applied more carefully, across a longer span of
+time.[^2]
 
 ---
 
@@ -196,8 +197,11 @@ teaching examples in this book. The larger adventure it was always pointing towa
 written yet. That is the next spellbook: built on the same engine, using everything this book
 put together, but written for a reader rather than a developer.
 
-The accessibility gate for the gamebook is described in Chapter 14 and not yet implemented.
-The intention is clear; the Pa11y command is clear; what remains is the work.
+The automated accessibility gate that Chapter 14 sketched for the gamebook, a Pa11y run wired
+into the verify pipeline, is the kind of check Campaign Ledger already has and the larger
+adventure will inherit. Mt. Graphnor itself is built from semantic HTML and works with a
+keyboard and a screen reader; what the larger project adds is the standing automated check that
+keeps it that way as the content grows.
 
 The gamebook has one adventure. The module system in Chapter 10 was designed to support more.
 A second adventure would validate that the content boundary, the graph validation, and the
@@ -288,7 +292,7 @@ being compared to a directed graph as a teaching aid and then set aside. It is a
 graph, with a real passage map, real reachability checks, and real validation results. The
 analogy does not explain the concept; the implementation embodies it.
 
-[^2]: This is worth stating plainly because the gap between a teaching prototype and a
+[^2]: This is worth stating plainly because the gap between a small teaching example and a
 production system can look, from the outside, like a different kind of knowledge. It is not.
 The extra knowledge is mostly: more edge cases, more explicit error handling, more careful
 attention to what breaks under load or adversarial input, more consideration for users who
@@ -300,7 +304,7 @@ for them.
 particularly interesting from a data model perspective. Managing a GM Fear pool alongside
 per-character resources, Hope and Fear dice results alongside standard modifiers, and
 narrative-weighted outcomes alongside numeric results would exercise the event-loop and
-resource-management ideas from Chapters 7 and 8 in ways the current D&D-flavoured prototype
+resource-management ideas from Chapters 7 and 8 in ways the gamebook's D&D-flavoured combat
 does not. That is an invitation, not a commitment.
 
 [^4]: This is the moment the book acknowledges its own structure. The dungeon was always a

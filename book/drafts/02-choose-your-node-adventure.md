@@ -67,8 +67,8 @@ the right one into YouTube's search bar sent you to the next node in the adventu
 player navigated by searching rather than clicking, using YouTube's infrastructure as a hypertext
 engine it was never designed to be. Robertson later adapted the piece into a live show, with
 himself as the omniscient narrator and the audience shouting choices. In the original YouTube form
-the game is no longer playable as Robertson intended — the platform evolved in ways that broke the
-edge structure — which makes it an accidental illustration of a real software concern: a graph
+the game is no longer playable as Robertson intended. The platform evolved in ways that broke the
+edge structure, which makes it an accidental illustration of a real software concern: a graph
 whose edges depend on a service you don't control can become disconnected without warning.
 
 Gamebooks reached their peak of popularity in the 1980s, then faded as home computers caught up

@@ -18,14 +18,16 @@
 >
 > "Is there."
 >
-> "The model reflects the domain. The vocabulary of the code matches the vocabulary of the
-> game. The boundaries in the system match the boundaries that exist in the world the system
-> represents." The Wizard set a book on the desk. It was blue, and heavy. "You have been
-> speaking domain-driven design. You just didn't know the phrase."
+> "The names in your ledger are the names the players use at the table. The boundaries you have
+> drawn between what the campaign knows, what the session knows, and what each character knows
+> are the boundaries that already exist in the telling of it. You did not invent a private order
+> and force the world into it. You listened to the world and wrote down the order it already
+> had." The Wizard set a book on the desk. It was blue, and heavy. "There are scholars who have
+> studied this. They have a phrase for it."
 >
 > The Scribe looked at the book, then at the ledger of campaign records, then at the Wizard.
 >
-> "I've been doing it for three years without the book."
+> "And I have been doing it for three years without the book."
 >
 > "Most people do," said the Wizard. "The book is for when you want to talk to other people
 > about it."

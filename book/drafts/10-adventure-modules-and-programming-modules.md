@@ -90,6 +90,17 @@ each other. The pair shows up in almost every serious piece of software engineer
 under various names, and the observation that it is simple in principle and difficult in practice
 has been made approximately as many times as software has been written.[^2]
 
+The word "module" is doing double duty in this chapter's title, and the two meanings turn out to
+agree. A published D&D adventure is called a module precisely because it is built to plug into a
+campaign through a small, well-defined interface. The Game Master needs to know a handful of
+things: where the adventure begins, what level of party it expects, what the players carry out
+when they leave, and how it hooks into the wider campaign. The internal room layout, the
+wandering-monster table, the secret the villain is hiding: those are the module designer's
+business, sealed behind that interface. A good adventure module can be dropped into anyone's
+campaign because it does not require the surrounding world to know its internals, and it does not
+reach out and rearrange that world. High cohesion, low coupling, written on a different kind of
+shelf. A software module aspires to exactly the same courtesy.
+
 ---
 
 ## The Gamebook's Module Map

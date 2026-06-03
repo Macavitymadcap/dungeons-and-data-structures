@@ -197,8 +197,8 @@ performance benefits while restoring the page's shareability and refreshability.
 The companion problem is what happens after an action that changes significant server-side state:
 a rest, a save, a purchase, something that should not be re-submitted if the player hits refresh.
 For these cases, the correct pattern is a **redirect after action**: the POST is processed, the
-state changes, and the response is not the new content but a `303 See Other`[^5a] response
-instructing the client to fetch the new content via GET from a canonical URL. This is sometimes
+state changes, and rather than returning the new content directly, the server sends a `303 See
+Other`[^5a] response instructing the client to fetch that content via GET from a canonical URL. This is sometimes
 called the **Post/Redirect/Get** pattern,[^5] and it solves the double-submission problem that
 has plagued form-heavy web applications since roughly the moment form-heavy web applications were
 invented.
@@ -240,8 +240,8 @@ A gamebook passage embodies this naturally. The passage presents:
 - A target for each action: another passage, an outcome, a changed state.
 
 The choices are not links to *pages*. They are invitations to *transitions*. The page you see
-after making a choice is not a pre-existing document but the server's rendering of the state that
-results from that action.
+after making a choice was never a pre-existing document waiting to be fetched; the server renders
+it fresh from the state that results from that action.
 
 This is a meaningful distinction and an easy one to lose. A gamebook that renders choices as
 simple links to static pages is navigating a graph. A gamebook that renders choices as form

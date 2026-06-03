@@ -29,6 +29,9 @@ A data structure for representing a graph in which each node stores the list of 
 **Adjacency Matrix**
 A data structure for representing a graph as a grid, with a row and column for every node and a mark at each intersection representing a connection. Efficient for dense graphs; wasteful for sparse ones, where most of the grid is empty. See also: *adjacency list*.
 
+**Advantage**
+In D&D, a condition on a d20 roll in which two dice are rolled and the higher result is kept. It shifts the distribution upward without changing the die itself: the average result of two-keep-highest is meaningfully better than a single roll, though the range stays 1 to 20. The gamebook represents it as the `"advantage"` value of `RollMode`. See also: *disadvantage*, *RollMode*, *d20 check*.
+
 **Aggregate** (Domain-Driven Design)
 A cluster of related entities and value objects that are treated as a single unit for the purposes of data changes. An `Adventure` is an aggregate: it owns its passages, encounters, items, and catalogue, and enforces consistency across all of them. Changes to things inside an aggregate go through its root. See also: *aggregate root*, *entity*, *value object*.
 
@@ -79,10 +82,16 @@ In D&D, a character's primary vocation: Fighter, Rogue, Wizard, Cleric, and many
 **Character Template**
 In the gamebook, a data record describing what a particular class or race provides at character creation: starting hit points, armour class, skill proficiencies, inventory, and attack profile. A plain object, not a class in the object-oriented sense. The design choice that makes composition possible without inheritance. See also: *composition*, *inheritance*.
 
+**Choice**
+In a gamebook, a single available action presented to the player, leading from one passage to another. In the graph, a choice is a directed edge; in the code, a `Choice` object with an `id`, display text, and a `targetId` naming the passage it leads to. A choice may carry requirements that gate whether it is offered at all. See also: *passage*, *directed edge*, *gate*.
+
 **Closed Vocabulary**
 A field whose valid values are a fixed, known set. `CharacterClass`, `Ability`, `Skill`, and `RollMode` are closed vocabularies in the gamebook: they can only hold values declared in their union type, and the compiler enforces this. The alternative is an open string field, which can hold anything and is checked by nobody until something explodes at runtime.
 
 **Cohesion** (see: *high cohesion*)
+
+**Combat Loop**
+The turn-based structure that resolves a fight: one participant's action is taken to completion (an attack roll, then a damage roll if it lands, then the result applied) before the next begins. Modelled in the gamebook as a sequence of complete rounds, each computed by a reducer and then applied to the encounter state. The combat equivalent of an event loop. See also: *event loop*, *reducer*, *encounter*, *EncounterState*.
 
 **Compatibility Shim** (see: *adapter*)
 
@@ -140,6 +149,9 @@ A graph in which all edges have a direction. Gamebooks, websites, dependency tre
 
 **Directed Cyclic Graph** (also: DCG)
 A directed graph in which at least one cycle exists. Most websites are directed cyclic graphs: you can navigate back to where you started. See also: *cyclic*, *directed acyclic graph*.
+
+**Disadvantage**
+In D&D, the mirror of advantage: two d20s are rolled and the lower result is kept, shifting the distribution downward without changing the range. The gamebook represents it as the `"disadvantage"` value of `RollMode`. Advantage and disadvantage do not stack or accumulate; a roll is made at advantage, at disadvantage, or normally, and having both at once cancels to normal. See also: *advantage*, *RollMode*, *d20 check*.
 
 **Domain**
 The subject matter a piece of software exists to serve. Not the technology, not the schema, not the framework: the real-world activity the software represents and supports. For Campaign Ledger, the domain is tabletop RPG campaign management. For Mt. Graphnor, the domain is a branching gamebook adventure. Understanding the domain is a prerequisite for modelling it well. See also: *domain-driven design*, *ubiquitous language*.
@@ -201,6 +213,9 @@ In the context of htmx and server-side rendering, a partial HTML response rather
 **GameState**
 The versioned save document in the gamebook: a single object containing everything that has changed since the adventure began. Schema, version, adventure ID, current passage, character, hit points, inventory, flags, encounter states, conditions, and log. The aggregate root for the play session.
 
+**Gate**
+A requirement checked before a choice is offered or a passage is entered: a needed item, a set flag, a minimum value. If the gate is not satisfied, the action does not appear. The gamebook checks gates when assembling the choices for a passage, so the player is never shown an action they cannot take. See also: *choice*, *flags*, *item*.
+
 **Graph**
 A mathematical structure consisting of nodes (also called vertices) connected by edges. Gamebooks, websites, social networks, dependency trees, tube maps, and version control histories are all graphs. Once you start seeing them you find them everywhere, which is either illuminating or mildly unsettling, depending on temperament. See also: *node*, *edge*, *directed graph*, *DAG*.
 
@@ -241,6 +256,9 @@ A mechanism in object-oriented programming by which one class can be defined as 
 
 **Interface** (TypeScript)
 A TypeScript declaration that describes the shape of a value: its fields, their names, and their types. Interfaces describe contracts; classes and plain objects may satisfy them. The gamebook's `Character`, `Passage`, and `Choice` are interfaces: they describe what these things must contain, not how they are created.
+
+**Item**
+In the gamebook, an entry in the player's inventory, stored as an id string in `GameState.inventory`. Items can be required by a gate, consumed by a choice, or simply carried. Membership ("do I have the brass key?") is a Set question; an item is either present or absent, with no associated quantity. Resources, which have counts, are modelled separately. See also: *gate*, *flags*, *resource*.
 
 ---
 
@@ -307,6 +325,9 @@ A web development approach in which a baseline experience works without JavaScri
 **Provenance**
 The record of where something came from. For rules data, provenance answers: which source provided this entity, under what licence, and through what path did it enter the application. Without provenance, you have data. With provenance, you have data you can publish, attribute, and defend.
 
+**Pseudo-random**
+Describing numbers produced by a deterministic algorithm that are statistically random enough for practical use but are not truly random: given the same starting seed, the sequence repeats exactly. `Math.random()` is pseudo-random. For a game this is entirely sufficient and has a useful side effect: a seeded generator can reproduce a run for testing, which a truly random source could not. See also: *random variable*, *RandomSource*.
+
 **Pure Function**
 A function that, given the same inputs, always returns the same outputs and has no side effects. The ability modifier calculation is a pure function: `abilityModifier(14)` is always 2. Pure functions are trivially testable, free of hidden dependencies, and composable. The gamebook's rules layer is almost entirely pure functions.
 
@@ -316,6 +337,9 @@ A function that, given the same inputs, always returns the same outputs and has 
 
 **Random Variable**
 A quantity whose value is determined by chance, with a known set of possible outcomes and known probabilities for each. A fair d20 is a random variable with 20 equally probable outcomes. In code, simulated using a pseudo-random number generator. See also: *pseudo-random*, *expected value*, *variance*.
+
+**RandomSource**
+In the gamebook, the injectable source of randomness for dice: a function returning a number, defaulting to `Math.random`. Because it is a parameter rather than a hard-coded call, tests can pass a controlled function that returns known values, making dice-dependent logic deterministic and verifiable. An example of depending on a contract rather than a concrete implementation. See also: *pseudo-random*, *pure function*, *dependency inversion principle*.
 
 **Reachability**
 In graph theory, the question of whether a path exists from one node to another by following edges. In a gamebook, the critical reachability question is: can the player get from the start passage to this passage? An unreachable passage exists in the data but can never be encountered in play. The gamebook validator checks reachability as its primary structural concern. See also: *graph*, *node*, *breadth-first search*.
@@ -334,6 +358,9 @@ Changing the internal structure of a system without changing what it does from t
 
 **Repository** (Domain-Driven Design)
 An abstraction over data access that presents a collection-like interface to domain code, hiding the storage details. Domain logic calls `getCharacter(id)`; the repository decides whether to query SQLite, a cache, or an in-memory store. Callers depend on the interface, not the implementation. Also makes testing significantly easier: swap the real repository for a test double and no database is required. See also: *dependency inversion principle*, *module*.
+
+**Resource**
+A counted thing a character holds, modelled as a record with a current value and an optional maximum: rations, torches, spell slots, gold. The defining question for a resource is "how many?", which distinguishes it from an item (a membership question, "do I have it?") and a flag (a historical fact, "did it happen?"). Spending a resource decrements its current value; it cannot drop below zero. See also: *item*, *flags*, *spell slot*.
 
 **Role**
 A named set of responsibilities in an access control system: player, game master, admin, author. Roles do not map to permissions globally; they map to permissions in context. Being an admin for a system does not make you the game master of every campaign in that system. See also: *capability*, *ownership*, *authorisation*.
@@ -359,6 +386,9 @@ A declaration of the expected structure and type of a piece of data. The gameboo
 
 **Serialisation**
 The act of converting an in-memory data structure to a string or byte stream for storage or transmission. The inverse is deserialisation. JSON.stringify is serialisation; JSON.parse is deserialisation. The storage boundary is where serialisation happens, and where validation must happen on the return trip. See also: *deserialisation*, *storage boundary*.
+
+**Set** (data structure)
+A collection that stores each value at most once and answers membership in constant time: `set.has(id)` is fast regardless of how many items the set holds. The gamebook uses a `Set` when checking inventory membership, converting the stored array to a set for the check and back to an array for storage, because arrays serialise cleanly to JSON and sets do not. The right structure for "is this present?"; the wrong one for "how many?". See also: *item*, *serialisation*.
 
 **Skill**
 In D&D, a specific area of competence derived from an ability score: Athletics (Strength), Stealth (Dexterity), Arcana (Intelligence), Perception (Wisdom), and others. A character proficient in a skill adds their proficiency bonus to checks using that skill. See also: *skill modifier*, *proficiency bonus*, *d20 check*.

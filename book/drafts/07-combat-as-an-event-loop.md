@@ -15,13 +15,13 @@
 >
 > "Time," said the Hourglass, "moves through events, not through people shouting."
 >
-> "Yes," said the Dungeon Master, "but—"
+> "Yes," said the Dungeon Master, "but..."
 >
 > "One event. Resolved completely. Then the next. Nothing overlaps. Nothing is left half done.
 > Petra declares her action. The action resolves. We learn the outcome. *Then* it is Rowan's
 > turn."
 >
-> "That's exactly what I've been—"
+> "That's exactly what I've been..."
 >
 > "The goblin is currently mid-swing, mid-fall, mid-shout, and mid-negotiation simultaneously.
 > This is not a coherent state."

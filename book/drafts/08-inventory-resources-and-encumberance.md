@@ -195,10 +195,10 @@ The `Math.max(0, ...)` clamp is not optional. A resource that drops below zero i
 resource; it is an error that will confuse every downstream calculation that looks at it.
 Spending a ration you don't have should produce zero rations, not negative one.[^3]
 
-The gamebook's current model represents rations as simple membership items for the sake of
+The gamebook's model represents rations as simple membership items for the sake of
 a beginner-sized implementation. The ration recovery choice checks that `"ration"` is in the
 inventory and removes one if it is, relying on the set behaviour to enforce uniqueness. For
-the purposes of the prototype this is sufficient. For any game where "how many do you have?"
+a five-room adventure this is sufficient. For any game where "how many do you have?"
 is a real question, the resource model is the more honest representation.
 
 ---

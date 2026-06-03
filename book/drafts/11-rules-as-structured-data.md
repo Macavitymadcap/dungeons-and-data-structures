@@ -469,9 +469,10 @@ fixing one record fixes every reference to it.
 [^7]: The SRD 5.1 defines conditions including Blinded, Charmed, Deafened, Frightened,
 Grappled, Incapacitated, Paralysed, Petrified, Poisoned, Prone, Restrained, Stunned, and
 Unconscious. The gamebook's condition model stores condition names as strings in the
-`GameState.conditions` array. The full mechanical effects of each condition are not yet
-implemented in the prototype; the gamebook uses conditions as flags that can gate choices and
-display summaries. The SRD catalogue names them for attribution. A future expansion would
-add mechanic records for each condition: which ability checks are affected, which actions are
-unavailable, and what removes the condition. That expansion would use the same source/entity/
-mechanic pattern this chapter describes.
+`GameState.conditions` array. The gamebook deliberately uses conditions as flags that can
+gate choices and display summaries rather than modelling the full mechanical effect of each
+one: that level of detail belongs to a tabletop system run by a person, not a five-room
+solo adventure. The SRD catalogue names the conditions for attribution. Modelling the full
+effect of a condition, which ability checks it affects, which actions it removes, and what
+ends it, would use the same source/entity/mechanic pattern this chapter describes, applied
+to a system that needs that depth.

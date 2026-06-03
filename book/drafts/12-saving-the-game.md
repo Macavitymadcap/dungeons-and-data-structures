@@ -49,6 +49,17 @@ survive the adventure being updated. It must be readable by future versions of t
 did not exist when it was written. And when any of these conditions are not met, it must fail
 gracefully rather than silently corrupting progress.
 
+Tabletop and gamebook traditions each solve this in their own way, and the solutions are worth
+holding in mind before the code arrives. A *Fighting Fantasy* gamebook saves by asking you to
+scribble your Skill, Stamina, and Luck on a paper sheet and pencil in the paragraph number you
+stopped at; the save is whatever you wrote down, and its integrity depends entirely on your
+handwriting and your honesty. A D&D table saves by consensus: someone notes "we ended outside
+the sanctum, half the party at low health," and the group reconstructs the rest from memory next
+week. Video games formalised the whole business into the checkpoint, the quicksave slot, and the
+autosave that quietly records your position whenever you cross a threshold. The checkpoint stone
+in the excerpt is that last idea wearing a fantasy costume. What follows is the same idea again,
+expressed in a form a browser can keep.
+
 ---
 
 ## Memory Is Not Persistence
@@ -400,10 +411,10 @@ the kind of silent data corruption that produces confusing bugs and frustrated p
 Treating it honestly, with explicit schemas, readable validation errors, and careful
 migrations, makes it something the player can trust.
 
-In Chapter 13, we'll look at the other kind of authoring: not the player's state, but the
-adventure's content itself. Writing a branching adventure is not just prose; it is building a
-structure that a validator can inspect, a previewer can render, and a player can explore
-without ever reaching a beautiful corridor that goes nowhere.
+In Chapter 13, we'll name the approach the book has been taking: the discipline of building
+software that models a real domain faithfully, using the domain's own vocabulary, drawing
+boundaries where the domain draws them. The work has been practice all along. The next chapter
+gives it a name.
 
 ---
 

@@ -53,9 +53,9 @@ opens. But who walks through it?
 
 Before a player can make a choice that has mechanical weight, before a Stealth check can succeed
 or fail, before a sword can deal damage or a goblin can deal it back, we need a character. Not
-a story, not a backstory, not a personality: those come later and are wonderful, but the rules
-don't need them. What the rules need is a structured record of specific facts that can be looked
-up, calculated from, and updated when something happens.
+a story, not a backstory, not a personality: those come later, and they are wonderful, and the
+rules can manage without them. What the rules need is a structured record of specific facts that
+can be looked up, calculated from, and updated when something happens.
 
 That record is a **data model**. Building one is the subject of this chapter.
 
@@ -130,7 +130,7 @@ type Ability =
   | "charisma";
 ```
 
-The value `"fighter"` is not just a label. It is a stable identifier that every part of the
+The value `"fighter"` does more than label the character. It is a stable identifier that every part of the
 system can use to look things up. A function that calculates a Fighter's hit dice can check
 `character.class === "fighter"` without worrying that someone has entered `"Fighter"`, `"FIGHTER"`,
 or `"swordsman"` instead. The type system enforces the vocabulary at compile time; the validation
