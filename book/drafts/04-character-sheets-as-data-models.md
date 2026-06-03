@@ -203,17 +203,16 @@ from their sources.
 ## A Note On What We Haven't Done
 
 The approach in this chapter, a plain interface for the data and separate pure functions for the
-derived values, is not the only way to model a character in TypeScript, and it may not be the
-first approach that feels natural. There is a temptation, when you notice that characters and
-monsters share a lot of the same vocabulary, to bundle the data and the behaviour together into
-a single structure that can represent both. TypeScript supports this, and there are good reasons
-to consider it.
+derived values, is one deliberate choice among several. TypeScript also supports classes: objects
+that bundle their data and their methods together, inheriting shared behaviour from a common
+parent. There is an obvious temptation to reach for this when you notice that characters and
+monsters speak roughly the same language, that both have hit points and armour class and the
+ability to take damage.
 
-There are also reasons not to, particularly when the shared vocabulary starts to diverge in
-ways that are hard to anticipate. That tension is the whole subject of the next chapter, and it
-needs more space than a section at the end of this one. For now it is enough to say: the gamebook
-uses plain interfaces and pure functions because they are easy to understand, easy to test, and
-honest about what they are. We'll look at the alternatives, and at what they cost, in Chapter 5.
+That temptation, and what it costs when you follow it, is the whole subject of the next chapter.
+For now it is enough to note: the gamebook uses plain interfaces and pure functions because they
+are easy to understand, easy to test, and honest about what they contain. We'll look at the
+alternative structure, and at where it serves you and where it doesn't, in Chapter 5.
 
 ---
 

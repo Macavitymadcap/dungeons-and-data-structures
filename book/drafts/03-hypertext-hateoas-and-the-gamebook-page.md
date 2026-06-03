@@ -198,8 +198,8 @@ The companion problem is what happens after an action that changes significant s
 a rest, a save, a purchase, something that should not be re-submitted if the player hits refresh.
 For these cases, the correct pattern is a **redirect after action**: the POST is processed, the
 state changes, and rather than returning the new content directly, the server sends a `303 See
-Other`[^5a] response instructing the client to fetch that content via GET from a canonical URL. This is sometimes
-called the **Post/Redirect/Get** pattern,[^5] and it solves the double-submission problem that
+Other`[^5] response instructing the client to fetch that content via GET from a canonical URL. This is sometimes
+called the **Post/Redirect/Get** pattern,[^6] and it solves the double-submission problem that
 has plagued form-heavy web applications since roughly the moment form-heavy web applications were
 invented.
 
@@ -217,7 +217,7 @@ There is a grander idea lurking behind all of this, and it has an acronym that s
 deity of bureaucracy: **HATEOAS**.
 
 It stands for Hypermedia As The Engine Of Application State, and it is one of the constraints Roy
-Fielding described in his 2000 doctoral dissertation defining REST.[^6] The core idea, stripped of
+Fielding described in his 2000 doctoral dissertation defining REST.[^7] The core idea, stripped of
 the architectural scaffolding around it, is this: a response should tell the client what it can do
 next.
 
@@ -299,7 +299,7 @@ By the end of this chapter, the gamebook has a working web surface:
 - The server returns a full page when the request doesn't come from htmx, and a fragment when it
   does. The distinction lives in a single header check.
 
-These live primarily in `src/app.tsx`, which is the Hono[^7] application shell: routes, request
+These live primarily in `src/app.tsx`, which is the Hono[^8] application shell: routes, request
 handling, and the composition of the domain modules from the previous chapter into HTTP responses.
 The rendering itself is split between `src/gamebook/render.ts` for the author-capable development
 build and `src/gamebook/player-render.ts` for the published player-only build. We'll look at why
@@ -353,7 +353,7 @@ thorough and occasionally combative examination of how the web drifted away from
 roots and how to drift back. Required reading if any part of this chapter makes you want to argue
 about JavaScript frameworks.
 
-[^5a]: HTTP status codes are organised into five families, each covering a different kind of
+[^5]: HTTP status codes are organised into five families, each covering a different kind of
 server response. 1xx codes are informational (the server is thinking; rarely encountered in
 practice). 2xx codes signal success: `200 OK` is the standard response for a page that exists
 and could be served. 3xx codes are redirections: the thing you asked for is over there. 4xx
@@ -364,18 +364,18 @@ The full list, maintained by IANA, contains many entries, including the eternall
 introduced in a 1998 April Fools' RFC and has survived every subsequent cleanup effort through
 sheer force of collective affection.
 
-[^5]: The Post/Redirect/Get pattern is described in the Web Application Architecture literature
+[^6]: The Post/Redirect/Get pattern is described in the Web Application Architecture literature
 and in Fowler's *Patterns of Enterprise Application Architecture*. The problem it solves is
 sometimes called the double-submit problem: if the browser is sitting on a POST response and the
 user refreshes, the browser will ask whether to resubmit the form. PRG replaces the POST response
 with a redirect to a GET endpoint, so the page the user ends up on is safe to refresh.
 
-[^6]: Roy Fielding, *Architectural Styles and the Design of Network-based Software
+[^7]: Roy Fielding, *Architectural Styles and the Design of Network-based Software
 Architectures*, Chapter 5, University of California Irvine, 2000. Available at
 [roy.gbiv.com/pubs/dissertation/rest_arch_style.htm](https://roy.gbiv.com/pubs/dissertation/rest_arch_style.htm).
 The dissertation is genuinely readable, which is unusual for academic work that spawned two decades
 of heated conference-talk disagreement.
 
-[^7]: Hono: [hono.dev](https://hono.dev/). A fast, lightweight web framework that runs on Bun,
+[^8]: Hono: [hono.dev](https://hono.dev/). A fast, lightweight web framework that runs on Bun,
 Node, Cloudflare Workers, and several other runtimes. Mt. Graphnor uses it as the application
 shell: routing, middleware, and request/response handling. The domain modules don't depend on it.

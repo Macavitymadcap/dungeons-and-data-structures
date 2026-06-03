@@ -179,9 +179,10 @@ Every field is either an input-derived value or a structured record of a roll fr
 Nothing in `CombatRoundResult` is opaque: a caller can inspect every die result, every
 damage total, every hit-point change, and the final outcome.
 
-The function that produces this result is `resolveCombatRound`. Its job is to run one
-complete exchange. It takes its arguments as an object, which keeps the call site readable
-when the number of parameters grows:
+The function that produces this result is `resolveCombatRound`. The full listing is shown
+here because understanding the shape of the whole thing is the point: one round, two attacks,
+three possible outcomes, no hidden state. The simplicity is intentional, and the chapter's
+later section on what the gamebook deliberately omits will explain what was left out and why.
 
 ```typescript
 function resolveCombatRound({
@@ -282,9 +283,8 @@ function resolveCombatRound({
 }
 ```
 
-There is an early return after the player's attack if the monster is defeated, which avoids
-the slightly absurd situation of a dead enemy attacking back. Everything else flows through
-to a final `"continue"` result if neither side is down after the exchange.
+The early return after a killing blow avoids the slightly absurd situation of a dead enemy
+attacking back. Everything else flows to a `"continue"` result if neither side is down.
 
 ---
 

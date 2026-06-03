@@ -34,9 +34,11 @@
 
 ---
 
-In Chapter 5, we built a character: a structured record with ability scores, a class, a set of
-proficiencies, and a template that assembles those facts into something the game can use. The
-character can try things. What we haven't yet decided is what happens when they do.
+In Chapter 4, we built a `Character`: a structured record with ability scores, a class, a set of
+proficiencies, and the pure functions to derive useful numbers from those facts. In Chapter 5,
+we added the template and creation system that assembles a starting character from a chosen class
+and race. The character exists. The character can try things. What we haven't yet decided is what
+happens when they do.
 
 The answer, in almost every RPG system ever designed, involves a die.
 
@@ -54,7 +56,7 @@ bell-curve distribution rather than a flat one, which means extreme outcomes are
 skill differences are more reliably expressed over several rounds. A hero with a high Skill score
 will usually beat a weaker opponent, rather than occasionally losing to a lucky roll. Different
 games have different answers to the question of how much randomness the dice should introduce,
-and the shape of the probability distribution is the primary lever.[^2]
+and the shape of the probability distribution is the primary lever.[^7]
 
 Daggerheart, a 2024 game from Darrington Press, takes a completely different approach: players
 roll two twelve-sided dice, one labelled Hope and one labelled Fear. Both contribute to the

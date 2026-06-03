@@ -57,81 +57,69 @@ now that all of them have been introduced.
 
 **Chapter 2** put the word "graph" on the table. A gamebook is a directed graph: passages as
 nodes, choices as edges, endings as terminal nodes. Reachability is whether a path exists from
-the start to a given node. Validation is the automated check that the graph is structurally
-sound. The Five Room Dungeon is a small graph template with room roles as design constraints.
+the start to a given node. Validation is the automated check that the structure is sound.
 
 **Chapter 3** showed that a web page is also a graph: URLs as nodes, links and forms as edges,
 HTTP responses as state transitions. HATEOAS is the idea that a response should carry the
-controls for the next valid action. Progressive enhancement is the principle that those
-controls should work with or without JavaScript. Fragments update part of the page; full-page
-routes remain refreshable and shareable.
+controls for the next valid action. Progressive enhancement means those controls work with or
+without JavaScript. Fragments update part of the page; full-page routes stay refreshable.
 
 **Chapter 4** introduced the record. A character sheet is a data model: stored facts, derived
-facts, closed vocabularies, and a validation boundary between trusted application state and
-untrusted input. The ability modifier is a derived fact; the ability score is the stored one.
-TypeScript types protect contracts at compile time; runtime validation protects them at the
-storage boundary.
+facts, closed vocabularies, and a validation boundary between trusted state and untrusted
+input. The ability modifier is derived; the ability score is stored. Types protect contracts
+at compile time; runtime validation protects them at the storage boundary.
 
 **Chapter 5** asked what the word "class" means twice over. In D&D it is a capability bundle.
 In object-oriented programming it is a reusable shape for state and behaviour. The two do not
-automatically correspond. Composition assembles a character from templates and helpers.
-Inheritance promises that a subtype can stand in for its parent anywhere the parent is
-expected, a promise that is harder to keep than it looks.
+automatically correspond. Composition assembles from templates. Inheritance promises that a
+subtype can stand in for its parent anywhere the parent is expected, a promise harder to keep
+than it looks.
 
-**Chapter 6** made probability visible. A d20 roll is a uniform random variable. Expected
-value is the long-run average, not the next result. Advantage shifts the distribution without
-changing the die. The transparent roll log is the implementation of one value: the player
-should be able to follow the arithmetic.
+**Chapter 6** made probability visible. A d20 is a uniform random variable; expected value is
+the long-run average, not the next result. Advantage shifts the distribution without changing
+the die. The transparent roll log is the implementation of one value: the player should be
+able to follow the arithmetic.
 
 **Chapter 7** named the combat loop. A round is a complete event: player action, possible
-damage, possible enemy response, outcome. Run to completion; render the result; offer the
-next choice. The reducer pattern makes state transitions testable: previous state plus event
-result produces next state.
+damage, enemy response, outcome. Run to completion; render the result; offer the next choice.
+The reducer pattern makes state transitions testable: previous state plus event equals
+next state.
 
-**Chapter 8** sorted the backpack. Membership is a Set question. Counting is a resource
-record with a current value and a maximum. Flags are permanent facts with no associated
-value. Gates are requirements checked before a choice is offered. None of these models is
-universal; each is the right shape for a different kind of thing.
+**Chapter 8** sorted the backpack. Membership is a Set question. Counting is a resource with
+a current value and a maximum. Flags are permanent facts with no associated value. Gates are
+requirements checked before a choice is offered. Each model is the right shape for a
+different kind of thing.
 
 **Chapter 9** drew the boundary between what different users can see and do. Authentication
-identifies. Authorisation decides. Role names a responsibility; ownership ties a user to a
+identifies; authorisation decides. Role names a responsibility; ownership ties a user to a
 specific resource; capability names a specific permitted action. The gate must be on the
-route, on the representation, and on the published artifact. Hiding a button is decoration,
-not access control.
+route, the representation, and the published artifact. Hiding a button is decoration.
 
 **Chapter 10** organised the source code. A module is a boundary around a design decision.
 High cohesion puts things that change together in the same place. Low coupling keeps things
-that change independently from knowing too much about each other. Dependency direction says
-that domain logic should not depend on the framework; the framework should depend on the
-domain. The import graph is structural access control: what is not imported cannot be reached.
+that change independently from knowing too much about each other. The import graph is
+structural access control: what is not imported cannot be reached.
 
 **Chapter 11** gave rules a provenance. A rule entity has a source, and the source has a
-licence, an attribution requirement, and a policy about what may be published. Structured
-rule data is the point where prose, schema, and policy meet. The attribution panel is
-generated from source records, not written by hand, because hand-written attribution drifts
-and automated attribution stays current.
+licence, an attribution requirement, and a policy about what may be published. The attribution
+panel is generated from source records, not written by hand, because automated attribution
+stays current and hand-written attribution drifts.
 
-**Chapter 12** made persistence honest. A save file is not a serialised object; it is a
-versioned document with a schema, an adventure id, and a declared version number. Validation
-at the storage boundary rejects malformed input with readable errors. Migration is the
-promise to old players that progress made under an earlier format will survive a format
-change. Three storage strategies, localStorage, SQLite, and exported JSON, serve different
-needs and cannot substitute for each other.
+**Chapter 12** made persistence honest. A save file is a versioned document with a schema,
+an adventure id, and a declared version number. Validation at the storage boundary rejects
+malformed input with readable errors. Migration is the promise to old players that progress
+under an earlier format will survive a format change.
 
 **Chapter 13** named the approach. Domain-driven design is the discipline of building software
-that models a real domain faithfully: using the domain's vocabulary in the code, drawing
-module boundaries where the domain draws them, naming entities and value objects what the
-domain names them. The gamebook had been doing this throughout; Chapter 13 gave it the
-vocabulary to recognise itself. Ubiquitous language, aggregate roots, bounded contexts,
-repositories, and anti-corruption layers are not abstract patterns to be applied from above.
-They are what naturally emerges when you take the domain seriously.
+that models a real domain faithfully: using the domain's vocabulary, drawing module boundaries
+where the domain draws them, naming entities what the domain names them. The gamebook had been
+doing this throughout; Chapter 13 gave it the vocabulary to recognise itself.
 
 **Chapter 14** sent in the test party. Unit tests prove domain logic. Route tests prove the
 interface. Static build and artifact checks prove the publishing pipeline. Browser smoke
-proves real player behaviour with real browser storage. Accessibility checks widen the
-audience. Screenshots give reviewers visual evidence. Acceptance notes record what was
-delivered and what was deferred. The verification manifest is living documentation: not a
-CI configuration file nobody reads, but a named set of claims about what the system does.
+proves real player behaviour. Accessibility checks widen the audience. Screenshots give
+reviewers visual evidence. The verification manifest is living documentation: a named set
+of claims about what the system does, surfaced where authors can see it.
 
 ---
 

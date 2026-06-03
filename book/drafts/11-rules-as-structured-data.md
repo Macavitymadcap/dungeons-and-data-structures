@@ -274,6 +274,16 @@ project-original content has priority for the game's specific mechanics. There i
 requiring a precedence resolution. The important lesson to carry forward is: define the
 resolution rule before the conflict exists, not after.
 
+I learned this the hard way in an earlier version of Campaign Ledger that did not track
+sources at all. The spell list was a flat file of records with no provenance field. When I
+added a homebrew spell for one campaign, it appeared in the global spell browser for every
+campaign, because there was no source-level visibility gate. Filtering it out required
+touching every query that returned spells. Adding the `sourceId` field fixed the symptom. The
+root cause was the earlier decision to treat all rules as equivalent regardless of where they
+came from. Once source is in the model, that class of bug becomes structurally impossible: a
+query for public-only rules simply does not return private-source records, because the filter
+is on a field that every record must have.
+
 ---
 
 ## Visibility And Public Export

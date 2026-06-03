@@ -69,8 +69,8 @@ The spreadsheet was the first room. A small problem, a small solution. I had des
 precisely enough for a machine to repeat it, which is, as I came to understand later, most of
 what programming actually is. From there: JavaScript tutorials, then Python scripts, then Bash
 one-liners that did something useful, then a Linux terminal, then HTML and CSS and web frameworks
-and databases and test suites and deployment pipelines, each one a passage into somewhere I had
-not previously been.
+and databases and test suites and deployment pipelines, each one a passage into another unexplored
+level of the dungeon.
 
 I was not doing this in order to become a software developer. I was doing it because each door
 had something interesting behind it.[^2] The job title came later.
@@ -96,17 +96,17 @@ maddening, and humbling at a rate that never quite levels off. But there is some
 close to the feeling I got from those fantasy books when a function returns the right answer
 after an hour of being wrong: a specific kind of competence, a sense of having learned the rules
 of a hidden system and being able to apply them. That feeling kept me going through the long
-early period where most of what I understood was insufficient.
+early period where most of what I understood was not much at all.
 
 ---
 
 ## Software Needs A World To Model
 
-Here is something I've come to believe, which is not original to me but took me a while to
-properly feel: software is interesting in isolation, but the real magic happens when it intersects
-with another domain and starts to *represent* something. A business, an archive, a game, a city's
-transport network, an encyclopaedia, an e-commerce catalogue. The intersection is where the work
-gets meaningful.
+Something I've come to believe, which is not original to me but took me a while to properly feel: 
+software is interesting in isolation, but the real magic happens when it intersects with another 
+domain and starts to *represent* something. A business, an archive, a game, a city's transport 
+network, an encyclopaedia, an e-commerce catalogue. The intersection is where the work gets 
+meaningful.
 
 A spreadsheet full of arbitrary numbers is a curiosity. A spreadsheet that models a D&D campaign,
 with characters, conditions, encounters, loot tables, and session history, is a system for
@@ -168,10 +168,7 @@ This book is roughly five years of self-directed learning, written down in a for
 follow.
 
 I came to software development not through a degree programme or a bootcamp, but through a
-spreadsheet that needed one more thing. The route was: custom function, JavaScript tutorial,
-Python script, Bash one-liner, Linux terminal, HTML and CSS, web framework, database, test suite,
-deployment pipeline. Crooked, largely unmapped, occasionally backtracked. The map in this book is
-made in retrospect.
+spreadsheet that needed one more thing. The route was crooked, largely unmapped, occasionally backtracked. The map in this book is made in retrospect.
 
 It is concept-led and beginner-friendly. Each chapter teaches one idea from computer science or
 software engineering, grounds it in an RPG or gamebook analogy, and connects it to working code.
@@ -271,7 +268,7 @@ vehicle because it *is* software in its most legible form. What the player exper
 the developer experiences as a graph traversal over a state machine with a persistence layer. Put
 it that way and the comparison sounds dry. Play it and it doesn't. I grew up with Fighting Fantasy
 before graduating to D&D and computers, and as I approach middle age I believe I am allowed a
-certain amount of nostalgia. It is, at any rate, considerably cheaper than a sports car.
+certain amount of nostalgia. At any rate, it's considerably cheaper than a sports car.
 
 A second reasonable question is why this particular stack: TypeScript, Bun, Hono, htmx, SQLite.
 They are not the objectively optimal tools for any specific task, and I wouldn't claim they are.
@@ -319,9 +316,9 @@ There's a door ahead. You know what to do.
 ---
 
 [^1]: Memory in this context functions something like a d20 roll against a difficulty class I
-can't quite determine. Sometimes I pass. The specific triggering problem, I did not pass.
+can't quite determine. Sometimes I pass. The specific triggering problem, not so lucky.
 
-[^2]: This is, on reflection, a reasonable heuristic for most things.
+[^2]: On reflection, a reasonable heuristic for most things.
 
 [^3]: The risk is that the analogy eventually becomes more interesting than the concept, and the
 reader leaves understanding gamebooks better but no clearer on graphs. The book tries to watch

@@ -201,13 +201,13 @@ The guard runs at the top of the route handler, before anything else. If it fail
 handler returns the appropriate response and stops. Nothing downstream runs. The rendering
 code, the database query, the mutation: none of it executes when the guard does not pass.
 
-The three failure modes map to distinct HTTP status codes.[^2a] **401 Unauthorized** is the correct
+The three failure modes map to distinct HTTP status codes.[^2] **401 Unauthorized** is the correct
 response when the actor is not authenticated at all: they haven't logged in, or their session
 has expired. **403 Forbidden** is for an authenticated actor who is not allowed to access this
 resource: they are known to the system but not permitted here. **404 Not Found** is sometimes
 appropriate when the resource exists but the actor should not know that: telling an
 unauthorised player that a private NPC dossier exists and they are forbidden from reading it
-leaks information the access control was meant to protect.[^2]
+leaks information the access control was meant to protect.[^3]
 
 ---
 
@@ -235,7 +235,7 @@ interface CampaignMembership {
 
 An admin is an admin for the installation. A game master is a game master for a specific
 campaign. The two are independent: an admin is not automatically the game master of any
-campaign, and a game master of one campaign is not the game master of another.[^3]
+campaign, and a game master of one campaign is not the game master of another.[^4]
 
 Sheet access follows the same principle. A player can read and write their own character
 sheet. A game master can read and write any sheet in their campaign. An admin cannot write
@@ -270,7 +270,7 @@ async function requireSheetAccess(
 
 The explicit test for admin bypass is absent, and that absence is deliberate. Admins tested
 against this guard fail. If an admin needs to edit a character sheet, the correct path is to
-join the campaign as a game master, not to short-circuit the permission system.[^4]
+join the campaign as a game master, not to short-circuit the permission system.[^5]
 
 ---
 
@@ -305,7 +305,7 @@ A player never sees an NPC whose visibility is set to game master only. Not "the
 the NPC but can't read the private notes": the player does not know the NPC exists. The
 visibility filter runs at the data layer, before anything is passed to the rendering code.
 The component is never handed data it shouldn't render, so there is no risk of the rendering
-code accidentally exposing it.[^5]
+code accidentally exposing it.[^6]
 
 This is the same principle as the gamebook's hidden choices. In Chapter 8, a choice that fails
 `isChoiceAvailable` is not rendered at all: the player doesn't see a greyed-out button with
@@ -391,15 +391,9 @@ app.post("/gamebook/passages", async c => {
 });
 ```
 
-The submitted `authorMode` field is a hint from the client to the server, not proof of
-authorisation. The server's `authorToolsEnabled` flag is the authoritative gate. The submitted
-value is only checked *after* the application-level flag has already passed. A player
-submitting `authorMode=1` to a production endpoint with `authorToolsEnabled: false` gets a
-404, because the route is not registered at all.
-
-This is the general principle: client-provided data can inform a request, but it cannot grant
-permissions. Permissions come from the server's own state, validated against authenticated
-identity and context, not from values the client chose to include.[^6]
+This is the "hiding buttons" principle applied to the gamebook's own internals: client-provided
+data can inform a request, but it cannot grant permissions. Permissions come from the server's
+own state, validated against authenticated identity and context.[^7]
 
 ---
 
@@ -442,7 +436,7 @@ it("allows a game master to read a sheet in their campaign", async () => {
 Each test names an actor, a resource, an action, and the expected outcome. Read together,
 they form a permission matrix: here is every important combination we have thought about,
 and here is what the system should do in each case. The tests are documentation as much as
-verification.[^7]
+verification.[^8]
 
 The gamebook's equivalent is the artifact check in `scripts/check-static.ts`. It does not
 test authentication flows or role assignments, because the gamebook has none. What it tests
@@ -470,7 +464,7 @@ By the end of this chapter, the gamebook has an explicit author/player boundary:
   any of the forbidden author-mode strings.
 
 Campaign Ledger contributes the mature parallel: `requireCampaignAccess`,
-`requireSheetAccess`, and the NPC visibility filter in `src/gamebook/state.ts` are the
+`requireSheetAccess`, and the NPC visibility filter in `src/campaign/npc.ts` are the
 production-scale versions of the same ideas, handling authenticated sessions, campaign
 membership, ownership, and representation-level data filtering.
 
@@ -507,12 +501,12 @@ specific campaign than a stranger who wanders in off the street. Role-based acce
 multi-tenant applications almost always makes this distinction; it is surprising how often
 first implementations accidentally collapse it.
 
-[^2a]: HTTP status codes are divided into five families explained in a footnote in Chapter 3:
+[^2]: HTTP status codes are divided into five families explained in a footnote in Chapter 3:
 1xx informational, 2xx success, 3xx redirection, 4xx client error, 5xx server error. The
 full tour, including the celebrated 418 I'm a Teapot, is there. The three codes that matter
 most for access control are 401, 403, and 404, addressed here.
 
-[^2]: The choice between 403 and 404 for private resources is a genuine design decision with
+[^3]: The choice between 403 and 404 for private resources is a genuine design decision with
 security implications. Returning 403 when a player asks for a private NPC page tells them that
 the resource exists and they are not allowed to see it. Returning 404 tells them nothing. The
 correct choice depends on whether the existence of the resource is itself sensitive. Private
@@ -521,13 +515,13 @@ master has a secret dossier for "Mira's contact in the Thieves' Guild" might con
 meaningful information. The campaign page itself returns 403 for non-members, because the
 existence of a campaign is not a secret.
 
-[^3]: Campaign Ledger also supports a `UserCapability` model that allows specific users to hold
+[^4]: Campaign Ledger also supports a `UserCapability` model that allows specific users to hold
 individual capabilities without having a global role that implies all of them. This matters
 for situations like delegated campaign management or temporary elevated access. The principle
 is the same: capabilities are more granular than roles, and granting a capability does not
 imply granting its neighbours.
 
-[^4]: This is called the principle of least privilege: actors should have access to exactly
+[^5]: This is called the principle of least privilege: actors should have access to exactly
 what they need to do their job, and no more. It is one of the OWASP Proactive Controls and
 is mentioned in nearly every access-control reference for good reason. The question "does
 this actor need this capability to do their job?" is a useful filter for every permission
@@ -535,7 +529,7 @@ grant. An admin who needs to review a campaign character sheet can join the camp
 player and read their own sheet, or ask the game master to share the relevant information.
 Neither path requires a short-circuit through the permission system.
 
-[^5]: The pattern of filtering at the data layer rather than the rendering layer is sometimes
+[^6]: The pattern of filtering at the data layer rather than the rendering layer is sometimes
 called "defence in depth" in the access-control literature, and sometimes called "keep secrets
 out of the template context." The practical effect is the same: if a component is never
 handed the private data, it cannot accidentally render it, no matter what bugs are introduced
@@ -543,13 +537,13 @@ in the rendering code later. Filtering in the repository, before the data reache
 component, is more reliable than filtering in a component that might be refactored by someone
 who doesn't know the data carries a sensitivity marker.
 
-[^6]: This is why "security through obscurity" fails: hiding the form field, or the endpoint
+[^7]: This is why "security through obscurity" fails: hiding the form field, or the endpoint
 URL, or the API key in client-side code, relies on attackers not noticing. They notice.
 The correct model is that the server verifies permission using state it controls, not state
 the client provided. The client can say "I am an author" until it runs out of breath. The
 server checks the `authorToolsEnabled` flag and ignores the claim.
 
-[^7]: The test suite as a permission matrix is a pattern worth internalising. If you can write
+[^8]: The test suite as a permission matrix is a pattern worth internalising. If you can write
 out the access rules in plain English (admins cannot access sheets they do not own; game
 masters can read any sheet in their campaign; players can write only their own sheets), you
 can write them as tests. If the test suite does not cover a case you care about, that case

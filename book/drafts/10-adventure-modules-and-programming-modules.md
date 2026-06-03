@@ -136,41 +136,14 @@ src/
 └── index.ts
 ```
 
-This is not a random filing arrangement. Each file owns a specific design decision, and the
-shape of the dependencies reflects what the code is allowed to know about what.
+This is not a random filing arrangement. The dependencies flow inward: `app.tsx` at the top
+imports from the domain modules; the domain modules do not import from `app.tsx`. The
+adventure content in `content/` knows nothing about HTTP. The `rules/` directory knows nothing
+about rendering. `model.ts` sits at the bottom of the tree, importing nothing from the rest of
+the gamebook, exporting the shared vocabulary that everything else uses.
 
-`model.ts` defines the shared vocabulary: `Passage`, `Choice`, `Character`, `GameState`,
-`Encounter`, `RollResult`, and everything else that multiple modules need to refer to. It
-imports nothing from the rest of the gamebook. It is the bottom of the dependency tree.
-
-`graph.ts` knows about adventure structure and validates it. It imports from `model.ts` and
-nothing else. It does not know about rendering, routing, or state. If the passage validation
-rules change, only `graph.ts` needs updating.
-
-`state.ts` knows about the save document: how to create it, load it, migrate old versions,
-check requirements, and apply effects. It imports from `model.ts` and from `rules/` for
-character and dice helpers. It does not know about HTTP or HTML.
-
-`play.ts` knows how to resolve a choice: it coordinates dice checks, combat rounds, state
-effects, log entries, and passage routing. It imports from `state.ts`, `rules/`, and
-`model.ts`. It does not know about Hono or the browser.
-
-`rules/` knows about domain logic: dice maths, character templates and derived stats, combat
-resolution, and SRD provenance data. None of these files know about HTTP, rendering, or save
-storage.
-
-`render.ts` and `player-render.ts` know about HTML: how to turn game state into markup.
-They import from `model.ts` and `state.ts` for the data they need to render. They do not
-know about routing.
-
-`app.tsx` is the application shell. It imports everything and assembles it into an HTTP
-server: routes, request handling, form parsing, fragment responses, and feature flags. It
-is the only place where Hono, Hyper-Dank UI primitives, and the gamebook domain modules
-meet. It sits at the top of the dependency tree.
-
-`index.ts` starts the process: it reads configuration, creates the app, and hands the
-`fetch` handler to Bun. It is the only place that knows about environment variables and
-process setup.
+The filing principle is clearest when you ask not what each file does, but what would have to
+change if something else changed.
 
 ---
 

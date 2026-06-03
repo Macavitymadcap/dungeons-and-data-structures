@@ -436,10 +436,11 @@ can detect colour contrast failures above a certain ratio; they cannot verify th
 colour scheme is comfortable for a player with photosensitive epilepsy. The automated gate
 is the starting line, not the finish.
 
-The gamebook does not yet have its own Pa11y gate. The accessibility section in the Build Move
-describes the expected posture: WCAG 2.2 AA targets for the player-facing routes, checked
-in the verify pipeline. The path from intention to implementation is a clear next step that
-does not require the rest of the chapter's architecture to change.
+The gamebook's Pa11y gate is the next step in the verify pipeline rather than the current
+one: the architecture that would support it is already in place, and the WCAG 2.2 AA targets
+for the player-facing routes are the stated goal. The chapter describes the full posture so
+the reader can see what it looks like implemented; the gamebook will match it when the book
+goes to press.
 
 ---
 
@@ -483,19 +484,15 @@ the acknowledgement that code review cannot evaluate visual design from a text d
 
 ---
 
-## The Acceptance Note
+## The Acceptance Note And Verification Summary
 
 A test suite that passes is necessary but not sufficient for a release. What passes must
 also be documented: which tests ran, which gates passed, what was checked, and what was
 deferred.
 
-Campaign Ledger's acceptance notes for major features are short documents that record:
-
-- The delivered scope: what was built and what was not.
-- The automated evidence: which commands ran, which gates passed, how many tests.
-- The screenshot evidence: which states were captured.
-- The known limits: what the feature does not yet do, and why.
-- The follow-up tickets: the deferred work that is tracked and planned.
+Campaign Ledger's acceptance notes for major features are short documents that record the
+delivered scope, the automated evidence, the screenshot evidence, the known limits, and the
+follow-up tickets. Here is one in full:
 
 ```markdown
 ## Game Master Prep: Acceptance Note
@@ -519,19 +516,8 @@ sheet-0071: Image upload in import pipeline
 sheet-0073: Bulk import from Google Drive folder
 ```
 
-The acceptance note is the written contract between the team that built the feature and the
-team that will maintain it. It says: here is what we built, here is the evidence that it
-works, here is what we deliberately left out, and here is where to find the deferred work.
-A PR that merges without an acceptance note leaves the next developer to guess at all of
-these.[^7]
-
----
-
-## The PR Verification Summary
-
-Not every change needs a full acceptance note. Most changes need a compact verification
-summary: a short section at the end of the PR description that says which commands ran and
-what they produced.
+Most changes do not need a document of this length. They need a compact verification
+summary: three lines at the end of the PR description.
 
 ```markdown
 ## Verification
@@ -541,13 +527,9 @@ what they produced.
 - Hyper-Dank compat: not required (no shared package changes)
 ```
 
-Three lines. Command, result, totals. A note for the things that were not needed and why.
-
-The summary is not the verification. The verification is the commands and the tests. The
-summary is the evidence that they ran: compact enough for a reviewer to read in thirty
-seconds, specific enough to chase down if anything looks wrong. A summary that says
-"tests pass" with no command or count is not evidence; it is an assertion. An assertion
-with receipts is evidence.[^8]
+Command, result, totals. A note for anything that was not needed and why. A summary that
+says "tests pass" with no command or count is not evidence; it is an assertion. An
+assertion with receipts is evidence.[^7]
 
 ---
 
@@ -705,11 +687,7 @@ feature is not done when the code is merged, but when the evidence of its correc
 recorded. In regulatory environments this is a compliance requirement. In most software
 teams it is a useful discipline even without the regulatory pressure, because it forces the
 question "what did we actually ship?" to be answered explicitly at the moment when the
-answer is most accessible. Six months later, nobody remembers what was in the PR.
-
-[^8]: The "assertions with receipts" framing comes from the observation that in software
-delivery, as in accounting, a claim without documentation is a claim that cannot be audited.
-"The tests passed" is a claim. "bun run verify: 5 gates, 82 tests, 0 failures" is the same
-claim with enough detail for a reviewer to verify it against the CI log, notice if the count
-has changed since the last release, and confirm that the right command was run. The extra
-fifteen words are not bureaucracy; they are the difference between a claim and evidence.
+answer is most accessible. The "assertions with receipts" shorthand applies the same logic:
+"the tests passed" is a claim; "bun run verify: 5 gates, 82 tests, 0 failures" is the same
+claim with enough detail for a reviewer to verify it against the CI log. The extra fifteen
+words are not bureaucracy; they are the difference between a claim and evidence.
