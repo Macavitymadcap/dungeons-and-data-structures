@@ -5,9 +5,9 @@
 > **The Scribe and the Archivist**
 >
 > The Scribe had, over many years of diligent service, developed a system. Everything went into
-> the great ledger: maps, rules, character records, room descriptions, house rulings, index
-> entries, errata notes, correspondence, pressed flowers from a campaign that had concluded
-> pleasantly. It was all in there somewhere.
+> the great ledger; maps; laws of various countries; chronicles of great heroes; pressed flowers
+> from a dalliance that had concluded pleasantly, if sooner than would have been liked. It was all
+> in there somewhere.
 >
 > "Where," said the Archivist, who had been called in to help find something, "is the map of the
 > Fogged Marshes?"
@@ -16,7 +16,7 @@
 >
 > "Which section?"
 >
-> "The maps are mostly toward the back, except the ones filed under the campaign they belong to,
+> "The maps are mostly toward the back, except the ones filed under the country they belong to,
 > except the ones filed under the cartographer's name, except the ones I found after the ledger
 > was full and added to the front."
 >
@@ -36,10 +36,10 @@
 > The Scribe considered this. The ledger was very large, and the Scribe was, now that the
 > question had been raised, not entirely certain where the Fogged Marshes map was.
 >
-> "Separate shelves," said the Archivist. "Maps on the maps shelf. Rules on the rules shelf.
-> Character records on their own shelf, indexed by campaign. Each shelf knows its own business
-> and nothing else. When you want the map, you go to the map shelf. You do not have to know
-> anything about the rules shelf to find it."
+> "Separate shelves," said the Archivist. "Maps on the maps shelf. Laws on the laws shelf.
+> Hero chronicles on their own shelf, indexed by country of hero's origin. Each shelf knows 
+> its own business and nothing else. When you want the map, you go to the map shelf. You do 
+> not have to know anything about the laws shelf to find it."
 >
 > "And if something belongs on more than one shelf?"
 >
@@ -75,10 +75,10 @@ David Parnas described the essential insight in 1972, in a paper about how to de
 into modules.[^1] His answer was not "group things that are similar" but "group things that change
 for the same reason, and hide the decision that might need to change."
 
-The Scribe's great ledger fails this test. Maps and rules and character records don't change for
-the same reason: maps change when the geography of the campaign changes, rules change when the
-system is updated, character records change when a player levels up. Putting them all in one
-place means that any change to one has to navigate past all the others.
+The Scribe's great ledger fails this test. Maps and laws and hero chronicles don't change for
+the same reason: maps change when the geography of the campaign changes, laws (rules) change when 
+the system is updated, hero chronicles (character records) change when a player levels up. Putting 
+them all in one place means that any change to one has to navigate past all the others.
 
 The Archivist's shelves pass it. The maps shelf changes when maps change. It knows nothing about
 rules. The rules shelf changes when rules change. It knows nothing about maps. Adding a new shelf
@@ -105,7 +105,10 @@ shelf. A software module aspires to exactly the same courtesy.
 
 ## The Gamebook's Module Map
 
-Let's look at what the gamebook has actually built, and why the pieces are where they are.
+In all of the 'The Build Move' sections so far, I've told you that files have been created, 
+or updated, but there has been no context for where these files exist and how they relate 
+to each other. Let's now look at the file structure of the gamebook, and why the pieces are
+where they are.
 
 ```
 src/gamebook/
@@ -443,7 +446,7 @@ observation: things that belong together should be together, and things that don
 together should not know about each other. The reason the observation has been made so many
 times is that it is violated at roughly the same rate.
 
-[^3]: Robert C. Martin, *Clean Architecture: A Craftsman's Guide to Software Structure and
+[^3]: Robert C. Martin (aka Uncle Bob), *Clean Architecture: A Craftsman's Guide to Software Structure and
 Design* (Prentice Hall, 2017). The Dependency Inversion Principle is one of the five SOLID
 principles Martin is associated with. The formulation here, "high-level policy should not
 depend on low-level details; both should depend on abstractions", is more useful when read

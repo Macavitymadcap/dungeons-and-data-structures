@@ -180,10 +180,10 @@ damage total, every hit-point change, and the final outcome.
 
 The function that produces this result is `resolveCombatRound`. The full listing is shown
 here because understanding the shape of the whole thing is the point: one round, two attacks,
-three possible outcomes, no hidden state. It has been broken up into a function that calls
-other functions to simplify the reading of it and because Uncle Bob says it is good practice.
-The simplicity is intentional, and the chapter's later section on what the gamebook deliberately 
-omits will explain what was left out and why.
+three possible outcomes, no hidden state. Breaking it into subfunctions keeps each piece at
+a readable length and isolates each decision cleanly: the player's attack path, the enemy's
+attack path, and the final assembly. The simplicity is intentional, and the chapter's later
+section on what the gamebook deliberately omits will explain what was left out and why.
 
 ```typescript
 function resolveCombatRound({
@@ -536,12 +536,34 @@ need. The `rounds` counter in `EncounterState` exists as a hook for future devel
 if a later design requires initiative-ordered turns, that counter becomes the baseline for
 tracking where in a full round the encounter sits.[^8]
 
-Daggerheart, on the other hand, does not have an initiative system that determines the precise 
-order of each player and GM. It leans into it's 'theatre kid' origins and goes for an approach
-more like improvised comedy. Each player acts when it feels right to them, one after the other,
-And the Gm is able to make moves based on their accumulated Fear and whenever a player fails 
-with Fear. This all sounds good in principle, but it depends on all the players being aware of
-each other, being chivalrous[^9] and ensuring that everyone at the table gets their time to shine.
+Daggerheart takes a different approach entirely. Rather than a strict initiative order,
+its combat runs on what the designers call an action spotlight: each player acts when it
+feels right to them, one after the other, with the GM making moves based on accumulated
+Fear and player failures. There is no queue, no sorted list of participants, no algorithm
+determining who goes when. The order emerges from the conversation at the table.
+
+This sounds appealingly organic, and in practice it often is. The cost is that it depends
+on a quality that improv comedians and experienced gaming groups take seriously: what the
+theatre world calls chivalry. Not the knights-in-armour kind; the ensemble kind. Being
+aware of the other players, not steamrollering their moments, making sure everyone gets
+time in the spotlight. A Daggerheart combat session where one player dominates every exchange
+is technically following the rules and completely missing the point. The system trusts the
+table to self-regulate, and at tables where that trust is warranted, it produces something
+looser and more narrative than D&D's clockwork round. At tables where it is not, the GM's
+Fear pool is the only lever for rebalancing, and it was designed for dramatic tension, not
+crowd control.
+
+D&D is, when you strip it back, improvised comedy with tactical wargaming bolted on. The
+chivalry instinct matters there too, whatever the initiative order says. The difference is
+that the initiative roll gives the Dungeon Master a mechanical procedure to point to: not
+yet, Brandavar, Rowan has higher initiative.
+
+The gamebook skips all of this, for the same reason it skips multi-monster encounters,
+reactions, opportunity attacks, and action economy: each is a real and interesting feature
+of tabletop combat, and each one adds complexity the beginner implementation does not yet
+need. The `rounds` counter in `EncounterState` exists as a hook for future development:
+if a later design requires initiative-ordered turns, that counter becomes the baseline for
+tracking where in a full round the encounter sits.[^8]
 
 ---
 
@@ -650,11 +672,3 @@ for software purposes, a sorted queue that needs to be constructed at the start 
 maintained as participants are added, removed, incapacitated, or delayed. Adding it to the
 gamebook is a well-defined future extension; omitting it now is a deliberate scope decision
 rather than an architectural limitation.
-
-[^9]: 'Chivalry' in this context has nothing to do with knights of old and borderline misogyny.
-It's a concept from improvised theatre and comedy which means being sensitive to all players on
-stage, not steam-rollering over any offers they make, making sure everyone contributes and gets
-seen. Improv is, after all, a team sport. If one player stands out amongst the troupe during 
-a performance, the team has lost at the expense of the show-boater. Chivalry is something more 
-gaming groups should be mindful of, given that, when you think about it, D&D is just improvised 
-comedy with tactical wargaming thrown in. 

@@ -2,32 +2,31 @@
 
 ---
 
-> **The Doorkeeper and the Admin**
+> **Ad Min and The Doorkeeper**
 >
-> The Admin arrived at the gate with a ring of keys.
+> Ad Min arrived at the gate with a ring of keys.
 >
 > They were impressive keys. Ornate, heavy, each one stamped with a different sigil. The Admin
 > held them up so the Doorkeeper could appreciate the craftsmanship.
 >
 > "I have the master ring," said the Admin.
 >
-> "I see that," said the Doorkeeper.
+> "Good for you." said the Doorkeeper.
 >
 > "I have access to everything."
 >
-> "You have keys," said the Doorkeeper. "That is different. I would like to know which door you
-> are trying to open, in whose name, and whether the campaign it belongs to has granted you the
-> right to open it."
+> "You've got keys," said the Doorkeeper. "That's different. Which door are you trying to open, in
+> whose name, and has the room it belongs to granted you the right to open it?"
 >
-> The Admin looked at the keys, then at the Doorkeeper. "I am the Admin."
+> Ad Min looked at the keys, then at the Doorkeeper. "I am Ad Min, keeper of the sacred dungeon."
 >
-> "You are an admin," said the Doorkeeper, with the particular patience of someone who has had
-> this conversation before. "There are several of you. Being one does not mean being all. This
-> campaign belongs to Mira. Are you Mira?"
+> "You are one of the keepers" said the Doorkeeper, with the particular patience of someone who has
+> had this conversation before. "There are several of you. Being one does not mean being all. This
+> room belongs to Mira. Are you Mira?"
 >
 > "No."
 >
-> "Are you Mira's Game Master?"
+> "Are you Mira's Master?"
 >
 > "No."
 >
@@ -35,13 +34,13 @@
 >
 > A pause.
 >
-> "Then I suggest," said the Doorkeeper, returning to the ledger, "that you find a door you are
+> "Then I suggest," said the Doorkeeper, returning to the ledger, "that you find a door you're
 > actually allowed to open."
 
 ---
 
 In Chapter 8, we looked at constraints on what a character can carry: which items they hold,
-which choices those items unlock, and what happens when a consumable is spent. Those constraints
+the choices those items unlock, and what happens when a consumable is spent. Those constraints
 operate on game state. The character meets a requirement or they don't.
 
 This chapter is about a different kind of constraint: not what the character can do inside the
@@ -156,8 +155,6 @@ accessible is not access control; it is decoration.
 ---
 
 ## Hiding Buttons Is Not Enough
-
-This point is important enough to expand.
 
 A common first instinct when implementing access control is to check the user's role in the
 component that renders the action, and not render the button if they shouldn't have it.
@@ -470,8 +467,8 @@ membership, ownership, and representation-level data filtering.
 
 ---
 
-The Admin's keys were real. They unlocked real doors. The Doorkeeper's objection was not that
-the keys were fake but that the Admin was standing in front of a door that wasn't theirs to
+Ad Min's keys were real. They unlocked real doors. The Doorkeeper's objection was not that
+the keys were fake but that Ad Min was standing in front of a door that wasn't theirs to
 open: the right actor, the wrong resource, the wrong campaign. Access control is not a
 judgement about whether someone is trustworthy. It is a set of rules about which actors are
 permitted to affect which resources, in which contexts, verified at every layer where the

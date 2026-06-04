@@ -4,17 +4,18 @@
 
 > **The Adventurer and the Timekeeper**
 >
-> The Adventurer paused at the threshold of the checkpoint stone, one hand on the carved
-> sigil. Beyond lay the deeper dungeon. Behind, three hours of progress: the guardian defeated,
-> the puzzle solved, the brass key spent and the trap disarmed.
+> The Adventurer paused at the threshold of the stone of memory, one hand on the carved sigil.
+> Beyond lay the deeper dungeon. Behind, three hours of progress: the guardian defeated, the
+> puzzle solved, the brass key spent and the trap disarmed.
 >
 > "Touch the stone," said the Timekeeper, "and it will remember."
 >
 > "Remember what, exactly?"
 >
 > "Where you are. What you carry. What you have done. The state of the world as it stands at
-> this moment." The Timekeeper consulted the ledger. "Schema: dungeon-progress. Version: two.
-> Adventure: Mt. Graphnor. Current passage: approach to the sanctum. Updated: now."
+> this moment." The Timekeeper consulted the ledger, tracing a line with one careful finger.
+> "Entry sealed under the name of this dungeon, in the manner of the second reckoning. The
+> passage you stand before, named in the register. The hour of sealing, noted in the margin."
 >
 > The Adventurer looked at the stone. "And if the dungeon changes while I'm away? If the
 > Game Warden rearranges the passages, updates the guardian's armour, adds a new room?"
@@ -399,7 +400,7 @@ file to verify that the restored passage and encounter state match.
 
 ---
 
-The Timekeeper was honest about the limits. All memory is unreliable. The checkpoint stone
+The Timekeeper was honest about the limits. All memory is unreliable. The stone of memory
 remembers what it knew at the moment of saving, not what the dungeon will look like next
 week. The question is not whether a save is perfect but whether the system is honest about
 what it recorded, explicit about the version it understands, and graceful when the two

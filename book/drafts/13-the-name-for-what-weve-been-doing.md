@@ -4,12 +4,13 @@
 
 > **The Scribe and the Wizard**
 >
-> The Scribe had been modelling the campaign for three years. Character records with closed
-> vocabularies. Derived stats calculated from stored scores. A boundary between what the
-> players could see and what only the Game Master knew. A rule that said the campaign was the
-> source of truth for session history, and that the session was the source of truth for what
-> the characters had done, and that the characters' sheets were the source of truth for what
-> the characters could do.
+> The Scribe had been modelling the campaign for three years. Character records with
+> closed categories: sword-sworn, shadow-walker, scripture-bearer, no column for
+> "multitudes". Scores that produced modifiers by formula. A curtain between what the
+> players' sheets showed and what sat behind the Dungeon Master's screen. A rule that
+> said the campaign ledger was the truth of what had happened in sessions, and the
+> sessions were the truth of what the characters had done, and the characters' sheets
+> were the truth of what the characters could do.
 >
 > The Scribe had arrived at all of this by instinct and necessity, without any particular
 > vocabulary for it.
@@ -50,7 +51,7 @@ other single idea, what this book has been practising.
 
 ---
 
-## The Domain Is The Thing Being Modelled
+## The Map Should Match The Territory
 
 A **domain** is the subject matter a piece of software exists to serve. Not the technology,
 not the database schema, not the framework: the real-world activity the software represents.
@@ -61,24 +62,31 @@ class, passages, choices, conditions, saving throws, encounters, does not belong
 It belongs to the game. The software borrows that vocabulary because the game is what it is
 modelling.
 
-Eric Evans named and systematised this approach in 2003 in a book that practitioners
-call the blue book.[^1] His central argument is deceptively simple: the code should speak the
-same language as the domain experts. Not a translation. Not an approximation. The same words,
-used the same way, meaning the same things.
+This sounds obvious. It should be obvious. The surprising thing is how often it fails to happen,
+and how quickly a codebase can drift from the domain it is supposed to represent. The drift is
+usually well-intentioned. It starts with a `BaseEntity` class because it is convenient. It
+continues with `AdventureNode` because "node" is the technically correct graph term, even though
+nobody in the room would call a gamebook passage a node. Six months later the code speaks a
+private language that belongs to no domain in particular.
 
-When a dungeon master talks about a character's hit points, they mean something precise: a
-number that tracks how much damage the character can absorb before falling unconscious. When
-`GameState.hitPoints` holds a number that tracks how much damage the character can absorb
-before falling unconscious, the code and the domain expert are speaking the same language.
-There is no translation layer, no impedance mismatch, no point where the code's concept of
-hit points diverges from the game's.
+Eric Evans named and systematised this approach in 2003 in a book that practitioners call the
+blue book.[^1] His central argument is deceptively simple: the code should speak the same language
+as the domain experts. Not a translation. Not an approximation. The same words, used the same way,
+meaning the same things.
 
-When they diverge, something has gone wrong. The divergence is a signal that the model has
-drifted from the domain it was supposed to represent.
+When a dungeon master talks about a character's hit points, they mean something precise: a number
+that tracks how much damage the character can absorb before falling unconscious. When
+`GameState.hitPoints` holds a number that tracks how much damage the character can absorb before
+falling unconscious, the code and the domain expert are speaking the same language. There is no
+translation layer, no impedance mismatch, no point where the code's concept of hit points diverges
+from the game's.
+
+When they diverge, something has gone wrong. The divergence is a signal that the model has drifted
+from the domain it was supposed to represent.
 
 ---
 
-## Ubiquitous Language
+## Calling Things What They Are
 
 Evans calls the shared vocabulary of a domain and its software the **ubiquitous language**:
 the set of terms that should appear identically in conversations, documents, diagrams, and
@@ -87,22 +95,26 @@ two are almost the same thing. When the domain experts say "saving throw" and th
 `defensiveRollOutcome`, they have started to diverge, and the divergence will widen over time
 as each side evolves independently.
 
-The gamebook's ubiquitous language is visible in `src/gamebook/model.ts`. `Passage`,
-`Choice`, `Encounter`, `GameState`, `EncounterState`, `EndingKind`: these names were not
-chosen because they are good programming vocabulary. They were chosen because they are what
-a gamebook author would call these things. A passage is a passage. An encounter is an
-encounter. An ending is an ending. The code names them what the domain names them.
+I have a concrete example from this project. The `src/nodes/` directory that existed in an
+earlier version contained an `AdventureNode` type with a `nextNodeId` field and an `isEnding`
+flag. Technically accurate. Graph-theoretically correct. And completely wrong for a gamebook.
+A gamebook author would not call a passage a "node". They would not say "the next node id" to
+mean "where this choice leads". The vocabulary belonged to graph theory, not to gamebooks, and
+it showed every time someone tried to explain what the code did.[^2]
 
-Compare this to the `src/nodes/` directory that existed in an earlier version of the project,
-with its `AdventureNode` and `nextNodeId` and `isEnding` flag. Technically equivalent. But
-a gamebook author would not call a passage a "node". They would not say "the next node id" to
-mean "where this choice leads". The vocabulary belonged to graph theory, not to gamebooks. The
-domain's language was being overwritten by the implementer's language. This is exactly the
-drift Evans warned against.[^2]
+Replacing it with `Passage`, `Choice`, and `targetId` was not a technical improvement. Nothing
+changed about what the code did. What changed was that the code started describing itself in
+terms anyone who had read a gamebook could follow. That is the whole game.
+
+The gamebook's current vocabulary is visible in `src/gamebook/model.ts`: `Passage`, `Choice`,
+`Encounter`, `GameState`, `EncounterState`, `EndingKind`. These names were not chosen because
+they are good programming vocabulary. They were chosen because they are what a gamebook author
+would call these things. A passage is a passage. An encounter is an encounter. An ending is an
+ending. The code names them what the domain names them.
 
 ---
 
-## Entities, Value Objects, And The Question Of Identity
+## Things That Have Identity And Things That Don't
 
 Not everything in a domain has the same relationship to identity. Evans draws a line between
 two kinds of things.
@@ -134,7 +146,7 @@ play session, which is the entity whose identity persists.
 
 ---
 
-## Aggregates: The Boundary Around Consistency
+## What Validates Together, Lives Together
 
 Some entities do not stand alone. They exist in clusters where one entity is the root and the
 others are subordinates that only make sense within the cluster. Evans calls these
@@ -163,7 +175,7 @@ same thing.[^4]
 
 ---
 
-## Bounded Contexts: Where One Model's Vocabulary Ends
+## The Same Word Can Mean Two Different Things
 
 A large domain is rarely one coherent model. Different parts of the same organisation, or the
 same application, use the same words to mean subtly different things.
@@ -219,7 +231,7 @@ speaks both.[^6]
 
 ---
 
-## Repositories: The Gateway To Persistence
+## Ask For What You Need, Not How To Get It
 
 A **repository** is a domain-language interface for retrieving and storing domain objects.
 The key word is "domain-language": the repository speaks in terms of the domain, not in terms
@@ -240,7 +252,7 @@ other's storage reality.[^7]
 
 ---
 
-## D&D As A Well-Designed Domain
+## The Game Already Solved This
 
 The reason D&D maps onto these ideas so naturally is that D&D is itself a well-designed
 domain model. Decades of iteration by designers and millions of players have produced a
@@ -268,39 +280,39 @@ independently, decades earlier, and called the solutions by different names.[^8]
 
 ---
 
-## What This Means For How You Write Code
+## What This Looks Like In Practice
 
 Domain-driven design is not a collection of patterns to be applied mechanically. It is an
 attitude: the code's job is to represent the domain honestly. Every naming decision, every
 boundary, every interface is an opportunity to either reflect the domain faithfully or to
 obscure it under implementation concerns.
 
-Concretely, this means a few things.
+In practice, this comes down to a few questions you start asking by reflex.
 
 When you are naming a type, ask: what does the domain expert call this thing? Not what is
-technically accurate, not what is convenient to type, but what does the person who understands
-the business call it. If they call it a "saving throw", call it a saving throw. If they call
-it a "campaign session", call it a campaign session. The name in the code is a claim about
-the domain, and it should be an honest claim.
+technically accurate, not what is convenient to type, but what does the person who actually
+lives in this domain call it. If they call it a "saving throw", call it a saving throw. If
+they call it a "campaign session", call it a campaign session. The name in the code is a
+claim about the domain. It should be an honest claim.
 
 When you are drawing a module boundary, ask: where does the domain say the responsibility
 ends? The gamebook separates `graph.ts` from `state.ts` not because it is good module
 structure in the abstract, but because adventure validation and play-session management are
-genuinely different domain concerns. The domain's own boundaries suggest the code's
-boundaries.
+genuinely different domain concerns. The boundary in the code follows the boundary in the
+domain. If the domain does not draw a line there, you should be suspicious of the module.
 
 When you are writing validation, ask: what does the domain say is valid? The `Character`
 interface constrains `class` to four named values because the domain has four playable classes.
 The save document requires an `adventureId` because you cannot have a play session without an
-adventure. The validation rules are domain rules expressed in code, not arbitrary constraints
-invented by the programmer.
+adventure. These are not arbitrary technical constraints. They are domain rules, expressed in
+code.
 
-The test of a good domain model is whether a domain expert, someone who knows D&D but not
-TypeScript, could read the type definitions and recognise the things they describe. Not the
-code, just the types. If `interface Character` with its `abilityScores`, `maxHitPoints`,
-`armourClass`, `skillProficiencies`, and `inventory` looks like a character sheet to a D&D
-player, the model is honest. If it looks like a data structure that could be anything, the
-model has lost the thread.[^9]
+There is a test I find useful for checking whether a model has stayed honest. Take the type
+definitions and read them to a domain expert, someone who knows D&D but not TypeScript. Can
+they recognise the things being described? If `interface Character` with its `abilityScores`,
+`maxHitPoints`, `armourClass`, `skillProficiencies`, and `inventory` looks like a character
+sheet to a D&D player, the model is working. If it looks like a generic data structure that
+could represent anything, the model has drifted from the territory it was supposed to map.[^9]
 
 ---
 

@@ -206,11 +206,18 @@ written real content is a useful forcing function in the run-up to a release.[^2
 
 ---
 
-## Route Tests For What The Player Sees
+## Route Tests: Does The Door Actually Open
 
-Domain tests prove the logic. Route tests prove the interface: the HTML the player receives,
-the fragments that update when a choice is submitted, the redirects that follow an action,
-the routes that return 404 when they should.
+Domain tests prove the logic. They are the ledger-keeper, checking that items promised in
+one room arrive in the next, that the arithmetic of the combat round adds up. Route tests
+are the scout: they check whether the doors open. Not whether the room behind the door is
+interesting; whether the door opens at all, whether it goes somewhere, whether it refuses
+entry correctly when it should.
+
+In practice, route tests exercise the interface the player actually receives: the HTML
+rendered for a given URL, the fragment returned when a choice is submitted, the redirect
+that follows a state-changing action, the 404 that comes back when an unauthorised path
+is attempted.
 
 ```typescript
 // src/app.test.tsx
@@ -277,11 +284,17 @@ non-existence of something rather than its existence.[^3]
 
 ---
 
-## The Static Build And Artifact Check
+## The Static Build: What Actually Ships
 
-The published gamebook is not the development server. It is a set of generated files that a
-completely different runtime serves. The static build can fail in ways the development server
-does not: a missing asset, a wrong path, an incorrectly bundled client.
+The archivist in the test party reads every scroll for the Dungeon Master's private notes.
+Not because the Dungeon Master is untrustworthy, but because the scroll and the Dungeon
+Master's intentions are two different things, and what reaches the players is the scroll.
+
+The static build is the same distinction. The development server and the published gamebook
+are not the same thing. The development server knows everything: author routes, debug panels,
+forced navigation, the full client bundle. The published gamebook is a set of generated files,
+served by a different runtime, with none of that. The gap between the two is where a class of
+bugs lives that no amount of running the development server will catch.
 
 The static build gate runs the build script and checks the exit code. If it fails, the
 subsequent checks are meaningless: there is nothing to inspect.
@@ -484,7 +497,7 @@ the acknowledgement that code review cannot evaluate visual design from a text d
 
 ---
 
-## The Acceptance Note And Verification Summary
+## The Acceptance Note: Evidence, Not Assertion
 
 A test suite that passes is necessary but not sufficient for a release. What passes must
 also be documented: which tests ran, which gates passed, what was checked, and what was
@@ -527,9 +540,14 @@ summary: three lines at the end of the PR description.
 - Hyper-Dank compat: not required (no shared package changes)
 ```
 
-Command, result, totals. A note for anything that was not needed and why. A summary that
-says "tests pass" with no command or count is not evidence; it is an assertion. An
-assertion with receipts is evidence.[^7]
+Command, result, totals. A note for anything that was not needed and why. It takes thirty
+seconds to write and it means a reviewer looking at the PR two weeks later can verify what
+was actually checked, rather than taking the author's word for it. A summary that says "tests
+pass" with no command or count is an assertion. An assertion with receipts is evidence.[^7]
+
+I used to write "all tests passing ✓" in PR descriptions and feel quite good about it.
+I have since learned that this is the equivalent of the Dungeon Master saying "it's fine"
+before the test party goes in. Technically true, no verifiable content.
 
 ---
 
