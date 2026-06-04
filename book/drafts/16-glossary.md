@@ -170,7 +170,7 @@ State that has been written to persistent storage and will survive the process e
 ## E
 
 **Edge**
-In graph theory, a connection between two nodes. In a gamebook, a choice is an edge from one passage to another. In a website, a link is an edge. See also: *node*, *directed edge*.
+In graph theory, a connection between two nodes. In a gamebook, a choice is an edge from one passage to another. In a website, a link is an edge. Edges are the reason graphs are interesting: a set of nodes without edges is just a list, which is considerably less exciting and does not have its own branch of mathematics. See also: *node*, *directed edge*.
 
 **Encounter**
 In D&D and the gamebook, a structured conflict between the player character and one or more enemies, resolved through a turn-based loop of attack rolls, damage rolls, and outcome determination. Defined by authored data (enemy statistics); state tracked separately during play. See also: *EncounterState*, *combat loop*.
@@ -204,7 +204,7 @@ A compact adventure-design template giving each of five structural beats a disti
 Boolean facts about what has happened in a play session, stored as strings in `GameState.flags`. A flag is either set or not; it has no associated value. Once set, flags are permanent within a session: "the puzzle room has been solved" is a historical fact, not a current state that can be reversed. Contrast with items (which can be spent) and resources (which have quantities). See also: *GameState*, *conditions*.
 
 **Fragment**
-In the context of htmx and server-side rendering, a partial HTML response rather than a complete page document. When a player makes a choice in Mt. Graphnor, the server returns just the updated passage panel rather than a full page reload. The fragment is swapped into the correct position by htmx; the rest of the page is undisturbed.
+In the context of htmx and server-side rendering, a partial HTML response rather than a complete page document. When a player makes a choice in Mt. Graphnor, the server returns just the updated passage panel rather than a full page reload. The fragment is swapped into the correct position by htmx; the rest of the page is undisturbed. The appeal of fragments is the same as the appeal of a good dungeon door: it opens exactly the part of the wall you need, without requiring the entire dungeon to move.
 
 ---
 
@@ -345,7 +345,7 @@ In the gamebook, the injectable source of randomness for dice: a function return
 In graph theory, the question of whether a path exists from one node to another by following edges. In a gamebook, the critical reachability question is: can the player get from the start passage to this passage? An unreachable passage exists in the data but can never be encountered in play. The gamebook validator checks reachability as its primary structural concern. See also: *graph*, *node*, *breadth-first search*.
 
 **Record** (data structure)
-A named collection of related fields, each with a name, a type, and a set of allowed values. A character sheet is a record. TypeScript's `interface` keyword defines records. See also: *data model*, *interface*.
+A named collection of related fields, each with a name, a type, and a set of allowed values. A character sheet is a record. TypeScript's `interface` keyword defines records. The Scribe's instinct — that a Hero who "contains multitudes" still needs a number next to their name — is the correct instinct. Records are how software makes the multitudes legible. See also: *data model*, *interface*.
 
 **Record\<K, V\>** (TypeScript utility type)
 A TypeScript built-in that describes an object with exactly the keys of type `K`, each holding a value of type `V`. `Record<Ability, number>` is equivalent to writing out all six ability names as fields by hand, but safer: if you add a new ability, TypeScript will require a corresponding entry. See also: *closed vocabulary*, *interface*.
@@ -354,7 +354,7 @@ A TypeScript built-in that describes an object with exactly the keys of type `K`
 A function that takes a previous state and an event (or result) and returns the next state. Used in the gamebook to separate the calculation of a combat round result from the application of that result to the game state. Makes both parts independently testable. See also: *event loop*, *state machine*.
 
 **Refactoring**
-Changing the internal structure of a system without changing what it does from the outside. Safe to do when tests cover the external behaviour being preserved. The reason to have tests; the reason the tests must cover the right boundaries.
+Changing the internal structure of a system without changing what it does from the outside. Safe to do when tests cover the external behaviour being preserved. The reason to have tests; the reason the tests must cover the right boundaries. Chapter 13 contains a real example: renaming `AdventureNode` to `Passage` changed nothing the code did, and everything the code said.
 
 **Repository** (Domain-Driven Design)
 An abstraction over data access that presents a collection-like interface to domain code, hiding the storage details. Domain logic calls `getCharacter(id)`; the repository decides whether to query SQLite, a cache, or an in-memory store. Callers depend on the interface, not the implementation. Also makes testing significantly easier: swap the real repository for a test double and no database is required. See also: *dependency inversion principle*, *module*.

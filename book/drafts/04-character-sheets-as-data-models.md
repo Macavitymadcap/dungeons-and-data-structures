@@ -271,7 +271,9 @@ species, background and class are not written on the sheet in cramped handwritin
 a neat space. Instead, each is a card that comes with the full set of the game, or available to
 print  online for the less economically endowed. This allows the player to manage a load out of
 abilities, each a separate item that can be shared between the table easily rather than having
-to look it up in a book or decipher someone's handwriting.
+to look it up in a book or decipher someone's handwriting. In data modelling terms, each card
+is a stored fact with its own identity: the sheet references the cards; it does not contain
+them. The character's capabilities are derived from what they hold, not written into who they are.
 
 Video games face a version of the same problem. Skyrim's character model derives almost all of
 its numbers from a single stored fact: the level of each individual skill. One-handed, Archery,

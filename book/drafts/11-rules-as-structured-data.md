@@ -388,6 +388,40 @@ and governed by different licence obligations.
 
 ---
 
+## From Prose To Panel: A Single Rule's Journey
+
+It is worth tracing one rule the full distance, because the individual pieces are easy to
+follow and the chain is easy to lose.
+
+The SRD states, in plain prose: a shield provides a +2 bonus to Armour Class. That sentence
+is useful at a table. It is not useful to code that needs to know whether a character is
+wearing a shield and what to add to their AC calculation.
+
+Turned into a catalogue record, the same rule looks like this:
+
+```typescript
+{
+  id: "shield",
+  name: "Shield",
+  sourceId: "srd-5-1-cc",
+  kind: "equipment",
+  category: "armour",
+  armourClassBonus: 2,
+}
+```
+
+That record goes into `EQUIPMENT_RULES` in `src/gamebook/rules/srd.ts`. When the adventure
+catalogue references `"shield"` as a starting item, the adventure validator checks that the
+id exists in `EQUIPMENT_RULES` and that its `sourceId` matches a known `RuleSource`. When
+the published gamebook renders its attribution panel, `gamebookRuleAttributions()` finds the
+`"srd-5-1-cc"` source and includes the required attribution string automatically.
+
+The SRD prose became a typed record. The typed record connected to a source. The source
+carried its licence. The licence generated the attribution. The whole chain runs from one
+entry in one catalogue file.
+
+---
+
 ## The Build Move
 
 By the end of this chapter, the gamebook has an explicit, attributed rules catalogue:
