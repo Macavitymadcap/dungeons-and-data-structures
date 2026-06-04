@@ -259,6 +259,15 @@ looking for. The code examples are written in TypeScript[^7] and run on the Bun 
 but the concepts don't require TypeScript. If you read JavaScript, most examples will translate
 without difficulty.
 
+A word on what this book assumes. It is not a book for complete beginners to programming: by
+Chapter 3 it expects that HTML, HTTP verbs, and the idea of a form submission are familiar
+territory, and by Chapter 4 it expects TypeScript interface notation to be readable without
+introduction. What it does not assume is any prior exposure to formal software design: no
+computer science degree, no bootcamp, no previous encounter with graphs, data models,
+composition, or domain-driven design. The intended reader has some web experience, has written
+code that does something useful, and has started to suspect there are better ways to organise
+it. If that describes you, you are in the right place.
+
 A reasonable question at this point is why a gamebook at all. Text adventures were some of the
 earliest computer games precisely because of technical constraints, but what they demonstrated,
 even in their constraints, was something a physical Fighting Fantasy book could never show: complex
@@ -268,7 +277,7 @@ vehicle because it *is* software in its most legible form. What the player exper
 the developer experiences as a graph traversal over a state machine with a persistence layer. Put
 it that way and the comparison sounds dry. Play it and it doesn't. I grew up with Fighting Fantasy
 before graduating to D&D and computers, and as I approach middle age I believe I am allowed a
-certain amount of nostalgia. At any rate, it's considerably cheaper than a sports car.
+certain amount of nostalgia.
 
 A second reasonable question is why this particular stack: TypeScript, Bun, Hono, htmx, SQLite.
 They are not the objectively optimal tools for any specific task, and I wouldn't claim they are.

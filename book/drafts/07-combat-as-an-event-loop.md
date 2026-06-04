@@ -6,32 +6,20 @@
 >
 > The Hourglass had been standing at the back of the room. Impressive, given it didn't have legs.
 >
-> "You're doing it wrong," it said.
+> Around the table, the fight had descended into pleasant chaos: a player was mid-gesture
+> demonstrating how her character would sweep the goblin's legs, two others were arguing about
+> who had gone last, and the fourth was off on a grand quest to find tortilla chips and guacamole.
 >
-> The Dungeon Master turned. Around the table, the fight had descended into pleasant chaos: a
-> player was mid-gesture demonstrating how her character would sweep the goblin's legs, two
-> others were arguing about who had gone last, and the fourth off on a grand quest to find tortilla
-> chips and guacamole.
->
-> "Time," said the Hourglass, "moves through events, not through people shouting."
->
-> "Yes," said the Dungeon Master, "but..."
->
-> "One event. Resolved completely. Then the next. Nothing overlaps. Nothing left half done.
-> Petra declares her action. The action resolves. We learn the outcome. *Then* Rowan's turn."
->
-> "That's what I've been..."
->
-> "The goblin is currently mid-swing, mid-fall, mid-shout, and mid-negotiation simultaneously.
-> Not exactly a coherent state of affairs, is it?"
+> "The goblin," said the Hourglass, "is currently mid-swing, mid-fall, mid-shout, and
+> mid-negotiation simultaneously."
 >
 > The Dungeon Master looked at the table. The goblin miniature had, through incremental
 > repositioning during the argument, ended up somehow behind the cart it had been standing in
 > front of.
 >
-> "Right," said the Dungeon Master. "From the top. One at a time."
+> The Hourglass turned itself over.
 >
-> "Thank you," said the Hourglass, and turned itself over.
+> The Dungeon Master flipped the table.
 
 ---
 
@@ -557,13 +545,6 @@ D&D is, when you strip it back, improvised comedy with tactical wargaming bolted
 chivalry instinct matters there too, whatever the initiative order says. The difference is
 that the initiative roll gives the Dungeon Master a mechanical procedure to point to: not
 yet, Brandavar, Rowan has higher initiative.
-
-The gamebook skips all of this, for the same reason it skips multi-monster encounters,
-reactions, opportunity attacks, and action economy: each is a real and interesting feature
-of tabletop combat, and each one adds complexity the beginner implementation does not yet
-need. The `rounds` counter in `EncounterState` exists as a hook for future development:
-if a later design requires initiative-ordered turns, that counter becomes the baseline for
-tracking where in a full round the encounter sits.[^8]
 
 ---
 

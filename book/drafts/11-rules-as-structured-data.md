@@ -27,9 +27,6 @@
 > is a policy decision, and it belongs to you."
 >
 > "Then what good are you?"
->
-> "I know the provenance of every rule in this library," said the Archivist. "Without provenance,
-> you cannot make the policy decision either. You just pick a book and hope."
 
 ---
 

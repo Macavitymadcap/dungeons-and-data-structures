@@ -69,7 +69,7 @@ it. The chapter you're reading is what I wish I'd understood first.
 
 ## What A Class Actually Is
 
-A **class** in TypeScript (and in most object-oriented languages[^1]) is a template for creating
+A **class** in TypeScript (and in most object-oriented languages) is a template for creating
 objects that bundle data and behaviour together. Where an interface describes only the *shape* of
 data, a class also provides **methods**: functions that operate on that data and belong to the
 object itself.

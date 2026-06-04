@@ -355,10 +355,10 @@ about JavaScript frameworks.
 [^5]: htmx does let you make any HTML element send requests, but just because you can, doesn't
 mean you should. `<button>`, `<a>`, `<form>` and similar elements are designed to trigger requests,
 and semantically they indicate this. `<div>`, `<span>`, `<tr>` and other elements are semantically
-inert. They are not intended to to call an API and do not signify this accordingly. Ideally htmx
+inert. They are not intended to call an API and do not signify this accordingly. Ideally htmx
 should only be applied to those elements that are intended to make requests, and this is what the
-maintainers of the library recommend. In fact, their 
-[proposal to update native HTML elements](https://triptychproject.org/?utm_source=chatgpt.com)
+maintainers of the library recommend. In fact, their
+[proposal to update native HTML elements](https://triptychproject.org/)
 only mentions updating the `<form>` and `<button>` elements.
 
 [^6]: HTTP status codes are organised into five families, each covering a different kind of

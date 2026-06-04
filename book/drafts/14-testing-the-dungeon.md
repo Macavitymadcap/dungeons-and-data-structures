@@ -21,11 +21,11 @@
 > "The test party," said the Dungeon Master, "can go in."
 >
 > The test party was not glamorous. It consisted of a scout who checked whether each door
-> opened, a ledger-keeper who verified that no item promised in one room was missing from the
-> next, a retreating fighter who confirmed that defeat led somewhere coherent, a reader with
-> poor eyesight who checked whether the public handout was legible in dim light, and a
-> suspicious archivist who read every scroll looking for the Dungeon Master's private notes
-> on what would happen three rooms later.
+> opened, a ledger-keeper who verified that no treasure promised in one chamber was missing
+> from the next, a retreating fighter who confirmed that defeat led somewhere coherent, a
+> herald who checked whether the entrance proclamation was legible by torchlight, and a
+> suspicious archivist who read every scroll looking for mechanisms the dungeon had not
+> declared to its visitors.
 >
 > They went in. They came out. The Chronicler read the report.
 >

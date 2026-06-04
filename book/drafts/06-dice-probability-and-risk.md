@@ -453,10 +453,7 @@ wins, loses, or runs. That loop is the subject of Chapter 7.
 
 ---
 
-[^1]: A personal bugbear of mine; the singular of *die* and the plural is *dice*. I see and hear it
-confused so often that it has become a sort of pavlovian response to shudder at the site of it. I 
-swear I am not a grammar Nazi, but it really isn't that hard to get it right. If you need an easy way
-of remembering it, just think 'Unless you have passengers, you die alone'.
+[^1]: The singular is *die* and the plural is *dice*. Easy way to remember it: unless you have passengers, you die alone.
 
 [^2]: *Chainmail* (1971) by Gary Gygax and Jeff Perren was a medieval miniatures wargame published
 by Guidon Games. Its "Fantasy Supplement" chapter introduced monsters, heroes, and spells,

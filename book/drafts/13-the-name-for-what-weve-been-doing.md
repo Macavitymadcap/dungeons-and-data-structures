@@ -4,34 +4,29 @@
 
 > **The Scribe and the Wizard**
 >
-> The Scribe had been modelling the campaign for three years. Character records with
+> The Scribe had been keeping the ledger for three years. Hero chronicles with
 > closed categories: sword-sworn, shadow-walker, scripture-bearer, no column for
-> "multitudes". Scores that produced modifiers by formula. A curtain between what the
-> players' sheets showed and what sat behind the Dungeon Master's screen. A rule that
-> said the campaign ledger was the truth of what had happened in sessions, and the
-> sessions were the truth of what the characters had done, and the characters' sheets
-> were the truth of what the characters could do.
+> "multitudes". Tallies that produced standings by formula. A curtain between what the
+> heroes' chronicles showed and what sat behind the Dungeon Master's screen. A rule that
+> said the great ledger was the truth of what had happened on the road, and the road was
+> the truth of what the heroes had done, and the chronicles were the truth of what the
+> heroes could do.
 >
 > The Scribe had arrived at all of this by instinct and necessity, without any particular
 > vocabulary for it.
 >
-> "There is a name for what you have been doing," said the Wizard.
+> The Wizard looked at the ledger for a long time.
 >
-> "Is there."
+> "The names you use," she said at last. "They are the same names the heroes use."
 >
-> "The names in your ledger are the names the players use at the table. The boundaries you have
-> drawn between what the campaign knows, what the session knows, and what each character knows
-> are the boundaries that already exist in the telling of it. You did not invent a private order
-> and force the world into it. You listened to the world and wrote down the order it already
-> had." The Wizard set a book on the desk. It was blue, and heavy. "There are scholars who have
-> studied this. They have a phrase for it."
+> "Of course," said the Scribe. "What other names would I use?"
 >
-> The Scribe looked at the book, then at the ledger of campaign records, then at the Wizard.
+> The Wizard set a book on the desk. It was blue, and heavy.
 >
-> "And I have been doing it for three years without the book."
+> "What is it?" said the Scribe.
 >
-> "Most people do," said the Wizard. "The book is for when you want to talk to other people
-> about it."
+> The Wizard said nothing. The Scribe looked at the ledger, then at the book, then back
+> at the ledger.
 
 ---
 

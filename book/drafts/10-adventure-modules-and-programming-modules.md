@@ -36,15 +36,7 @@
 > The Scribe considered this. The ledger was very large, and the Scribe was, now that the
 > question had been raised, not entirely certain where the Fogged Marshes map was.
 >
-> "Separate shelves," said the Archivist. "Maps on the maps shelf. Laws on the laws shelf.
-> Hero chronicles on their own shelf, indexed by country of hero's origin. Each shelf knows 
-> its own business and nothing else. When you want the map, you go to the map shelf. You do 
-> not have to know anything about the laws shelf to find it."
->
-> "And if something belongs on more than one shelf?"
->
-> "Then you decide which shelf owns it," said the Archivist, "and you put a reference on the
-> other."
+> "The map," said the Archivist. "Of the Fogged Marshes."
 
 ---
 
