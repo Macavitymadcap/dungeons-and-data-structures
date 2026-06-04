@@ -124,8 +124,8 @@ look like:
 ```
 
 Checking whether the requirement is satisfied is a membership question: is this id in the
-inventory array? The function `requirementsMet` in `src/gamebook/state.ts` does this check
-before `isChoiceAvailable` decides whether to show the option to the player.
+inventory array? The function `isChoiceAvailable` in `src/gamebook/state.ts` runs this check
+and decides whether to show the option to the player.
 
 For this pattern, a `Set` would be more efficient than an array: `Set.has(id)` is O(1), while
 `Array.includes(id)` is O(n) over every item in the pack. The gamebook converts the inventory
@@ -307,6 +307,16 @@ function isChoiceAvailable(
     if (state.hitPoints < req.minHitPoints) return false;
   }
 
+  if (req.conditionsAll) {
+    const conditions = new Set(state.conditions);
+    if (!req.conditionsAll.every(condition => conditions.has(condition))) return false;
+  }
+
+  if (req.conditionsNone) {
+    const conditions = new Set(state.conditions);
+    if (req.conditionsNone.some(condition => conditions.has(condition))) return false;
+  }
+
   return true;
 }
 ```
@@ -448,11 +458,12 @@ By the end of this chapter, the gamebook has a working inventory and flags layer
 
 - `ItemDefinition` in `src/gamebook/model.ts` defines the catalogue shape: `id`, `name`,
   `kind`, and an optional `sourceId` for SRD-derived or project-original items.
-- `ChoiceRequirement` in `src/gamebook/model.ts` gates choices on `itemsAll` (a list of
-  required item ids), `flags` (required flag ids), and `minHitPoints`.
+- `ChoiceRequirement` in `src/gamebook/model.ts` gates choices on `itemsAll` (required item
+  ids), `flagsAll` and `flagsNone` (required and forbidden flags), `conditionsAll` and
+  `conditionsNone` (required and forbidden conditions), and `minHitPoints`.
 - `ChoiceEffect` in `src/gamebook/model.ts` applies `addItems`, `removeItems`, `setFlags`,
   and hit point changes when a choice is taken.
-- `isChoiceAvailable(choice, state, adventure)` in `src/gamebook/state.ts` checks all
+- `isChoiceAvailable(choice, state)` in `src/gamebook/state.ts` checks all
   requirements and returns `false` if any are unmet, hiding the choice from the player.
 - `applyChoiceEffects(state, effects)` in `src/gamebook/state.ts` converts the inventory to
   a `Set`, applies additions and removals, serialises back to an array, sets flags, and

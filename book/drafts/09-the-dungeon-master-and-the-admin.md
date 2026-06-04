@@ -284,8 +284,10 @@ repository query must filter the response based on the viewer's role:
 ```typescript
 function listNpcSummariesForCampaign(
   campaignId: string,
+  viewerId: string,
   viewerRole: CampaignMemberRole
 ): NpcSummary[] {
+  const npcs = getCampaignNpcs(campaignId);
   return npcs.filter(npc => {
     if (npc.visibility === "public") return true;
     if (npc.visibility === "selected_player") {

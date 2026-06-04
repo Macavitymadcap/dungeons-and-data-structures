@@ -120,7 +120,7 @@ gaining equipment, levelling up, or changing conditions. The identity is what ma
 attributes are what describe the current state of that identity. In code, entities have ids.
 
 A **value object** is something defined entirely by its attributes, with no meaningful
-independent identity. A damage roll is a value object: `{ dice: 1, sides: 8, modifier: 3,
+independent identity. A damage roll is a value object: `{ count: 1, sides: 8, modifier: 3,
 type: "slashing" }`. Two damage rolls with the same values are interchangeable. There is no
 meaningful sense in which the damage roll from Tuesday's session is a different object from
 an identical damage roll on Wednesday. Value objects can be copied, compared by value, and
@@ -234,7 +234,7 @@ of the storage technology.
 
 Campaign Ledger defines repository interfaces like `CharacterRepository`, `CampaignRepository`,
 and `RulesRepository`. These interfaces say things like `getCharacter(id)`,
-`listNpcSummariesForCampaign(campaignId, viewerRole)`, and `updateResourceCurrent(resourceId,
+`listNpcSummariesForCampaign(campaignId, viewerId, viewerRole)`, and `updateResourceCurrent(resourceId,
 delta)`. They do not say `SELECT * FROM characters WHERE id = ?`. The domain logic knows what
 it needs; the repository knows how to get it. The SQLite implementation satisfies the
 repository interface without the routes or domain modules ever knowing SQLite is involved.

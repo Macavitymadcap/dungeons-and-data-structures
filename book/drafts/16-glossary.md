@@ -117,7 +117,10 @@ The fundamental resolution mechanic in D&D: roll a twenty-sided die, add a modif
 A directed graph with no cycles: every path through it moves forward, with no way to return to a previously visited node via the same route. Most gamebooks are DAGs, or close to them. The abbreviation sounds like something lurking in a dungeon, which is appropriate. See also: *directed graph*, *acyclic*.
 
 **Damage Roll**
-In D&D, the roll that determines how much damage a successful attack deals. Separate from the attack roll. A longsword deals 1d8 damage; a dagger 1d4. In the gamebook, represented as a `DamageRollResult` with the notation, individual rolls, modifier, and total. See also: *attack roll*, *DamageRollResult*.
+In D&D, the roll that determines how much damage a successful attack deals. Separate from the attack roll. A longsword deals 1d8 damage; a dagger 1d4. In the gamebook, represented as a `DamageRollResult` with the notation, individual rolls, modifier, and total. See also: *attack roll*, *DamageExpression*, *DamageRollResult*.
+
+**DamageExpression**
+The value object the gamebook uses to describe a quantity of damage: a dice `count`, the number of `sides` per die, a flat `modifier`, and a damage `type`. `{ count: 1, sides: 8, modifier: 3, type: "slashing" }` is a longsword hit from a Strength +3 fighter. The human-readable form (`1d8+3`) is derived from it for display, not stored. See also: *damage roll*, *DamageRollResult*, *value object*.
 
 **DamageRollResult**
 The structured type in the gamebook that records a completed damage roll: the notation (`"1d8+2"`), all individual dice rolled, the modifier, and the total. See also: *damage roll*, *RollResult*.

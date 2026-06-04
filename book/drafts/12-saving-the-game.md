@@ -137,7 +137,7 @@ interface GameState {
   inventory: string[];
   flags: string[];
   encounters: Record<string, EncounterState>;
-  log: GameLogEntry[];
+  log: string[];
   updatedAt: string;
 }
 ```

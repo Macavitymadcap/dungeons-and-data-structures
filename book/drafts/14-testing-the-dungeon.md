@@ -150,10 +150,10 @@ test("reports an unreachable passage", () => {
 
   // Assert
   expect(issues).toContainEqual(
-    expect.objectContaining({ code: "dead-end", passageId: "orphan" })
+    expect.objectContaining({ code: "empty-passage", passageId: "orphan" })
   );
   expect(issues).toContainEqual(
-    expect.objectContaining({ code: "unreachable", passageId: "orphan" })
+    expect.objectContaining({ code: "unreachable-passage", passageId: "orphan" })
   );
 });
 ```

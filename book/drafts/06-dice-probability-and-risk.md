@@ -311,7 +311,37 @@ both dice, so the player can see what the unchosen die showed.
 
 Attack rolls are d20 checks against armour class. Damage rolls are a separate kind of roll:
 not a threshold comparison, but a quantity. When a fighter hits with a longsword, they roll a
-`1d8` and add their Strength modifier. The result is how many hit points the target loses.
+single eight-sided die for the weapon and add their Strength modifier. The result is how many
+hit points the target loses.
+
+A damage roll has no identity of its own. It is defined entirely by its parts: how many dice,
+of what size, with what bonus, dealing what kind of harm. A thing defined wholly by its
+attributes is a **value object**, a small bundle of data that can be copied, compared, and
+replaced without ceremony. The gamebook describes one as a `DamageExpression`:
+
+```typescript
+type DamageType =
+  | "bludgeoning"
+  | "piercing"
+  | "slashing"
+  | "fire"
+  | "cold"
+  | "lightning"
+  | "hit points";
+
+interface DamageExpression {
+  count: number;
+  sides: number;
+  modifier: number;
+  type: DamageType;
+}
+```
+
+A longsword swing from a Strength +3 fighter is `{ count: 1, sides: 8, modifier: 3, type:
+"slashing" }`: one eight-sided die, a flat +3, dealing slashing damage. The familiar dice
+notation `1d8+3` is a human-readable label derived from this object, not the object itself.
+Keeping the structured form as the source of truth means nothing ever has to parse a string to
+discover how many dice to roll or what kind of damage they deal.
 
 ```typescript
 interface DamageRollResult {
@@ -321,28 +351,28 @@ interface DamageRollResult {
   total: number;
 }
 
+function formatDamage(expr: DamageExpression): string {
+  const dice = `${expr.count}d${expr.sides}`;
+  if (expr.modifier === 0) return dice;
+  return expr.modifier > 0 ? `${dice}+${expr.modifier}` : `${dice}${expr.modifier}`;
+}
+
 function rollDamage(
-  notation: string,
-  modifier: number,
+  expr: DamageExpression,
   rng: RandomSource = Math.random
 ): DamageRollResult {
-  const match = notation.match(/^(\d+)d(\d+)$/);
-  if (!match) throw new Error(`Invalid damage notation: ${notation}`);
-
-  const count = parseInt(match[1], 10);
-  const sides = parseInt(match[2], 10);
-  // Array.from with a length and a mapping function creates an array of `count` items,
+  // Array.from with a length and a mapping function creates an array of `expr.count` items,
   // each produced by calling the function once. It is the standard way to roll a pool of dice.
-  const rolls = Array.from({ length: count }, () => rollDie(sides, rng));
-  const total = rolls.reduce((sum, d) => sum + d, 0) + modifier;
+  const rolls = Array.from({ length: expr.count }, () => rollDie(expr.sides, rng));
+  const total = rolls.reduce((sum, die) => sum + die, 0) + expr.modifier;
 
-  return { notation: `${notation}${modifier >= 0 ? "+" : ""}${modifier}`, rolls, modifier, total };
+  return { notation: formatDamage(expr), rolls, modifier: expr.modifier, total };
 }
 ```
 
-Damage notation is a small domain-specific language: `1d6` means one six-sided die, `2d8` means
-two eight-sided dice, and so on. The function parses the notation, rolls the specified dice,
-and returns the result with enough structure for both rendering and logging.
+The `DamageExpression` is the structured description; `formatDamage` turns it into the `1d8+3`
+label for display and logging; `rollDamage` rolls it and returns a `DamageRollResult`. Because
+the notation is generated from the object, the two can never disagree.
 
 ---
 
@@ -424,9 +454,13 @@ By the end of this chapter, the gamebook has a working dice layer:
   mode, and an injectable random source. The `notation` field uses standard dice notation:
   `1d20+3` for a normal check, `2d20kh1+3` for advantage (two d20s, keep highest), and
   `2d20kl1+3` for disadvantage (two d20s, keep lowest).
-- `DamageRollResult` records the dice rolls, modifier, and total for a damage roll.
-- `rollDamage(notation, modifier, rng)` parses notation like `"1d8"` or `"2d6"`, rolls the
-  specified dice, and returns a `DamageRollResult`.
+- `DamageType` is a union of the damage categories the gamebook uses, including `"slashing"`,
+  `"bludgeoning"`, and `"hit points"` for hit dice.
+- `DamageExpression` is the value object describing a damage roll: a dice `count`, the number
+  of `sides`, a flat `modifier`, and a damage `type`.
+- `formatDamage(expr)` renders a `DamageExpression` as its human-readable label (`"1d8+3"`).
+- `DamageRollResult` records the notation, the individual dice rolled, the modifier, and the total.
+- `rollDamage(expr, rng)` rolls a `DamageExpression` and returns a `DamageRollResult`.
 
 These live in `src/gamebook/rules/dice.ts`. The choice resolution in `src/gamebook/play.ts`
 calls `rollD20Check` to resolve any choice that carries a check. The combat loop in Chapter 7

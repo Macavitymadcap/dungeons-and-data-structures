@@ -77,7 +77,7 @@ interface EquipmentRule extends NamedRule {
   kind: "equipment";
   category: "armour" | "weapon" | "adventuring-gear" | "tool";
   armourClassBonus?: number;
-  damageDice?: string;
+  damage?: DamageExpression;
 }
 ```
 
@@ -158,7 +158,7 @@ The gamebook keeps these at the level of detail it actually needs. The SRD catal
 ```typescript
 interface ClassRule extends NamedRule {
   kind: "class";
-  hitDie: DamageRoll;
+  hitDie: DamageExpression;
   primaryAbility: Ability;
   spellcastingAbility?: Ability;
 }
@@ -169,7 +169,7 @@ const CLASS_RULES: ClassRule[] = [
     name: "Fighter",
     sourceId: "srd-5-1-cc",
     kind: "class",
-    hitDie: { dice: 1, sides: 10, modifier: 0, type: "hit points" },
+    hitDie: { count: 1, sides: 10, modifier: 0, type: "hit points" },
     primaryAbility: "strength",
   },
   {
@@ -177,7 +177,7 @@ const CLASS_RULES: ClassRule[] = [
     name: "Wizard",
     sourceId: "srd-5-1-cc",
     kind: "class",
-    hitDie: { dice: 1, sides: 6, modifier: 0, type: "hit points" },
+    hitDie: { count: 1, sides: 6, modifier: 0, type: "hit points" },
     primaryAbility: "intelligence",
     spellcastingAbility: "intelligence",
   },
@@ -185,8 +185,8 @@ const CLASS_RULES: ClassRule[] = [
 ];
 ```
 
-The `hitDie` field uses `DamageRoll` from Chapter 6 rather than a bare number, because the
-same dice notation type is used consistently throughout the gamebook's rules. The catalogue
+The `hitDie` field uses `DamageExpression` from Chapter 6 rather than a bare number, because the
+same dice value object is used consistently throughout the gamebook's rules. The catalogue
 contains the minimum the code actually reads: the hit die for calculating starting hit points,
 the spellcasting ability for any future spell mechanics.[^2]
 

@@ -241,6 +241,12 @@ Rather than a `Wizard` class that extends `Character` and adds spellcasting, the
 `CharacterTemplate` record that describes everything a starting Wizard needs:
 
 ```typescript
+interface AttackProfile {
+  name: string;
+  attackBonus: number;
+  damage: DamageExpression;
+}
+
 interface CharacterTemplate {
   class: CharacterClass;
   maxHitPoints: number;
@@ -256,9 +262,17 @@ const WIZARD_TEMPLATE: CharacterTemplate = {
   armourClass: 11,
   skillProficiencies: ["arcana", "history"],
   inventory: ["spellbook", "quarterstaff"],
-  attack: { name: "Quarterstaff", bonus: 2, damageDice: "1d6", damageType: "bludgeoning" },
+  attack: {
+    name: "Quarterstaff",
+    attackBonus: 2,
+    damage: { count: 1, sides: 6, modifier: 0, type: "bludgeoning" },
+  },
 };
 ```
+
+The `attack` here is an `AttackProfile`: a name, an attack bonus, and a `damage` value. That
+`damage` is a small dice value object, `DamageExpression`, which Chapter 6 defines in full; for
+now, read it as a single six-sided die of bludgeoning damage.
 
 There is no inheritance. There is no `extends`. There is data describing what a Wizard starts
 with, and a `createCharacter` function that combines a template with a name and a race to

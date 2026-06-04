@@ -150,9 +150,9 @@ a result that describes everything that happened:
 interface CombatRoundResult {
   encounterId: string;
   round: number;
-  playerAttackRoll: RollResult;
+  playerAttack: RollResult;
   playerDamage?: DamageRollResult;
-  monsterAttackRoll?: RollResult;
+  monsterAttack?: RollResult;
   monsterDamage?: DamageRollResult;
   monsterHitPoints: number;
   playerHitPoints: number;
@@ -203,6 +203,7 @@ function resolveCombatRound({
       playerDamage: playerResult.damage,
       monsterHitPoints: 0,
       playerHitPoints: state.hitPoints,
+      playerTemporaryHitPoints: state.temporaryHitPoints,
       outcome: "victory",
       log: playerResult.log,
     };
