@@ -463,7 +463,9 @@ By the end of this chapter, the gamebook has an explicit author/player boundary:
 Campaign Ledger contributes the mature parallel: `requireCampaignAccess`,
 `requireSheetAccess`, and the NPC visibility filter in `src/campaign/npc.ts` are the
 production-scale versions of the same ideas, handling authenticated sessions, campaign
-membership, ownership, and representation-level data filtering.
+membership, ownership, and representation-level data filtering. The full guard library and
+permission-matrix test suite are in the repository rather than reproduced here; the extract
+shown in this chapter is representative of the pattern, not the complete implementation.
 
 ---
 

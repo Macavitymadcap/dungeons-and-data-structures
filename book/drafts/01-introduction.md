@@ -212,8 +212,7 @@ after many years, many tutorials, and a career change. It is a private, locally 
 run for my own table: character sheets, session notes, NPC dossiers, rules references, staged
 imports, player-safe publishing, role-based access, and a deployment posture with accessibility
 checks, smoke tests, screenshots, and acceptance notes. It handles real users and real sessions.
-It is not a public product; it exists for the four or five people who play D&D in my living room.
-But it is built with the same care as something that would be public, and that care is the point.
+It is not a public product, and was never intended to be. It is built with the same care as something that would be, and that care is the point.
 
 Where Mt. Graphnor is small enough to hold in your head all at once, Campaign Ledger is large
 enough to show how the same ideas grow under real-world pressure. When a chapter needs a

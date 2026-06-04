@@ -409,7 +409,9 @@ By the end of this chapter, the gamebook has an explicit, attributed rules catal
 The adventure validation in `src/gamebook/graph.ts` checks that every item's `sourceId`
 matches a known `RuleSource`, and `srd.test.ts` verifies that the SRD source has the correct
 metadata, that the catalogue entries cover the playable character model, and that character
-template inventory references catalogued equipment.
+template inventory references catalogued equipment. The condition model and the full entity
+and mechanic type hierarchy are in the repository; this chapter shows the structural pattern
+rather than the complete catalogue.
 
 ---
 

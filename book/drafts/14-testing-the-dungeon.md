@@ -630,6 +630,11 @@ By the end of this chapter, the gamebook has an explicit, layered verification p
   graph validation and template coverage, making testing visible as part of the authoring
   workflow.
 
+The full `TEST_COVERAGE_AREAS` structure, the complete `scripts/check-static.ts` assertions,
+and the Playwright session walkthrough in `scripts/test-static-gamebook.ts` are in the
+repository rather than reproduced here; the extracts in this chapter show the shape of each
+approach rather than the complete listings.
+
 The accessibility posture is described here and is a clear next step: Pa11y targeting WCAG
 2.2 AA for the player-facing routes, added to the verify pipeline alongside the existing
 gates.
