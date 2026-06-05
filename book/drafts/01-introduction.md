@@ -168,7 +168,8 @@ This book is roughly five years of self-directed learning, written down in a for
 follow.
 
 I came to software development not through a degree programme or a bootcamp, but through a
-spreadsheet that needed one more thing. The route was crooked, largely unmapped, occasionally backtracked. The map in this book is made in retrospect.
+spreadsheet that needed one more thing. The route was crooked, largely unmapped, occasionally
+backtracked. The map in this book is made in retrospect.
 
 It is concept-led and beginner-friendly. Each chapter teaches one idea from computer science or
 software engineering, grounds it in an RPG or gamebook analogy, and connects it to working code.
@@ -212,13 +213,17 @@ after many years, many tutorials, and a career change. It is a private, locally 
 run for my own table: character sheets, session notes, NPC dossiers, rules references, staged
 imports, player-safe publishing, role-based access, and a deployment posture with accessibility
 checks, smoke tests, screenshots, and acceptance notes. It handles real users and real sessions.
-It is not a public product, and was never intended to be. It is built with the same care as something that would be, and that care is the point.
+It is not a public product, and was never intended to be. It is built with the same care as something
+that would be, and that care is the point.
 
 Where Mt. Graphnor is small enough to hold in your head all at once, Campaign Ledger is large
 enough to show how the same ideas grow under real-world pressure. When a chapter needs a
 beginner-sized example, it uses Mt. Graphnor. When it needs to show the same idea surviving
 contact with a real application, it uses Campaign Ledger. The two don't require you to understand
-both at once.
+both at once. When a Campaign Ledger section moves into SQL schemas, repository interfaces, or bounded 
+contexts without stopping to introduce them, that's intentional: those sections are aimed at the reader 
+who already has some of that ground. Read past them and the concept still lands from the gamebook side;
+come back when the territory feels more familiar and they'll read differently.
 
 ---
 

@@ -315,24 +315,15 @@ covers it.[^5]
 
 ## The Rules Page As A Product Feature
 
-Rules provenance is not just a data-integrity concern. In Campaign Ledger, it has become a
-visible product feature.
+Rules provenance is not just a data-integrity concern. In Campaign Ledger, the source model
+connects directly to access control: a rule's `visibility` and `publicExportEligible` fields
+determine how it participates in browsing, searching, and exporting. The data model encodes
+a policy, and the UI expresses it. Adding a new rules source is a product decision, not
+just a data operation.
 
-The rules reference page filters by source category, entity type, equipment category, and
-spell level. A player browsing for spells sees only SRD-eligible spells. A game master
-browsing within a campaign can also see campaign-scoped rules from imported supplements.
-The visibility filtering is the same filter from the access control layer: the reader's
-context determines what they see, and the source's visibility category determines whether
-it appears in that context.
-
-This means that adding a new rules source to Campaign Ledger is not just a data operation.
-It is a product decision: the source's `contentCategory`, `visibility`, and
-`publicExportEligible` fields determine how its rules participate in browsing, searching, and
-exporting. The data model encodes a policy, and the UI expresses it.
-
-The gamebook's smaller version of this is the attribution panel: a section of the published
-gamebook that lists every source, its licence, and the required attribution text. This panel
-is generated from `RULE_SOURCES`, filtered to sources actually used by the current adventure.
+The gamebook's version of this is the attribution panel: a section of the published gamebook
+that lists every source, its licence, and the required attribution text. This panel is
+generated from `RULE_SOURCES`, filtered to sources actually used by the current adventure.
 It is produced automatically rather than written by hand, which means it stays accurate as
 the adventure's content evolves. Adding a new SRD-derived item to the adventure catalogue
 automatically adds its source to the attribution list.

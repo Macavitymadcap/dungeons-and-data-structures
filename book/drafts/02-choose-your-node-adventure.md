@@ -17,14 +17,14 @@
 >
 > "Look at the passages," said the Cartographer.
 >
-> The chamber sat at the meeting of four beautifully drawn corridors. Each  one, on closer inspection,
+> The chamber sat at the meeting of four beautifully drawn corridors. Each one, on closer inspection,
 > led *to* the chamber from somewhere else. Not one led *away* from anywhere that could be reached from
 > the entrance.
 >
 > "It's on the map," said the Adventurer.
 >
 > "Aye," said the Cartographer. "It exists. It has walls, a floor, a ceiling, presumably some answers. 
-> But How do you get in? There's no path to it from the door we came in by. We'd have to begin inside 
+> But how do you get in? There's no path to it from the door we came in by. We'd have to begin inside 
 > it."
 >
 > "Then why is it on the map?"
@@ -443,7 +443,11 @@ not tree-ness.
 stores roughly 600 connections. An adjacency matrix stores 200 x 200 = 40,000 cells, most of them
 empty. For sparse graphs, which most gamebooks are, the list wins on both memory and lookup time.
 
-[^10]: The Five Room Dungeon template has been around probably since the beginning of RPGs. The exact author is lost to the sands of time. Johnn Four at [roleplayingtips.com](https://www.roleplayingtips.com/5-room-dungeons/) offers an excellent introduction to the idea. It's less a formula than a useful pressure: five distinct beats force you to think about pacing in a way that a vague "write some rooms" instruction simply doesn't.
+[^10]: The Five Room Dungeon template has been around probably since the beginning of RPGs. The
+exact author is lost to the sands of time. Johnn Four at 
+[roleplayingtips.com](https://www.roleplayingtips.com/5-room-dungeons/) offers an excellent
+introduction to the idea. It's less a formula than a useful pressure: five distinct beats force you
+to think about pacing in a way that a vague "write some rooms" instruction simply doesn't.
 
 [^11]: Steve Lawford, *Five-Room Dungeons*, available via HAL open science at
 [enac.hal.science/hal-03097484/document](https://enac.hal.science/hal-03097484/document). The

@@ -335,64 +335,15 @@ dead-end passage for most players. The authoring tools in the development build 
 problem by showing choice requirements in passage previews, so the author can see which
 players reach a passage with which items and whether the gates make structural sense.
 
----
-
-## How Other Systems Handle The Same Problem
-
-Inventory management is one of those areas where different RPGs reveal very different
-assumptions about what a game is.
-
-*Fighting Fantasy* handles it with almost no system at all. There is an Equipment section on
-the adventure sheet and a small box for Gold pieces. You list what you have, you cross things
-out when you use them, and you add things when you find them. There is no weight system,
-no slot system, and no rule about how many things fit. The constraint is narrative: the
-author writes "you cannot take the chest" and that is the rule. The simplicity means the
-game can move quickly, and the lack of formal constraint puts the responsibility for
-reasonable inventory decisions on the player's sense of verisimilitude.[^6]
-
-D&D has explicit carrying capacity in the SRD: a character can carry a number of pounds
-equal to fifteen times their Strength score. The optional Encumbrance variant adds threshold
-effects: carry more than a certain weight and you are encumbered; carry significantly more
-and you are heavily encumbered. Neither version appears in most actual play, because tracking
-pounds at the table is more bookkeeping than most groups want. The system exists, but its
-enforcement is mostly a matter of table taste.[^7]
-
-Each of these is a different answer to the same design question: what should the constraint
-on carrying be, and how much cognitive overhead is the player willing to accept to track it?
-The gamebook's current model follows *Fighting Fantasy* in being deliberately minimal. The
-constraint is the requirement gate, not a weight calculation.
-
----
-
-## The Campaign Ledger Comparison
-
-Campaign Ledger's inventory model shows what the same ideas look like under production
-pressure: real users, real sessions, real characters with complex sheets.
-
-Equipment in Campaign Ledger is not a string array. Each item is a record with an id, a
-name, a category, a quantity, an equipped flag, and a notes field. Resources are a separate
-table: each one has a key, a label, a type, a current value, and an optional maximum. Both
-tables enforce their constraints at the database level, not just in application code.
-
-The `quantity` field on equipment and the `current` field on resources both require
-non-negative values via database constraints. The `updateResourceCurrent` function clamps
-updates to the valid range before writing them. A resource cannot go below zero via a race
-condition or a malformed request; the constraint is enforced at the lowest accessible level.
-
-The spend and restore controls in the sheet UI also observe disabled states: a "spend"
-button is disabled when the resource is already at zero, and a "restore" button is disabled
-when the resource is already at maximum. The user never encounters a state the system cannot
-handle, because the interface does not offer transitions into invalid states. This is the
-same principle as the choice gate, applied at the UI level: don't offer an action you can't
-execute.
-
-The resource types in Campaign Ledger include hit points, hit dice, spell slots, and custom
-counters. Hit points and temporary hit points are mirrored into the character table as well
-as the resources table, because the sheet displays them in the summary header and the
-application cannot afford to look them up with a join every time the header renders. This is
-a deliberate consistency trade-off: the duplication is managed by ensuring that every update
-to either location goes through the same path, and the game's source of truth is the
-character table for the header and the resource table for the detailed edit panel.[^8]
+It is worth noting how different this is from the approaches other RPG systems take to the
+same problem. *Fighting Fantasy* handles inventory with almost no system at all: an Equipment
+section on the adventure sheet, a small box for Gold pieces, and no weight or slot rules.
+The constraint is narrative; the author writes "you cannot take the chest" and that is the
+rule.[^6] D&D sits at the other extreme, with carrying capacity in pounds, optional
+encumbrance thresholds, and a rule few tables actually enforce because the bookkeeping
+overhead outweighs the tactical interest.[^7] The gamebook's model sits closer to *Fighting
+Fantasy*: the constraint is the requirement gate, not a weight calculation, and the
+cognitive overhead stays low enough that the mechanics stay invisible.
 
 ---
 
@@ -547,12 +498,3 @@ times the Strength score in pounds, sees occasional use at tables that want some
 weight to their packs. The Dungeon Master's Guide notes that tracking weight can slow the game
 and recommends against it for groups that value pace. This is one of the more honest admissions
 in an official rulebook that a rule exists primarily to be there rather than to be followed.
-
-[^8]: The mirroring of hit points from the resources table into the character table in Campaign
-Ledger is the kind of duplication that purists flag and pragmatists accept. The character table
-hit points are denormalised for query performance: the sheet header renders on almost every
-page load and cannot afford a join. The resource table hit points are the editable source used
-by the spend/restore controls. The application keeps them synchronised through the same update
-path. This is a reasoned trade-off, documented in the architecture notes, rather than an
-accident. Reasoned trade-offs are fine; undocumented duplication that nobody notices until it
-drifts is not.

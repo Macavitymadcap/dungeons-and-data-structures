@@ -449,12 +449,6 @@ can detect colour contrast failures above a certain ratio; they cannot verify th
 colour scheme is comfortable for a player with photosensitive epilepsy. The automated gate
 is the starting line, not the finish.
 
-The gamebook's Pa11y gate is the next step in the verify pipeline rather than the current
-one: the architecture that would support it is already in place, and the WCAG 2.2 AA targets
-for the player-facing routes are the stated goal. The chapter describes the full posture so
-the reader can see what it looks like implemented; the gamebook will match it when the book
-goes to press.
-
 ---
 
 ## Screenshots As Review Evidence
@@ -634,10 +628,6 @@ The full `TEST_COVERAGE_AREAS` structure, the complete `scripts/check-static.ts`
 and the Playwright session walkthrough in `scripts/test-static-gamebook.ts` are in the
 repository rather than reproduced here; the extracts in this chapter show the shape of each
 approach rather than the complete listings.
-
-The accessibility posture is described here and is a clear next step: Pa11y targeting WCAG
-2.2 AA for the player-facing routes, added to the verify pipeline alongside the existing
-gates.
 
 ---
 

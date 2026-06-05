@@ -325,28 +325,18 @@ other.[^7]
 ## The Local Play Document
 
 Campaign Ledger's local play feature shows how the same pattern scales to a more complex
-data model. Signed-in campaign data lives in SQLite on the server. But some players want
-to use Campaign Ledger without an account: to track a character for a one-shot, or to
-explore the interface before committing.
+data model. Some players want to use Campaign Ledger without an account — for a one-shot,
+or to explore the interface before committing. The local play document serves this need.
 
-The local play document serves this need. It is stored in `localStorage` under a versioned
-key, structured exactly like the gamebook's save with an explicit schema and version:
+It is stored in `localStorage` under a versioned key, structured exactly like the gamebook's
+save: an explicit schema, a declared version, validation before accepting imported data, and
+readable errors on failure. It stores only a summary of each character rather than a full
+sheet; the full sheet lives in SQLite and requires authentication. The player is told what
+the storage boundary means: characters stored here exist only in this browser, and here is
+how to take them elsewhere.[^8]
 
-```typescript
-const LOCAL_PLAY_KEY = "campaign-ledger.local-play.v1";
-const LOCAL_PLAY_SCHEMA = "campaign-ledger.local-play";
-const LOCAL_PLAY_VERSION = 1;
-```
-
-Like the gamebook save, it validates before accepting imported data, produces readable
-errors on failure, and stores only a summary of each character rather than a full sheet. The
-full sheet lives in SQLite and requires authentication; the local document holds enough to
-run a session and no more.
-
-The product copy is explicit about this: characters stored in the local play document exist
-only in the current browser. The player is told what the storage boundary means in practical
-terms. This is the honest version of local-first storage: here is what we save, here is where
-it lives, here is what you need to do to take it with you.[^8]
+The gamebook's save and the local play document are the same idea at different scales. The
+pattern is the same; the complexity of the data model and the number of users are different.
 
 ---
 

@@ -5,7 +5,7 @@
 > **The Scribe and the Hero**
 >
 > The Scribe uncapped the ink pot, straightened the vellum, and set the quill where it would be
-> easy to reach. Then, everything in its right place, looked up at the next client.
+> easy to reach. Then, with everything finally in its right place, looked up at the next client.
 >
 > "Right," said the Scribe. "Let's start with your name."
 >
@@ -21,14 +21,14 @@
 >
 > "I need to know your calling," said the Scribe, "it tells me what arms you've trained with,
 > what armour your body knows, what oaths you've made and to whom, and how far you've walked the
-> road that made you. I have columns for sword-sworn, for shadow-walkers, and for  those who 
+> road that made you. I have columns for sword-sworn, for shadow-walkers, and for those who 
 > carry the word of gods. I do not have a column for *multitudes*."
 >
 > A pause.
 >
 > "Sword-sworn," said the Hero.
 >
-> "Good," said the Scribe, picking the quill back up. "Now. Your endurance. How much punishment
+> "Good" said the Scribe, picking the quill back up. "Now. Your endurance. How much punishment
 > can you take before you stop?"
 >
 > "I have endured wounds that would fell lesser mortals," said the Hero. "I am, for practical
@@ -42,7 +42,7 @@
 >
 > "Ten," they said.
 >
-> "Good" said the Scribe, and wrote it down.
+> "Fantastic" said the Scribe, and wrote it down.
 
 ---
 
