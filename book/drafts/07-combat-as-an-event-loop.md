@@ -1,4 +1,4 @@
-# Chapter 7: Combat As An Event Loop
+di# Chapter 7: Combat As An Event Loop
 
 ---
 
@@ -166,12 +166,10 @@ Every field is either an input-derived value or a structured record of a roll fr
 Nothing in `CombatRoundResult` is opaque: a caller can inspect every die result, every
 damage total, every hit-point change, and the final outcome.
 
-The function that produces this result is `resolveCombatRound`. The full listing is shown
-here because understanding the shape of the whole thing is the point: one round, two attacks,
-three possible outcomes, no hidden state. Breaking it into subfunctions keeps each piece at
-a readable length and isolates each decision cleanly: the player's attack path, the enemy's
-attack path, and the final assembly. The simplicity is intentional, and the chapter's later
-section on what the gamebook deliberately omits will explain what was left out and why.
+The function that produces this result is `resolveCombatRound`. The shape of the whole
+thing is the point: one round, two attacks, three possible outcomes, no hidden state.
+`resolveCombatRound` coordinates the sequence; the actual attack logic lives in helper
+functions that both paths share.
 
 ```typescript
 function resolveCombatRound({
@@ -185,15 +183,9 @@ function resolveCombatRound({
 }): CombatRoundResult {
   const encounterState = state.encounters[encounter.id];
   const round = (encounterState?.rounds ?? 0) + 1;
-
   const monsterHitPoints = encounterState?.hitPoints ?? encounter.hitPoints;
 
-  const playerResult = resolvePlayerAttack({
-    encounter,
-    state,
-    monsterHitPoints,
-    rng,
-  });
+  const playerResult = resolvePlayerAttack({ encounter, state, monsterHitPoints, rng });
 
   if (playerResult.outcome === "victory") {
     return {
@@ -209,12 +201,7 @@ function resolveCombatRound({
     };
   }
 
-  const monsterResult = resolveMonsterAttack({
-    encounter,
-    state,
-    rng,
-  });
-
+  const monsterResult = resolveMonsterAttack({ encounter, state, rng });
   const log = [...playerResult.log, ...monsterResult.log];
 
   if (monsterResult.outcome === "defeat") {
@@ -244,129 +231,23 @@ function resolveCombatRound({
     log,
   };
 }
+```
 
-function resolvePlayerAttack({
-  encounter,
-  state,
-  monsterHitPoints,
-  rng,
-}: {
-  encounter: Encounter;
-  state: GameState;
-  monsterHitPoints: number;
-  rng: RandomSource;
-}) {
-  const result = resolveAttack({
-    attack: state.character.attack,
-    targetArmourClass: encounter.armourClass,
-    targetName: encounter.name,
-    rng,
-  });
+The early return after a killing blow avoids the slightly absurd situation of a dead enemy
+retaliating. If the player's attack reduces the enemy to zero, `resolveCombatRound` returns
+immediately with a victory result and the monster's attack never fires. Everything else
+passes both results through to a `"continue"` outcome.
 
-  if (!result.damage) {
-    return {
-      attack: result.attack,
-      monsterHitPoints,
-      outcome: "continue" as const,
-      log: result.log,
-    };
-  }
+The shared logic lives in `resolveAttack`, which both attack helpers call:
 
-  const remainingHitPoints = Math.max(
-    0,
-    monsterHitPoints - result.damage.total
-  );
-
-  if (remainingHitPoints === 0) {
-    return {
-      attack: result.attack,
-      damage: result.damage,
-      monsterHitPoints: 0,
-      outcome: "victory" as const,
-      log: [...result.log, `${encounter.name} is defeated.`],
-    };
-  }
-
-  return {
-    attack: result.attack,
-    damage: result.damage,
-    monsterHitPoints: remainingHitPoints,
-    outcome: "continue" as const,
-    log: result.log,
-  };
-}
-
-function resolveMonsterAttack({
-  encounter,
-  state,
-  rng,
-}: {
-  encounter: Encounter;
-  state: GameState;
-  rng: RandomSource;
-}) {
-  const result = resolveAttack({
-    attack: encounter.attack,
-    targetArmourClass: state.character.armourClass,
-    rng,
-  });
-
-  let playerHitPoints = state.hitPoints;
-  let playerTemporaryHitPoints = state.temporaryHitPoints;
-
-  if (!result.damage) {
-    return {
-      attack: result.attack,
-      playerHitPoints,
-      playerTemporaryHitPoints,
-      outcome: "continue" as const,
-      log: result.log,
-    };
-  }
-
-  const absorbed = Math.min(
-    playerTemporaryHitPoints,
-    result.damage.total
-  );
-
-  playerTemporaryHitPoints -= absorbed;
-  playerHitPoints = Math.max(
-    0,
-    playerHitPoints - (result.damage.total - absorbed)
-  );
-
-  if (playerHitPoints === 0) {
-    return {
-      attack: result.attack,
-      damage: result.damage,
-      playerHitPoints: 0,
-      playerTemporaryHitPoints: 0,
-      outcome: "defeat" as const,
-      log: [...result.log, `${state.character.name} falls.`],
-    };
-  }
-
-  return {
-    attack: result.attack,
-    damage: result.damage,
-    playerHitPoints,
-    playerTemporaryHitPoints,
-    outcome: "continue" as const,
-    log: result.log,
-  };
-}
-
+```typescript
 function resolveAttack({
   attack,
   targetArmourClass,
   targetName,
   rng,
 }: {
-  attack: {
-    name: string;
-    attackBonus: number;
-    damage: DamageExpression;
-  };
+  attack: { name: string; attackBonus: number; damage: DamageExpression };
   targetArmourClass: number;
   targetName?: string;
   rng: RandomSource;
@@ -381,16 +262,11 @@ function resolveAttack({
   if (!attackRoll.success) {
     return {
       attack: attackRoll,
-      log: [
-        targetName
-          ? `${attack.name} misses ${targetName}.`
-          : `${attack.name} misses.`,
-      ],
+      log: [targetName ? `${attack.name} misses ${targetName}.` : `${attack.name} misses.`],
     };
   }
 
   const damage = rollDamage(attack.damage, rng);
-
   return {
     attack: attackRoll,
     damage,
@@ -403,8 +279,13 @@ function resolveAttack({
 }
 ```
 
-The early return after a killing blow avoids the slightly absurd situation of a dead enemy
-attacking back. Everything else flows to a `"continue"` result if neither side is down.
+`resolvePlayerAttack` calls `resolveAttack` with the character's attack profile against the
+encounter's armour class, checks whether the remaining monster hit points have reached zero,
+and returns either a victory or a continue result with updated hit points. `resolveMonsterAttack`
+does the same in reverse: the encounter's attack profile against the character's armour class,
+with temporary hit points absorbing damage before regular hit points take the remainder. Both
+helpers follow the same structure; only the roles and the hit point pools are swapped. The full
+implementations are in `src/gamebook/rules/combat.ts`.
 
 ---
 
@@ -458,39 +339,49 @@ pipeline: compute the result, then apply it.
 ## State Machines: The Shape Of A Fight
 
 The possible states of an encounter form a small **state machine**: a finite set of
-configurations and the transitions between them.
+configurations and the transitions between them. The concept is useful here even though the
+code does not implement it as an explicit named type — understanding the shape first makes
+the implicit implementation easier to follow.
+
+Conceptually, a combat encounter moves through these states:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Ready
+    [*] --> NotEngaged
 
-    Ready --> Resolving : start combat
+    NotEngaged --> Ongoing : player submits combat choice
 
-    Resolving --> Continue
-    Continue --> Resolving : next round
-
-    Resolving --> Victory
-    Resolving --> Defeat
-    Resolving --> Retreat
+    Ongoing --> Ongoing : round resolves, neither side down
+    Ongoing --> Victory : monster hit points reach zero
+    Ongoing --> Defeat : player hit points reach zero
+    Ongoing --> Retreat : player chooses to withdraw
 
     Victory --> [*]
     Defeat --> [*]
     Retreat --> [*]
 ```
 
-An encounter starts as `ready` (the player hasn't engaged yet). Once the first combat choice
-is submitted, it enters `resolving`. After each round it transitions to `continue` (more
-fighting needed), `victory` (the enemy is defeated), `defeat` (the player is down), or
-`retreat` (the player chose to withdraw before the round resolved).
+In the gamebook, these states are not stored as a named enum. They are read from the
+combination of two fields: `EncounterState.defeated` says whether the encounter has
+been won, and `GameState.hitPoints` says whether the player is still standing. The
+`CombatRoundResult.outcome` field — `"victory"`, `"defeat"`, or `"continue"` — is what
+`resolveCombatRound` returns each round to signal which transition just happened.
 
-In the gamebook, these states are not stored as an explicit enum. They are implicit in the
-combination of `EncounterState.defeated`, `GameState.hitPoints`, and the outcome field on
-`CombatRoundResult`. A future version of the code could make the state machine explicit: a
-named `CombatStatus` type that the rest of the code dispatches on. For a first combat
-loop the implicit version is easier to reason about.[^7]
+```typescript
+// The implicit state machine encoded in these three things:
+// EncounterState.defeated === false, GameState.hitPoints > 0  → Ongoing
+// EncounterState.defeated === true                             → Victory
+// GameState.hitPoints === 0                                    → Defeat
+// (Retreat is handled by passage routing before a round fires)
+```
 
-The passages in the adventure handle routing. A combat choice in Mt. Graphnor looks roughly
-like this:
+A future version of the code could make this explicit with a named `CombatStatus` type that
+the rest of the code dispatches on. For a first combat loop the implicit version is easier
+to reason about: there are only two meaningful fields, and the state follows directly from
+them.[^7]
+
+The passages in the adventure handle routing. A combat choice in Mt. Graphnor looks like
+this:
 
 ```typescript
 {

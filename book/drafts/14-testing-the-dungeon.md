@@ -1,730 +1,419 @@
-# Chapter 14: Testing The Dungeon
+# Chapter 13: The Name For What We've Been Doing
 
 ---
 
-> **The Dungeon Master and the Test Party**
+> **The Scribe and the Wizard**
 >
-> The dungeon was finished. The Dungeon Master had checked the map personally. It all seemed
-> fine.
+> The Scribe had been keeping the ledger for three years. Hero chronicles with
+> closed categories: sword-sworn, shadow-walker, scripture-bearer, no column for
+> "multitudes". Tallies that produced standings by formula. A curtain between what the
+> heroes' chronicles showed and what sat behind the Dungeon Master's screen. A rule that
+> said the great ledger was the truth of what had happened on the road, and the road was
+> the truth of what the heroes had done, and the chronicles were the truth of what the
+> heroes could do.
 >
-> "We should send in the test party first," said the Chronicler.
+> The Scribe had arrived at all of this by instinct and necessity, without any particular
+> vocabulary for it.
 >
-> "It's fine," said the Dungeon Master.
+> The Wizard looked at the ledger for a long time.
 >
-> "You've said that about every dungeon."
+> "The names you use," she said at last. "They are the same names the heroes use."
 >
-> "And they have all been fine."
+> "Of course," said the Scribe. "What other names would I use?"
 >
-> "The third one had a secret door that opened into a wall. The fifth one had a puzzle whose
-> answer was impossible to derive from the available clues. The seventh one..."
+> The Wizard set a book on the desk. It was blue, and heavy.
 >
-> "The test party," said the Dungeon Master, "can go in."
+> "What is it?" said the Scribe.
 >
-> The test party was not glamorous. It consisted of a scout who checked whether each door
-> opened, a ledger-keeper who verified that no treasure promised in one chamber was missing
-> from the next, a retreating fighter who confirmed that defeat led somewhere coherent, a
-> herald who checked whether the entrance proclamation was legible by torchlight, and a
-> suspicious archivist who read every scroll looking for mechanisms the dungeon had not
-> declared to its visitors.
->
-> They went in. They came out. The Chronicler read the report.
->
-> "The secret door on level two opens into a wall."
->
-> A silence.
->
-> "Send them in again," said the Dungeon Master.
+> The Wizard said nothing. The Scribe looked at the ledger, then at the book, then back
+> at the ledger.
 
 ---
 
-In Chapter 13, we named the approach the book has been taking: domain-driven design. The
-domain has its own vocabulary; the code uses that vocabulary. The adventure is an aggregate
-root; its consistency rules span the whole adventure. The validator is the domain service
-that checks those rules. That is one member of the test party. The scout who checks whether
-doors open.
+In Chapter 12, we gave the save document a schema, a version, and an adventure id. The system
+is honest about what it knows. In Chapter 11, rules had provenance. In Chapter 9, every actor
+had a context-specific permission rather than a global role. In Chapter 4, the `Character`
+interface stored ability scores and derived modifiers from them, because that is what a
+character sheet actually does.
 
-This chapter sends in the rest. Route tests check what the player sees when they navigate the
-application. Static build checks verify that the published files contain what they should and
-omit what they should not. Browser smoke tests drive a real browser through the player's most
-important journey. Accessibility checks ask whether more than one kind of player can use the
-interface. Screenshots give reviewers visual evidence without requiring them to run the
-application themselves. Acceptance notes record what was delivered, what was verified, and
-what was deferred.
+None of these decisions were arbitrary. They all followed from paying careful attention to
+what the domain, the game of D&D, the gamebook format, the campaign management problem, was
+actually like. The software modelled the real thing rather than inventing its own structures
+for the programmer's convenience.
 
-Testing is not a single activity. It is a collection of targeted questions, each addressed
-at the level where the risk actually lives. The scout and the archivist are asking different
-questions. Both are necessary.
+There is a name for this approach. It is **domain-driven design**, and it is, more than any
+other single idea, what this book has been practising.
 
 ---
 
-## Every Test Answers A Question
+## The Map Should Match The Territory
 
-The most important discipline in a test suite is knowing what each test is for.
+A **domain** is the subject matter a piece of software exists to serve. Not the technology,
+not the database schema, not the framework: the real-world activity the software represents.
+For Mt. Graphnor, the domain is a branching adventure gamebook. The vocabulary of that domain,
+hit points, armour class, passages, choices, conditions, encounters, does not belong to
+software. It belongs to the game. The software borrows it because the game is what it is
+modelling.
 
-A test that checks everything simultaneously checks nothing with confidence. When it fails,
-the failure message is somewhere in a wall of output and the debugging starts from scratch.
-A test that checks one specific claim fails with a specific message that names the claim and
-the deviation.
+This sounds obvious. It should be obvious. The surprising thing is how often it fails to happen,
+and how quickly a codebase can drift from the domain it is supposed to represent. The drift is
+usually well-intentioned. It starts with a `BaseEntity` class because it is convenient. It
+continues with `AdventureNode` because "node" is the technically correct graph term, even though
+nobody in the room would call a gamebook passage a node. Six months later the code speaks a
+private language that belongs to no domain in particular.
 
-The gamebook expresses this directly in its verification manifest:
+Eric Evans named and systematised this approach in 2003 in a book that practitioners call the
+blue book.[^1] His central argument is deceptively simple: the code should speak the same language
+as the domain experts. Not a translation. Not an approximation. The same words, used the same way,
+meaning the same things.
 
-```typescript
-// src/gamebook/testing.ts
-export interface VerificationGate {
-  id: string;
-  name: string;
-  command: string;
-  evidence: string;
-}
+When a dungeon master talks about a character's hit points, they mean something precise: a number
+that tracks how much damage the character can absorb before falling unconscious. When
+`GameState.hitPoints` holds a number that tracks how much damage the character can absorb before
+falling unconscious, the code and the domain expert are speaking the same language. There is no
+translation layer, no impedance mismatch, no point where the code's concept of hit points diverges
+from the game's.
 
-export const VERIFICATION_GATES: VerificationGate[] = [
-  {
-    id: "typecheck",
-    name: "Type check",
-    command: "bun run typecheck",
-    evidence:
-      "TypeScript compiler verifies type contracts across all modules.",
-  },
-  {
-    id: "unit-tests",
-    name: "Unit tests",
-    command: "bun test",
-    evidence:
-      "Bun tests exercise graph validation, state migration, choice resolution, " +
-      "dice, combat, rules, and route rendering.",
-  },
-  {
-    id: "static-build",
-    name: "Static build",
-    command: "bun run build:static",
-    evidence: "Static build produces dist/ with player-only assets.",
-  },
-  {
-    id: "static-check",
-    name: "Static artifact check",
-    command: "bun run check:static",
-    evidence:
-      "Artifact check verifies published HTML and JS omit author/debug tooling.",
-  },
-  {
-    id: "static-browser",
-    name: "Static browser smoke",
-    command: "bun run test:static",
-    evidence:
-      "Playwright drives the published static build through a full player session " +
-      "including local storage, choice progression, combat, export, and import.",
-  },
-];
-```
-
-Five gates. Each names a command and states what it proves. Run them in order: the type
-check catches contracts, the unit tests catch domain logic, the static build catches the
-publishing pipeline, the artifact check catches access-control guarantees, and the browser
-smoke catches real player interactions. A failure at any gate stops the chain; there is no
-point verifying the browser build if the static build has already failed.[^1]
-
-A note on where this chapter sits in the book. Testing appears in Chapter 14, after the
-code has been built. In practice, tests often belong earlier: alongside the code, or even
-before it. Writing a test that describes the behaviour you want before writing the code that
-produces that behaviour is a discipline called test-driven development, and it has real
-advantages in keeping code focused and interfaces clean. The book defers it to here because
-understanding what to test first requires understanding what you are building, and that
-understanding has been accumulating across thirteen chapters. The order is pedagogical, not
-prescriptive.[^2]
+When they diverge, something has gone wrong. The divergence is a signal that the model has drifted
+from the domain it was supposed to represent.
 
 ---
 
-## Unit Tests For Domain Rules
+## Calling Things What They Are
 
-Domain logic is the easiest part of the system to test well, because it is also the most
-framework-light. The graph validator, the save migrator, the dice roller, and the combat
-resolver are plain TypeScript functions that take data in and return data out. No HTTP server,
-no browser, no database connection.
+Evans calls the shared vocabulary of a domain and its software the **ubiquitous language**:
+the set of terms that should appear identically in conversations, documents, diagrams, and
+code. When the domain experts say "saving throw" and the code says `savingThrowCheck`, the
+two are almost the same thing. When the domain experts say "saving throw" and the code says
+`defensiveRollOutcome`, they have started to diverge, and the divergence will widen over time
+as each side evolves independently.
 
-```typescript
-// src/gamebook/graph.test.ts
-test("reports an unreachable passage", () => {
-  // Arrange
-  const adventure = makeAdventure({
-    startPassageId: "entrance",
-    passages: [
-      { id: "entrance", choices: [{ id: "go", targetId: "room-two" }] },
-      { id: "room-two", ending: "victory", choices: [] },
-      { id: "orphan", choices: [] }, // Not connected
-    ],
-  });
+I have a concrete example from this project. The `src/nodes/` directory that existed in an
+earlier version contained an `AdventureNode` type with a `nextNodeId` field and an `isEnding`
+flag. Technically accurate. Graph-theoretically correct. And completely wrong for a gamebook.
+A gamebook author would not call a passage a "node". They would not say "the next node id" to
+mean "where this choice leads". The vocabulary belonged to graph theory, not to gamebooks, and
+it showed every time someone tried to explain what the code did.[^2]
 
-  // Act
-  const issues = validateAdventure(adventure);
+Replacing it with `Passage`, `Choice`, and `targetId` was not a technical improvement. Nothing
+changed about what the code did. What changed was that the code started describing itself in
+terms anyone who had read a gamebook could follow. That is the whole game.
 
-  // Assert
-  expect(issues).toContainEqual(
-    expect.objectContaining({ code: "empty-passage", passageId: "orphan" })
-  );
-  expect(issues).toContainEqual(
-    expect.objectContaining({ code: "unreachable-passage", passageId: "orphan" })
-  );
-});
-```
-
-The test does not start a server. It does not load a browser. It calls `validateAdventure`
-with a known broken input and asserts the output contains the expected issues. The test runs
-in milliseconds and the failure message names the passage.
-
-The rule for domain tests is: test the function, not the infrastructure. If `validateAdventure`
-can be called without a server, it should be tested without a server. If `migrateV1ToV2` can
-be called with a fixture object, it should be tested with a fixture object. The test is as
-close as possible to the unit it describes.
-
-For the full Mt. Graphnor adventure, the tests assert structural facts that the adventure
-must maintain:
-
-```typescript
-test("Mt. Graphnor passes full validation", () => {
-  // Act
-  const issues = validateAdventure(mtGraphnorAdventure);
-
-  // Assert
-  expect(issues).toHaveLength(0);
-});
-
-test("Mt. Graphnor has all required Five Room endings", () => {
-  // Act
-  const result = validateFiveRoomTemplate(mtGraphnorAdventure);
-
-  // Assert
-  expect(result).toHaveLength(0);
-});
-
-test("Mt. Graphnor no longer contains placeholder prose", () => {
-  // Arrange
-  const placeholders = ["TODO", "PLACEHOLDER", "lorem ipsum"];
-
-  // Act & Assert
-  for (const passage of mtGraphnorAdventure.passages) {
-    for (const placeholder of placeholders) {
-      expect(passage.body).not.toContain(placeholder);
-    }
-  }
-});
-```
-
-The last test is structural gatekeeping on content. It cannot check whether the prose is good.
-It can check whether it is still placeholder text. A test that fails until the author has
-written real content is a useful forcing function in the run-up to a release.[^3]
+The gamebook's current vocabulary is visible in `src/gamebook/model.ts`: `Passage`, `Choice`,
+`Encounter`, `GameState`, `EncounterState`, `EndingKind`. These names were not chosen because
+they are good programming vocabulary. They were chosen because they are what a gamebook author
+would call these things. A passage is a passage. An encounter is an encounter. An ending is an
+ending. The code names them what the domain names them.
 
 ---
 
-## Route Tests: Does The Door Actually Open
+## Things That Have Identity And Things That Don't
 
-Domain tests prove the logic. They are the ledger-keeper, checking that items promised in
-one room arrive in the next, that the arithmetic of the combat round adds up. Route tests
-are the scout: they check whether the doors open. Not whether the room behind the door is
-interesting; whether the door opens at all, whether it goes somewhere, whether it refuses
-entry correctly when it should.
+Not everything in a domain has the same relationship to identity. Evans draws a line between
+two kinds of things.
 
-In practice, route tests exercise the interface the player actually receives: the HTML
-rendered for a given URL, the fragment returned when a choice is submitted, the redirect
-that follows a state-changing action, the 404 that comes back when an unauthorised path
-is attempted.
+An **entity** is something with a meaningful identity that persists through change. A
+character is an entity: Brandavar the Twice-Born is still Brandavar after losing hit points,
+gaining equipment, levelling up, or changing conditions. The identity is what matters; the
+attributes are what describe the current state of that identity. In code, entities have ids.
 
-```typescript
-// src/app.test.tsx
-test("renders the gamebook passage page", async () => {
-  // Arrange
-  const app = createApp({ authorToolsEnabled: false });
+A **value object** is something defined entirely by its attributes, with no meaningful
+independent identity. A damage roll is a value object: `{ count: 1, sides: 8, modifier: 3,
+type: "slashing" }`. Two damage rolls with the same values are interchangeable. There is no
+meaningful sense in which the damage roll from Tuesday's session is a different object from
+an identical damage roll on Wednesday. Value objects can be copied, compared by value, and
+replaced without ceremony.[^3]
 
-  // Act
-  const response = await app.request("/gamebook");
+In the gamebook: `Character` is an entity. `AttackProfile` is a value object. `Passage` is
+an entity (it has a stable `id` that the graph, the save file, and the validator all reference
+by name). `Choice` is closer to a value object: its identity comes from its parent passage
+and its position, not from any independent id. `RollResult` is a value object: a snapshot of
+what happened on a roll, with no ongoing identity of its own.
 
-  // Assert
-  expect(response.status).toBe(200);
-  const html = await response.text();
-  expect(html).toContain("Mt. Graphnor");
-  expect(html).not.toContain("Debug state");
-});
-
-test("applies a choice and returns the next passage", async () => {
-  // Arrange
-  const app = createApp();
-  const state = createInitialState(mtGraphnorAdventure, createCharacter("hero", "Adventurer", "fighter"));
-  const body = new URLSearchParams({ state: JSON.stringify(state) });
-
-  // Act
-  const response = await app.request("/gamebook/choices/sneak-guard", {
-    method: "POST",
-    body,
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-  });
-
-  // Assert
-  expect(response.status).toBe(200);
-  const html = await response.text();
-  expect(html).toContain("keyboard-room");
-});
-
-test("returns 404 for author routes when author tools are disabled", async () => {
-  // Arrange
-  const app = createApp({ authorToolsEnabled: false });
-
-  // Act
-  const response = await app.request("/gamebook/author");
-
-  // Assert
-  expect(response.status).toBe(404);
-});
-```
-
-Route tests are more expensive than domain tests: they instantiate an application, make
-HTTP requests, and parse HTML responses. They catch a different class of bug: not "is the
-combat logic correct" but "does the route wire the correct logic to the correct URL" and
-"does the rendered HTML contain what the player needs to see."
-
-Note that state is submitted to the server in the form body as serialised JSON, not in a
-session or cookie. The gamebook is stateless at the server level: each request carries the
-current game state with it, and the server applies the choice and returns the next passage.
-This architecture is what makes the static publishing in Chapter 9 possible.
-
-The access control tests deserve special attention. A route that should return 404 in player
-mode must be tested to verify that it returns 404. The test in the third example above is not
-checking a positive case; it is checking that a negative capability is absent. These tests are
-the most likely to go missing in an incomplete suite, because they are testing for the
-non-existence of something rather than its existence.[^4]
+The distinction matters because it determines how you handle change. When an entity changes,
+you update it in place and preserve its identity. When a value object changes, you replace it
+entirely with a new one. `applyChoiceEffects` in `src/gamebook/state.ts` works this way: it
+does not mutate the existing `GameState`; it produces a new `GameState` with the changed
+values. The old state was a value snapshot. The new state is a different snapshot of the same
+play session, which is the entity whose identity persists.
 
 ---
 
-## The Static Build: What Actually Ships
+## What Validates Together, Lives Together
 
-The archivist in the test party reads every scroll for the Dungeon Master's private notes.
-Not because the Dungeon Master is untrustworthy, but because the scroll and the Dungeon
-Master's intentions are two different things, and what reaches the players is the scroll.
+Some entities do not stand alone. They exist in clusters where one entity is the root and the
+others are subordinates that only make sense within the cluster. Evans calls these
+**aggregates**, and the root entity is the **aggregate root**.
 
-The static build is the same distinction. The development server and the published gamebook
-are not the same thing. The development server knows everything: author routes, debug panels,
-forced navigation, the full client bundle. The published gamebook is a set of generated files,
-served by a different runtime, with none of that. The gap between the two is where a class of
-bugs lives that no amount of running the development server will catch.
+The `Adventure` type is an aggregate root. It owns its `passages`, its `encounters`, its
+`items`, its `discoveries`, and its `attribution`. None of those things has a meaningful
+existence outside an adventure. You do not look up a `Passage` independently; you look it up
+within an adventure via `createPassageMap`. The adventure enforces consistency across all of
+them: `validateAdventure` checks that every item reference, every passage target, every
+encounter id is coherent within the adventure's own catalogue. The aggregate root is the
+consistency boundary.
 
-The static build gate runs the build script and checks the exit code. If it fails, the
-subsequent checks are meaningless: there is nothing to inspect.
-
-The artifact check is a separate step that reads the generated files and asserts their
-contents:
-
-```typescript
-// scripts/check-static.ts
-const html = await readFile("dist/gamebook/index.html", "utf-8");
-const js = await readFile("dist/assets/player-client.js", "utf-8");
-
-// Player content is present
-expect(html).toContain("Mt. Graphnor");
-expect(html).toContain("Start your adventure");
-
-// Author content is absent
-const forbidden = ["Debug state", "gamebook-force-passage", "authorMode", "mermaid"];
-for (const string of forbidden) {
-  expect(html).not.toContain(string);
-  expect(js).not.toContain(string);
-}
-```
-
-The positive assertions verify that the build produced usable output. The negative assertions
-verify the access control guarantee: the published files do not contain author tooling. Both
-are necessary. A build that passes the negative checks because it produced no output at all
-would be wrong in a different way.
-
-The artifact check is the automated version of the security review from Chapter 9. Where
-Chapter 9 argued that hiding buttons is not enough, the artifact check proves the stronger
-claim: the strings are not present in the output at all, regardless of any runtime condition.
+`GameState` is similarly an aggregate root for the play session. It owns the current passage
+id, the character, hit points, inventory, flags, encounter states, and log entries. The
+consistency rules that govern the save document, the schema, the version, the adventure id
+match, the passage id validity, operate across the whole aggregate. `parseGame` validates the
+whole `GameState`, not its parts in isolation, because consistency is a property of the whole.
 
 ---
 
-## Browser Smoke Tests
+## The Same Word Can Mean Two Different Things
 
-The artifact check verifies that the files look correct. Browser smoke tests verify that they
-behave correctly when a real browser loads and interacts with them.
+A large domain is rarely one coherent model. Different parts of the same organisation, or the
+same application, use the same words to mean subtly different things.
 
-The gamebook's browser smoke runs against the generated `dist/` directory, served locally
-by a simple static file server. Playwright drives a real browser through the player's most
-important session:
+Evans calls these regions **bounded contexts**: areas within which a particular model and its
+vocabulary are consistent and authoritative. At the boundary between two contexts, translation
+is required.
 
-```typescript
-// scripts/test-static-gamebook.ts
-test("full player session", async ({ page }) => {
-  // Arrange: clear any saved state
-  await page.goto(baseUrl);
-  await page.evaluate(() => localStorage.clear());
-  await page.reload();
+The gamebook has two bounded contexts. The **adventure context** knows about passages,
+choices, encounters, items, the graph, and validation. The **play context** knows about game
+state, save documents, inventory effects, dice checks, and persistence. `model.ts` defines
+the shared types that cross the boundary; `graph.ts` and `state.ts` are the domain logic of
+their respective contexts.
 
-  // Act: start a new game and select class
-  await page.click('[data-action="new-game"]');
-  await page.click('[data-class="fighter"]');
-  await page.click('[data-race="human"]');
-  await page.click('[data-action="confirm-character"]');
-
-  // Act: make a choice
-  await page.click('button:has-text("Creep past the guardian")');
-
-  // Assert: the next passage rendered
-  await expect(page.locator(".passage-title")).toContainText("The Keyboard Room");
-
-  // Assert: local storage was written
-  const saved = await page.evaluate(() =>
-    localStorage.getItem("dads-gamebook-save")
-  );
-  expect(saved).not.toBeNull();
-  const state = JSON.parse(saved!);
-  expect(state.currentPassageId).toBe("keyboard-room");
-
-  // Act: export the save
-  await page.click('[data-action="export-save"]');
-  const exportedJson = await page.inputValue('[data-role="save-export"]');
-
-  // Assert: the export carries the expected schema
-  expect(JSON.parse(exportedJson).schema).toBe("dads-gamebook-save");
-
-  // Act: reset progress
-  await page.click('[data-action="reset-game"]');
-
-  // Assert: the player is back at the start
-  await expect(page.locator(".passage-title")).toContainText("Mt. Graphnor");
-
-  // Act: import the saved game back
-  await page.fill('[data-role="save-import"]', exportedJson);
-  await page.click('[data-action="import-save"]');
-
-  // Assert: the imported state is restored
-  await expect(page.locator(".passage-title")).toContainText("The Keyboard Room");
-});
-```
-
-The browser smoke covers things that no other test can cover: the interaction between the
-HTML, the browser client JavaScript, and `localStorage`. The save-on-choice, the export
-format, the import round-trip, and the reset behaviour all require a real browser with a real
-storage implementation.[^5]
-
-The smoke test does not walk every path through the adventure. It walks the golden path: the
-most important sequence the player will execute. Attempting to exercise every branch in a
-browser smoke would be slow, brittle, and redundant: the unit tests cover the branching logic.
-The smoke test covers the integration of that logic with the browser.
+The fact that both contexts use `Passage` does not mean they use it in the same way. The
+adventure context treats a `Passage` as a node in a static graph to be validated. The play
+context treats the current passage id as a pointer into that graph, looked up at runtime.
+The same word; different use. Keeping the contexts separate means each can evolve
+independently: tightening the validation rules in `graph.ts` does not require changes in
+`state.ts`.[^5]
 
 ---
 
-## Accessibility Checks
+## The Anti-Corruption Layer
 
-A dungeon that cannot be navigated by a player who uses a keyboard instead of a mouse, or a
-screen reader instead of a monitor, is a dungeon with locked doors that were never designed
-to be opened.
+When a bounded context must import vocabulary or data from outside its own model, Evans
+recommends a translation boundary he calls an **anti-corruption layer**: a layer that converts
+the external representation into the internal domain language, preventing the external model's
+concepts from leaking into the internal one.
 
-Accessibility testing has two layers: automated and manual. Automated tools like Pa11y check
-for structural accessibility problems that have deterministic rules: missing alt text, buttons
-without labels, colour contrast failures, focus order violations, missing landmark regions.
-These are the checks a script can run and a human would find tedious to repeat manually.
-
-Campaign Ledger runs Pa11y against its routes in the accessibility gate:
-
-```typescript
-// scripts/test-a11y.ts
-const routes = [
-  { path: "/", label: "Home (public)" },
-  { path: "/local-play", label: "Local play" },
-  { path: "/rules", label: "Rules reference" },
-  { path: "/login", label: "Login" },
-];
-
-for (const route of routes) {
-  const results = await pa11y(`${baseUrl}${route.path}`, {
-    standard: "WCAG2AA",
-    runners: ["axe", "htmlcs"],
-  });
-
-  if (results.issues.length > 0) {
-    console.error(`${route.label}: ${results.issues.length} issues`);
-    for (const issue of results.issues) {
-      console.error(`  [${issue.type}] ${issue.message}`);
-      console.error(`  ${issue.selector}`);
-    }
-  }
-}
-```
-
-WCAG 2.2 Level AA is the standard. Each route is checked against two runners for broader
-coverage. Failures are reported with the selector, so the developer knows exactly which
-element failed and why.[^6]
-
-Automated checks are necessary but not sufficient. They can verify that a button has an
-accessible label; they cannot verify that the label is the right label for the action. They
-can detect colour contrast failures above a certain ratio; they cannot verify that the overall
-colour scheme is comfortable for a player with photosensitive epilepsy. The automated gate
-is the starting line, not the finish.
+Chapter 11 described this without naming it. The gamebook's SRD catalogue converts SRD 5.1
+vocabulary into the application's own type definitions. The `ClassRule` interface does not
+reproduce SRD prose; it records the three facts `createCharacter` actually needs: the hit die,
+the primary ability, and the spellcasting ability. The SRD's vocabulary does not leak into
+the domain model. The application decides what it needs; the catalogue bridges the gap.
 
 ---
 
-## Screenshots As Review Evidence
+## Ask For What You Need, Not How To Get It
 
-Tests prove behaviour. Screenshots show appearance. Both matter to a reviewer, and they are
-not substitutes for each other.
+A **repository** is a domain-language interface for retrieving and storing domain objects.
+The key word is "domain-language": the repository speaks in terms of the domain, not in terms
+of the storage technology.
 
-Campaign Ledger captures screenshots as part of the verification pipeline, organised by role,
-route, and theme:
-
-```typescript
-// scripts/capture-screenshots.ts
-const targets = [
-  { path: "/", role: "public", theme: "light", label: "home-light" },
-  { path: "/", role: "public", theme: "dark", label: "home-dark" },
-  { path: "/sheet/fighter-1", role: "player", theme: "light", label: "sheet-light" },
-  { path: "/sheet/fighter-1", role: "player", theme: "dark", label: "sheet-dark" },
-  { path: "/campaign/1/prep", role: "game_master", theme: "light", label: "prep-light" },
-];
-
-for (const target of targets) {
-  await loginAs(page, target.role);
-  await setTheme(page, target.theme);
-  await page.goto(`${baseUrl}${target.path}`);
-  await page.screenshot({
-    path: `${outputDir}/${target.label}.png`,
-    fullPage: true,
-  });
-}
-```
-
-Screenshots are not committed to the repository as part of routine work. Committing a
-screenshot on every run would churn the repository history with binary diffs and inflate
-the repository size. Instead, screenshots are generated on demand during development or
-captured deliberately as PR evidence when a UI change is being reviewed.
-
-The PR template makes this expectation explicit: user-facing UI changes require screenshot
-evidence or a note explaining why screenshots are not needed. This is not bureaucracy; it is
-the acknowledgement that code review cannot evaluate visual design from a text diff alone.[^7]
+The gamebook's `StorageAdapter` from Chapter 12 is the simplest possible repository: three
+methods, `getItem`, `setItem`, and `removeItem`, that say what the play session needs without
+saying where or how. The browser provides `localStorage`. The tests provide an in-memory
+object. The play logic knows neither, and cares less. The contract stays constant; the
+implementation changes behind it.[^6]
 
 ---
 
-## The Acceptance Note: Evidence, Not Assertion
+## The Game Already Solved This
 
-A test suite that passes is necessary but not sufficient for a release. What passes must
-also be documented: which tests ran, which gates passed, what was checked, and what was
-deferred.
+The reason D&D maps onto these ideas so naturally is that D&D is itself a well-designed
+domain model. Decades of iteration by designers and millions of players have produced a
+vocabulary that is precise, stable, and widely understood.
 
-Campaign Ledger's acceptance notes for major features are short documents that record the
-delivered scope, the automated evidence, the screenshot evidence, the known limits, and the
-follow-up tickets. Here is one in full:
+"Saving throw" does not mean "any roll to avoid something bad". It means a specific kind of
+roll against a specific ability score, triggered by a specific category of effect, with
+specific consequences for success and failure. The term is loaded with meaning. When
+`rollD20Check` accepts a `reason` field and the call site passes `"saving throw"`, the code
+is borrowing that precision without having to re-invent it.
 
-```markdown
-## Game Master Prep: Acceptance Note
+The aggregate structure is visible in the published rulebooks. A character sheet is a
+character aggregate: the character is the root entity, and their abilities, skills, inventory,
+conditions, and resources are owned within it. The dungeon master's screen is a bounded
+context boundary made physical: on one side, the information available to players; on the
+other, the information the GM holds. The adventure module is an aggregate: encounters, rooms,
+NPCs, and maps are all owned by the adventure and meaningless outside it.
 
-### Delivered scope
-Private NPC dossiers, selected-player visibility, staged Markdown import,
-Google Docs manual import, player preview, import preview with warnings.
-
-### Automated evidence
-- PASS: bun run verify (typecheck, tests, a11y, smoke, screenshots)
-- PASS: 147 tests, 0 failures
-- PASS: Hyper-Dank compatibility check
-- Screenshots: docs/pr-screenshots/sheet-0068/
-
-### Known limits
-Google Docs import is manual export only; no live sync or webhook support.
-Image upload is not yet part of the import pipeline.
-
-### Follow-up
-sheet-0071: Image upload in import pipeline
-sheet-0073: Bulk import from Google Drive folder
-```
-
-Most changes do not need a document of this length. They need a compact verification
-summary: three lines at the end of the PR description.
-
-```markdown
-## Verification
-
-- PASS: `bun run verify`: 5 gates, 82 tests, 0 failures
-- Screenshots: not required (logic change, no rendering affected)
-- Hyper-Dank compat: not required (no shared package changes)
-```
-
-Command, result, totals. A note for anything that was not needed and why. It takes thirty
-seconds to write and it means a reviewer looking at the PR two weeks later can verify what
-was actually checked, rather than taking the author's word for it. A summary that says "tests
-pass" with no command or count is an assertion. An assertion with receipts is evidence.[^8]
-
-I used to write "all tests passing ✓" in PR descriptions and feel quite good about it.
-I have since learned that this is the equivalent of the Dungeon Master saying "it's fine"
-before the test party goes in. Technically true, no verifiable content.
+Game designers made these structural decisions for the same reasons software architects make
+them. They needed consistency: a character's proficiency bonus should be the same everywhere
+it appears on the sheet. They needed bounded visibility: players should not know what the GM
+rolls behind the screen. They needed stable identity: Brandavar is still Brandavar regardless
+of which adventure they appear in. The game solved the same problems the software solves,
+independently, decades earlier, and called the solutions by different names.[^8]
 
 ---
 
-## The Verification Manifest As Living Documentation
+## What This Looks Like In Practice
 
-The gamebook surfaces its verification manifest in the author tools page. This is unusual:
-most test suites are invisible to the people who run the software, living only in CI
-configuration files that developers read reluctantly.
+Domain-driven design is not a collection of patterns to be applied mechanically. It is an
+attitude: the code's job is to represent the domain honestly. Every naming decision, every
+boundary, every interface is an opportunity to either reflect the domain faithfully or to
+obscure it under implementation concerns.
 
-Making the manifest visible does two things. It forces the manifest to be accurate: if the
-author tools page shows a gate that no longer exists, someone will notice. And it connects
-the verification system to the authoring system: when an author visits the author page to
-check graph validation and template coverage, they also see the verification gates and what
-each one proves. Testing is not a separate activity that happens somewhere else; it is part
-of the authoring posture.
+In practice, this comes down to a few questions you start asking by reflex.
 
-```typescript
-// src/gamebook/testing.ts
-export interface CoverageArea {
-  id: string;
-  title: string;
-  purpose: string;
-  coveredBy: string[];
-  gates: string[];
-}
+When you are naming a type, ask: what does the domain expert call this thing? Not what is
+technically accurate, not what is convenient to type, but what does the person who actually
+lives in this domain call it. If they call it a "saving throw", call it a saving throw. If
+they call it a "campaign session", call it a campaign session. The name in the code is a
+claim about the domain. It should be an honest claim.
 
-export const TEST_COVERAGE_AREAS: CoverageArea[] = [
-  {
-    id: "passage-graph",
-    title: "Passage graph and content",
-    purpose:
-      "Protects adventure structure, reachability, content completeness, and template coverage.",
-    coveredBy: [
-      "src/gamebook/graph.test.ts",
-      "src/gamebook/content/mt-graphnor.ts",
-    ],
-    gates: ["unit-tests"],
-  },
-  {
-    id: "published-static",
-    title: "Published static gamebook",
-    purpose:
-      "Protects generated static HTML, player-only client bundling, and browser-local play.",
-    coveredBy: [
-      "scripts/check-static.ts",
-      "scripts/test-static-gamebook.ts",
-    ],
-    gates: ["static-build", "static-check", "static-browser"],
-  },
-  // ...
-];
-```
+When you are drawing a module boundary, ask: where does the domain say the responsibility
+ends? The gamebook separates `graph.ts` from `state.ts` not because it is good module
+structure in the abstract, but because adventure validation and play-session management are
+genuinely different domain concerns. The boundary in the code follows the boundary in the
+domain. If the domain does not draw a line there, you should be suspicious of the module.
 
-Each coverage area names the files that exercise it and the gates that protect it. This is
-the map of the test party's routes: which scout covers which room, and which door they are
-checking.
+When you are writing validation, ask: what does the domain say is valid? The `Character`
+interface constrains `class` to four named values because the domain has four playable classes.
+The save document requires an `adventureId` because you cannot have a play session without an
+adventure. These are not arbitrary technical constraints. They are domain rules, expressed in
+code.
+
+There is a test I find useful for checking whether a model has stayed honest. Take the type
+definitions and read them to a domain expert, someone who knows D&D but not TypeScript. Can
+they recognise the things being described? If `interface Character` with its `abilityScores`,
+`maxHitPoints`, `armourClass`, `skillProficiencies`, and `inventory` looks like a character
+sheet to a D&D player, the model is working. If it looks like a generic data structure that
+could represent anything, the model has drifted from the territory it was supposed to map.[^9]
 
 ---
 
 ## The Build Move
 
-By the end of this chapter, the gamebook has an explicit, layered verification posture:
+This chapter does not introduce new code. It introduces a vocabulary for code that already
+exists.
 
-- `VERIFICATION_GATES` in `src/gamebook/testing.ts` defines the five gates shown in this
-  chapter: typecheck, unit tests, static build, static artifact check, and static browser
-  smoke. Each carries the command and a prose statement of what it proves.
-- `TEST_COVERAGE_AREAS` in `src/gamebook/testing.ts` maps the gamebook's test suite to the risks
-  it addresses, naming the evidence files and the gates that cover each area.
-- `bun run verify` in `scripts/verify.ts` runs all five gates in order, reports the result
-  of each, and exits non-zero on the first failure. A single command produces the full
-  verification report.
-- `scripts/check-static.ts` checks positive and negative artifact assertions: player content
-  is present, author/debug content is absent.
-- `scripts/test-static-gamebook.ts` drives the published static build through a full session
-  with Playwright: new game, class selection, choice navigation, local storage verification,
-  export, reset, and import.
-- `src/app.test.tsx` covers route rendering, choice fragments, access control boundaries,
-  author tool output, and invalid state handling.
-- The author tools page at `/gamebook/author` renders the verification manifest alongside
-  graph validation and template coverage, making testing visible as part of the authoring
-  workflow.
+Looking back across the gamebook:
 
-The full `TEST_COVERAGE_AREAS` structure, the complete `scripts/check-static.ts` assertions,
-and the Playwright session walkthrough in `scripts/test-static-gamebook.ts` are in the
-repository rather than reproduced here; the extracts in this chapter show the shape of each
-approach rather than the complete listings.
+- `Adventure`, `Passage`, `Choice`, `Encounter` in `src/gamebook/model.ts` are the **entities**
+  and **value objects** of the adventure domain, named in the domain's language.
+- `Adventure` and `GameState` are **aggregate roots**: each enforces consistency across its
+  owned objects through `validateAdventure` and `parseGame` respectively.
+- `src/gamebook/graph.ts` and `src/gamebook/state.ts` are two distinct domain services,
+  each representing a **bounded context**: adventure authoring and play session management.
+- `StorageAdapter` in `src/gamebook/state.ts` is a **repository interface**: the play logic
+  depends on the abstraction, not the browser storage implementation.
+- The SRD catalogue in `src/gamebook/rules/srd.ts` is the gamebook's small
+  **anti-corruption layer**: SRD vocabulary translated into the application's domain model,
+  with source attribution preserved.
+
+The ubiquitous language of the gamebook is `Passage`, `Choice`, `Encounter`, `GameState`,
+`EndingKind`, `RollResult`: words a gamebook author would use, not words a database
+administrator would use. That alignment was not accidental. It was the whole strategy.
 
 ---
 
-The Dungeon Master's dungeon had a secret door that opened into a wall. The test party found
-it. Not because they were looking for that specific problem, but because checking every door
-is what the test party does.
+The Scribe's three years of instinctive modelling and the blue book on the Wizard's desk
+describe the same activity. The instinct comes first; the vocabulary comes when you want to
+talk to other people about it, read about what has worked for others, or recognise when you
+are about to make a well-documented mistake.
 
-The scout checks whether doors open. The ledger-keeper checks that items promised in one room
-arrive in the next. The retreating fighter verifies that defeat leads somewhere coherent. The
-reader in poor light asks whether the public handout is legible. The archivist reads every
-scroll for private notes that should not be there.
+Domain-driven design does not solve software problems. It names a way of thinking about them
+that keeps the code honest about what it represents. The domain is the dungeon. The software
+is the map. A good map does not impose its own structure on the territory; it follows the
+territory's structure faithfully enough that someone who knows the territory can read the map,
+and someone who can read the map can find their way through the territory.
 
-None of them improve the dungeon's design. That is the Dungeon Master's job. What they do is
-ensure that what was designed is what was built, that what was built is what was published,
-and that what was published is what the player receives. The gap between those three things
-is where bugs live, and the test party is the systematic effort to close it.
-
-In Chapter 15, we close the spellbook. Not because the labyrinth is finished, but because the
-map is good enough to navigate by, and the reader now has the tools to keep drawing it.
+In Chapter 14, we will send a test party through every door to verify that the map is
+accurate: that the code does what it claims, the published build contains what it should, and
+the access boundaries hold under pressure.
 
 ---
 
-[^1]: Running gates in order and stopping on failure is not just a time-saving convention. It
-is an epistemic principle: a gate that depends on a previous gate's output cannot produce
-meaningful results when the previous gate has failed. Checking the browser smoke against a
-static build that failed would be checking a missing or incorrect build. The result would
-be noise. Stopping the chain on failure preserves the signal: the first failure tells you
-exactly where the problem is, and the subsequent gates tell you nothing useful until it is
-fixed.
+## At Scale: Campaign Ledger
 
-[^2]: Test-driven development (TDD) is the practice of writing a failing test before writing
-the code that makes it pass. The cycle is: write a test that describes the desired behaviour,
-watch it fail, write the minimum code to make it pass, refactor. The discipline has genuine
-advantages: tests that are written first tend to be cleaner, code that is written to satisfy
-a test tends to have clearer interfaces, and the suite stays honest because there is no
-temptation to write tests that are calibrated to the existing code rather than the intended
-behaviour. It works best for domain logic with clear inputs and outputs, which is exactly
-where the gamebook uses it most. It works less well for frontend components, where the
-"desired behaviour" is partly visual, partly interactive, and partly a matter of taste that
-changes as the design evolves; writing a test for a component before the component exists
-often means writing a test against an interface that will be redesigned three times before
-it settles. TDD has a devoted following, and some of its adherents treat it as the only
-legitimate way to write software, which is the kind of absolutism that tends to follow any
-good idea when it acquires a methodology and a name. The idea is sound; the cult is optional.
+Campaign Ledger applies the same DDD vocabulary to a larger domain. The observations below are
+not new concepts; they are what the patterns from this chapter look like when the application
+has multiple bounded contexts, authenticated users, and several years of accumulated decisions.
 
-[^3]: The content readiness test is one of the more unusual uses of automated testing:
-asserting that the content is not in a specific bad state. It is not testing that the
-content is good; it is testing that it has passed a minimum bar. The precedent in software
-is the linting rule that forbids `console.log` statements in committed code, or the CI check
-that forbids TODO comments in certain directories. These tests do not measure quality; they
-enforce a threshold that prevents known categories of carelessness from reaching production.
+**Aggregate roots and access boundaries.** `Campaign` is an aggregate root. Characters,
+sessions, notes, NPCs, imports, and wiki pages are all owned within it. The access control
+from Chapter 9 follows directly from this boundary: checking `requireCampaignAccess` is
+checking whether an actor has permission to interact with this aggregate. The consistency
+boundary and the access boundary coincide because the domain made them the same thing.
 
-[^4]: The testing of negative capabilities, things that should not be possible, is
-systematically underrepresented in most test suites. Positive assertions are natural: we
-built a feature, we test that it works. Negative assertions require deliberately thinking
-about what should be absent. In the context of access control, this matters enormously: a
-test suite that verifies every positive access permission but never checks that forbidden
-access is actually forbidden is not a security test suite. It is a feature demo.
+**Bounded contexts in practice.** The `campaigns` context knows about sessions, prep, NPCs,
+wikis, and imports. The `characters` context knows about sheets, abilities, skills, resources,
+and equipment. The `rules` context knows about sources, entities, and mechanics. Each has its
+own repository, its own read models, and its own vocabulary. A "character" in the characters
+context is a full sheet with abilities and resources. A "character" in the local play context
+is a summary with a name, a class, and a level. Same word, different shape, appropriate to each
+context's needs.
 
-[^5]: Playwright is the most capable cross-browser automation library currently available for
-web testing. It supports Chromium, Firefox, and WebKit, exposes a clean API for navigation,
-interaction, and assertion, and has first-class support for capturing screenshots, network
-requests, and browser storage. The choice of Playwright over the alternatives reflects its
-ability to test the static gamebook exactly as a player experiences it: real browser, real
-storage, real JavaScript execution. Alternatives that simulate the browser rather than running
-it cannot verify that `localStorage` behaves as expected.
+**Anti-corruption layers.** The SRD importer converts SRD 5.1 vocabulary into the application's
+own `rules_entities` and `rule_mechanics` schema — the same translation the gamebook's compact
+catalogue performs, with more moving parts. The Google Docs campaign-content importer does the
+same for prep material: normalising Markdown, stripping private URLs, preserving source
+metadata before anything enters the campaign domain. Each importer speaks both languages so the
+domain only has to speak one.
 
-[^6]: WCAG 2.2 is the current version of the Web Content Accessibility Guidelines, published
-by the W3C. Level AA is the standard required by most accessibility legislation and
-procurement policies in the UK and elsewhere. The three levels, A, AA, and AAA, represent
-increasing levels of accessibility provision; AA is the practical target for most web
-applications. The full specification is at [w3.org/TR/WCAG22](https://www.w3.org/TR/WCAG22/).
-Pa11y is available at [pa11y.org](https://pa11y.org/).
+**Repository interfaces through the stack.** Campaign Ledger defines explicit repository
+interfaces that speak domain language: `getCharacter(id)`, `listNpcSummariesForCampaign(...)`,
+`updateResourceCurrent(resourceId, delta)`. The SQLite implementation satisfies them; routes
+never import SQLite details directly. The gamebook's `StorageAdapter` is the same pattern at
+minimum scale. Campaign Ledger is what it looks like when the pattern has to carry the weight
+of a production application.
 
-[^7]: The PR template as a forcing function for evidence is a specific application of a
-general principle: good process is built into the workflow rather than appended to it.
-A reviewer who has to remember to ask for screenshots will sometimes forget. A PR template
-that includes a screenshots section, with a required checkbox or a note explaining why
-screenshots are not needed, makes the evidence expectation part of submitting the PR.
-The effort required to write "not applicable, logic change only" is much lower than the
-effort required to explain a visual regression after the fact.
+---
 
-[^8]: The acceptance note pattern is borrowed from delivery practice: the assumption that a
-feature is not done when the code is merged, but when the evidence of its correctness is
-recorded. In regulatory environments this is a compliance requirement. In most software
-teams it is a useful discipline even without the regulatory pressure, because it forces the
-question "what did we actually ship?" to be answered explicitly at the moment when the
-answer is most accessible. The "assertions with receipts" shorthand applies the same logic:
-"the tests passed" is a claim; "bun run verify: 5 gates, 82 tests, 0 failures" is the same
-claim with enough detail for a reviewer to verify it against the CI log. The extra fifteen
-words are not bureaucracy; they are the difference between a claim and evidence.
+[^1]: Eric Evans, *Domain-Driven Design: Tackling Complexity in the Heart of Software*
+(Addison-Wesley, 2003). The book is long, dense, and worth reading slowly. Its core
+arguments are clear; much of its bulk is examples and pattern catalogues. Martin Fowler's
+website at [martinfowler.com](https://martinfowler.com/tags/domain%20driven%20design.html)
+provides shorter, searchable treatments of the individual patterns. The blunt entry point is
+Fowler's article "UbiquitousLanguage", which makes the core claim in about six paragraphs.
+
+[^2]: The `src/nodes/` directory and its `AdventureNode` model are visible in the project's
+early history. The migration to `src/gamebook/model.ts` with its `Passage` and `Choice`
+types was exactly the kind of refactoring Evans describes: not changing what the code does,
+but changing what the code says it is. The technical behaviour was equivalent. The model
+became honest.
+
+[^3]: The entity/value object distinction has a useful practical implication for equality.
+Two entities with the same attributes are still two different entities if they have different
+ids. Two value objects with the same attributes are the same thing. `AttackProfile`s with
+identical fields can be compared by value and swapped freely. Characters with identical fields
+but different ids are different characters. TypeScript does not enforce this distinction
+automatically; it is a design commitment, not a type-system feature. Making it explicit, naming
+it, helps the team maintain it consistently.
+
+[^4]: The aggregate root as consistency boundary is one of Evans' most practically useful
+ideas. It answers the question "what validates together?" The adventure validates as a whole
+because the consistency rules, passage targets, item references, encounter ids, span the whole
+adventure. You cannot validate a passage in isolation from the adventure that defines its
+items and encounters. The aggregate root is the boundary at which you can meaningfully ask
+"is this correct?"
+
+[^5]: This is Evans' concept of context mapping: understanding which contexts exist, where
+their boundaries are, and what translation is required at each boundary. Campaign Ledger's
+architecture documents describe this implicitly in the repository interfaces: each repository
+speaks its context's language, and the routes coordinate between contexts without the contexts
+directly knowing about each other.
+
+[^6]: The anti-corruption layer pattern is one of Evans' more widely adopted ideas, partly
+because it solves a very practical problem: integrating with external systems without letting
+the external system's design choices infect the internal model. Every system that consumes an
+external API or imports from an external format benefits from an explicit translation layer.
+The alternative, letting the external vocabulary in directly, accumulates as technical debt:
+the code starts to speak the external system's language rather than the domain's language, and
+the two become harder to disentangle.
+
+[^7]: The repository pattern also makes testing significantly easier, which is one practical
+argument for it that does not require any commitment to DDD philosophy. If the application
+logic depends on a `StorageAdapter` interface rather than directly on `localStorage`, tests
+can inject a simple in-memory object and verify behaviour without needing a browser. This is
+the same injectable dependency pattern used for `RandomSource` in Chapter 6: depend on the
+contract, not the implementation, and the tests can control the implementation.
+
+[^8]: This observation is not unique to D&D. Any sufficiently mature domain develops a rich
+and precise vocabulary over time. Legal systems have terms of art with exact meanings. Medical
+systems have clinical vocabulary. Financial systems have accounting terms. In each case,
+domain-driven design's advice is the same: use the domain's vocabulary, do not invent your
+own. The domain experts have usually spent considerably more time thinking about their domain
+than the developers have, and their vocabulary reflects that.
+
+[^9]: The "read the types" test is one I find genuinely useful. If the type definitions read
+like a description of the domain, the model is honest. If they read like a description of the
+database schema, or the API response format, or the programmer's convenience, the model has
+been built upside down. Types describe what things are; the domain already knows what things
+are; the code should agree.

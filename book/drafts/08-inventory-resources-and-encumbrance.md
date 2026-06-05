@@ -360,12 +360,92 @@ interface ChoiceEffect {
 }
 ```
 
-These apply in a defined order inside `applyChoiceEffects`: items are added and removed first,
-then flags are set, then hit points change. The order matters. When a choice removes a
-consumable and uses it to heal, the item should be gone before the healing is confirmed,
-because a careless implementation that heals first and removes second has a window in which the
-item exists in the inventory, the healing has already applied, and something could go wrong in
-between. There is no such window if the removal comes first.
+These apply in a defined order inside `applyChoiceEffects`. Items are added and removed first,
+then flags are set, then hit points change. Showing the implementation makes the guarantee
+concrete:
+
+```typescript
+function applyChoiceEffects(state: GameState, effects: ChoiceEffect): GameState {
+  // Step 1: mutate inventory
+  const inventory = new Set(state.inventory);
+  for (const item of effects.addItems ?? []) inventory.add(item);
+  for (const item of effects.removeItems ?? []) inventory.delete(item);
+
+  // Step 2: set flags
+  const flags = [...state.flags];
+  for (const flag of effects.setFlags ?? []) {
+    if (!flags.includes(flag)) flags.push(flag);
+  }
+
+  // Step 3: apply hit point changes
+  const maxHp = state.character.maxHitPoints;
+  let hp = state.hitPoints;
+  if (effects.heal) hp = Math.min(maxHp, hp + effects.heal);
+  if (effects.damage) hp = Math.max(0, hp - effects.damage);
+
+  return { ...state, inventory: [...inventory], flags, hitPoints: hp };
+}
+```
+
+The order matters. When a choice removes a consumable and uses it to heal, the item should be
+gone before the hit points change. A careless implementation that heals first and removes
+second leaves a window between the two operations: if the state were inspected mid-function,
+the ration would still be present while the healing had already applied. Nothing actually goes
+wrong in a synchronous function, but the ordering is still important as a design principle:
+the effect should be atomic — from the caller's perspective, the item is spent and the healing
+applied in one transaction. The implementation enforces this by resolving all inventory changes
+before touching hit points.
+
+A test makes this explicit:
+
+```typescript
+// src/gamebook/state.test.ts
+test("applyChoiceEffects removes a consumable before applying its heal", () => {
+  // Arrange
+  const state = makeGameState({
+    inventory: ["ration"],
+    hitPoints: 6,
+    character: makeCharacter({ maxHitPoints: 10 }),
+  });
+
+  const effects: ChoiceEffect = {
+    removeItems: ["ration"],
+    heal: 4,
+  };
+
+  // Act
+  const next = applyChoiceEffects(state, effects);
+
+  // Assert: ration is gone
+  expect(next.inventory).not.toContain("ration");
+
+  // Assert: healing was applied
+  expect(next.hitPoints).toBe(10);
+
+  // Assert: original state is unchanged (pure function)
+  expect(state.inventory).toContain("ration");
+  expect(state.hitPoints).toBe(6);
+});
+
+test("applyChoiceEffects does not heal above maximum", () => {
+  // Arrange
+  const state = makeGameState({
+    inventory: ["ration"],
+    hitPoints: 9,
+    character: makeCharacter({ maxHitPoints: 10 }),
+  });
+
+  // Act
+  const next = applyChoiceEffects(state, { removeItems: ["ration"], heal: 4 });
+
+  // Assert: capped at max, not 13
+  expect(next.hitPoints).toBe(10);
+});
+```
+
+The second test is the one that catches a missing clamp. It is easy to write `hp + heal`
+without thinking about the ceiling; the test makes the missing `Math.min` a test failure
+rather than a silent corruption.
 
 Each effect is also logged. When a player spends a ration and gains four hit points, the game
 records "Used ration. Recovered 4 hit points." This is the same transparency principle the
