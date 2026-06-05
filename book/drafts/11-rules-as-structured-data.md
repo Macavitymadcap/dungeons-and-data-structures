@@ -51,20 +51,21 @@ become a problem the moment the software picks one without recording the choice.
 ## The Difference Between Text And Data
 
 A rule in a physical rulebook is prose. "A shield provides a +2 bonus to Armour Class." That
-sentence is useful for a person at a table. It is of limited use to software that needs to
-know whether a character is wearing a shield, how much that affects their AC calculation, and
-whether the rule is from a source the application is allowed to publish.
+sentence is useful for a person at a table who knows what a shield is, understands what Armour
+Class means, and can apply the bonus themselves when the time comes. It is of limited use to
+software that needs to know whether a character is currently wearing a shield, by exactly how
+much that changes their AC, and whether the rule comes from a source the application is allowed
+to publish.
 
-Turning prose into data always involves trade-offs. Some nuance is lost; some affordances are
-gained. The question is not whether the data is a perfect representation of the prose, but
-whether it is sufficient for the software's actual needs.
+Turning prose into data involves a deliberate loss. Flavour text, historical context, the
+weight of the item in pounds: none of that travels into the record. What does travel is whatever
+the software actually needs to act on. The question is not whether the data perfectly represents
+the prose, but whether it is sufficient for the software's specific requirements. This is a
+different question, and it has a smaller answer.
 
-The gamebook's needs are modest: it needs to know that a shield exists, that it is an
-equipment item, that it belongs to the SRD, and that its game-mechanical effect is a +2 armour
-class bonus applied at character creation time. The rest of the rulebook prose, the flavour
-text, the historical context, the equipment weights in pounds, is not needed by the code.
-
-The smallest useful rule record looks like this:
+The gamebook's requirements are modest: it needs to know that a shield exists, that it is
+equipment, that it comes from the SRD, and that its mechanical effect is a +2 armour class bonus.
+That is the whole job. The smallest record that does that job looks like this:
 
 ```typescript
 interface NamedRule {
@@ -190,48 +191,50 @@ same dice value object is used consistently throughout the gamebook's rules. The
 contains the minimum the code actually reads: the hit die for calculating starting hit points,
 the spellcasting ability for any future spell mechanics.[^2]
 
-The design principle: the entity is the name; the mechanic is the machine-readable detail. They
-have different reasons to change and should be changed independently where possible.
+The entity is the name; the mechanic is the machine-readable detail. A `ClassRule` for the
+Wizard does not reproduce the class description. It records the three facts `createCharacter`
+actually reads: the hit die, the primary ability, and the spellcasting ability. The rest is not
+used, not copied, and not reproduced.
 
 ---
 
 ## Provenance: Making Bugs Explainable
 
-Provenance is the record of where something came from. For rules data, provenance answers:
-which source provided this entity, and what path it followed from the source into the
-application.
+Provenance is the record of where something came from. In a rules catalogue, it answers a
+question that sounds administrative until you need the answer urgently: which source provided
+this entity, and is the software allowed to publish it?
 
-The gamebook records provenance through the `sourceId` field on every rule. That field is
-enough to satisfy the attribution requirement and to answer the policy question: can this rule
-appear in the published static build? Every rule in the catalogue either carries `"srd-5-1-cc"`
-or `"dads-original"`. The build pipeline checks the source before including anything in the
-published output.
+The gamebook records provenance through the `sourceId` field on every rule. Every entry in
+`srd.ts` carries either `"srd-5-1-cc"` or `"dads-original"`. The build pipeline checks the
+source before including anything in the published output: SRD content carries the attribution
+requirement; project-original content does not. Without the `sourceId` field, these are rules.
+With it, they are rules the software can reason about, filter, and attribute correctly.
 
 The record of where something came from is not a footnote to the real data. It is the condition
-under which the real data may be used.
+under which the real data may be used.[^3]
 
 ---
 
 ## Source Precedence
 
-The Wizard's three spellbooks describe the same incantation with different details. This is not
-a hypothetical problem. Real rules data has overlapping sources: a spell might appear in the
-core SRD and in a third-party supplement with additional flavour text and revised mechanics.
-A condition might appear in the base rules and in a campaign-specific house ruling that modifies
-its effect.
+The Wizard's three spellbooks are not a contrived problem. Real rules data has overlapping
+sources: the same spell might appear in the core SRD and in a third-party supplement with
+different mechanics. The same condition might appear in the base rules and in a campaign-specific
+house ruling that modifies its effect. The software needs a policy for this before the conflict
+arrives, because writing the policy after the fact requires touching every query that assumed
+there wasn't one.
 
-The software needs a policy for this. When two sources describe the same entity, which one
-wins? The gamebook does not yet face this conflict: it has two sources, SRD 5.1 and
-project-original material, with no overlapping entities. The important lesson is to define the
-resolution rule before the conflict exists, not after.
+The gamebook does not yet face this conflict; it has two sources with no overlapping entities.
+The lesson worth carrying forward is that "define the resolution rule before the conflict
+exists" is not fastidiousness. It is avoiding a specific class of bug I found the hard way.
 
-I learned this the hard way in an earlier version of Campaign Ledger that did not track
-sources at all. The spell list was a flat file of records with no provenance field. When I
-added a homebrew spell for one campaign, it appeared in the global spell browser for every
-campaign, because there was no source-level visibility gate. Adding the `sourceId` field fixed
-the symptom. Once source is in the model, that class of bug becomes structurally impossible:
-a query for public-only rules simply does not return private-source records, because the
-filter is on a field that every record must have.
+In an earlier version of Campaign Ledger, the spell list was a flat file with no provenance
+field. When I added a homebrew spell for one campaign, it appeared in the global spell browser
+for every campaign, because there was no source-level visibility gate. Filtering it out required
+touching every query that returned spells. Adding the `sourceId` field fixed the symptom.
+Once source is in the model, that class of bug becomes structurally impossible: a query for
+public-only rules does not return private-source records, because the filter is on a field that
+every record must have.
 
 ---
 
@@ -260,26 +263,28 @@ changes, every reference to it by id reflects the update automatically.[^5]
 
 ## What The Gamebook's SRD Catalogue Actually Contains
 
-It is worth being specific about what the gamebook uses from the SRD and what it does not.
+It is worth being specific, because the SRD is a large document and the gamebook uses a small
+slice of it.
 
 The gamebook uses SRD 5.1-compatible vocabulary and mechanics. It does not reproduce class
-feature descriptions, spell descriptions, monster stat blocks, or any other extended prose
-from the SRD. What it uses is the structural vocabulary: the names of the six ability scores,
-the four character classes, the four playable races, the standard set of conditions, the names
-and categories of starting equipment, and the abstract mechanics of proficiency bonuses,
-ability modifiers, and dice notation.
+feature descriptions, spell descriptions, monster stat blocks, or any extended prose. What it
+uses is the structural vocabulary: the names of the six ability scores, the four character
+classes, the four playable races, the standard set of conditions, the names and categories of
+starting equipment, and the abstract mechanics of proficiency bonuses, ability modifiers, and
+dice notation.
 
-The `srd.ts` catalogue holds compact records for these. A `SkillRule` records the skill's
-name, the associated ability, and whether the gamebook uses it. An `EquipmentRule` records
-the item's name, category, any armour class bonus or damage dice, and whether it is SRD-derived
-or project-original. The records are factual rather than descriptive: they contain what the
-code needs, not what a reader would find interesting.[^7]
+The `srd.ts` catalogue holds compact records for these. A `SkillRule` records the skill's name,
+the associated ability, and whether the gamebook uses it. An `EquipmentRule` records the item's
+name, category, any armour class bonus or damage dice, and its source. The records are factual
+rather than descriptive: they contain what the code needs to read, not what a player would find
+interesting.[^7]
 
 This is the honest version of SRD use: credit the source, use the mechanics, write your own
 prose. The adventure passages in Mt. Graphnor describe the brass key, the rations, and the
 locked door in original language. The SRD catalogue tells the code that a quarterstaff is a
-weapon with 1d6 damage. The two things are in different files, maintained independently,
-and governed by different licence obligations.
+weapon with 1d6 damage. The two things live in different files, change for different reasons,
+and are governed by different licence obligations. Keeping them separate is not extra work. It
+is the work.
 
 ---
 
@@ -344,16 +349,15 @@ rather than the complete catalogue.
 
 ---
 
-The Archivist's value is not having opinions about which spellbook is correct. It is having a
-complete and accurate record of which spellbook is which, what was changed in each edition,
-and who made the changes. That record is the prerequisite for any policy decision worth
-trusting.
+The Archivist's value was never having opinions about which spellbook was correct. It was
+having a complete and accurate record of which spellbook was which, what was changed between
+editions, and who made the changes. That record is the prerequisite for any policy decision
+worth trusting — including the Wizard's.
 
-Software rules data works the same way. The source, the licence, the attribution requirement,
-the visibility category, the export eligibility: these are not footnotes to the real data.
-They are the conditions under which the real data may be used. Without them, you have rules.
-With them, you have rules you can publish, share, reason about, and explain to someone who
-asks where they came from.
+Software rules data works the same way. The source, the licence, the attribution requirement:
+these are not footnotes to the real data. They are the conditions under which the real data
+may be used. Without them, you have rules. With them, you have rules you can publish, share,
+reason about, and explain when someone asks where they came from.
 
 In Chapter 12, we'll turn from the rules the game runs on to the state the player accumulates
 while running it. Saving a game is a contract: a promise that the progress made in one session

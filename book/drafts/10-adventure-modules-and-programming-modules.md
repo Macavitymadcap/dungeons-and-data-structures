@@ -67,31 +67,26 @@ David Parnas described the essential insight in 1972, in a paper about how to de
 into modules.[^1] His answer was not "group things that are similar" but "group things that change
 for the same reason, and hide the decision that might need to change."
 
-The Scribe's great ledger fails this test. Maps and laws and hero chronicles don't change for
-the same reason: maps change when the geography of the campaign changes, laws (rules) change when
-the system is updated, hero chronicles (character records) change when a player levels up. Putting
-them all in one place means that any change to one has to navigate past all the others.
+The Scribe's great ledger fails this test immediately. Maps and laws and hero chronicles do not
+change for the same reason: maps change when the geography shifts, laws change when the rules
+are revised, chronicles change when a player levels up. Putting all three in one place means
+any change to one has to navigate past the others, and adding a fourth category requires knowing
+where the first three currently live.
 
-The Archivist's shelves pass it. The maps shelf changes when maps change. It knows nothing about
-rules. The rules shelf changes when rules change. It knows nothing about maps. Adding a new shelf
-for encounter tables does not require reorganising either.
+The Archivist's shelves pass it. The maps shelf changes when maps change, and knows nothing about
+rules. The rules shelf changes when rules change, and knows nothing about maps. Adding a shelf
+for encounter tables requires no reorganisation of either. The principle is sometimes called
+**high cohesion**: things that change together belong together. Its complement is **low coupling**:
+things that change independently should not know too much about each other.[^2]
 
-This is the principle of **high cohesion**: things that change together belong together. Its
-complement is **low coupling**: things that change independently should not know too much about
-each other. The pair shows up in almost every serious piece of software engineering writing,
-under various names, and the observation that it is simple in principle and difficult in practice
-has been made approximately as many times as software has been written.[^2]
-
-The word "module" is doing double duty in this chapter's title, and the two meanings turn out to
-agree. A published D&D adventure is called a module precisely because it is built to plug into a
-campaign through a small, well-defined interface. The Game Master needs to know a handful of
-things: where the adventure begins, what level of party it expects, what the players carry out
-when they leave, and how it hooks into the wider campaign. The internal room layout, the
-wandering-monster table, the secret the villain is hiding: those are the module designer's
+The word "module" is doing double duty in this chapter's title, and the two meanings agree more
+than they should. A published D&D adventure is called a module precisely because it plugs into
+a campaign through a small, well-defined interface. The Game Master needs to know where it
+begins, what level of party it expects, and how it connects to the wider world. The internal
+room layout, the wandering-monster table, the villain's secret: those are the designer's
 business, sealed behind that interface. A good adventure module can be dropped into anyone's
-campaign because it does not require the surrounding world to know its internals, and it does not
-reach out and rearrange that world. High cohesion, low coupling, written on a different kind of
-shelf. A software module aspires to exactly the same courtesy.
+campaign because it does not require the surrounding world to know its internals. A software
+module aspires to exactly the same courtesy.
 
 ---
 
@@ -136,42 +131,31 @@ adventure content in `content/` knows nothing about HTTP. The `rules/` directory
 about rendering. `model.ts` sits at the bottom of the tree, importing nothing from the rest of
 the gamebook, exporting the shared vocabulary that everything else uses.
 
-The filing principle is clearest when you ask not what each file does, but what would have to
-change if something else changed.
-
 ---
 
 ## What Changes For What Reason
 
-The filing principle is clearest when you ask: if this thing needs to change, what else has
-to change with it?
+The filing principle becomes clearest when you ask not what a file does, but what you would
+have to touch if something else changed.
 
-If the passage validation rules tighten: change `graph.ts`. Nothing else needs to know.
+Tighten the passage validation rules and only `graph.ts` needs to know. Add a new field to
+the save document and only `model.ts` and `state.ts` need updating; the graph validator, the
+dice module, and the HTTP routes have no opinion on save schemas. Change the rendering of a
+passage panel and the combat rules and inventory logic are unaffected. Change the adventure
+content and the modules that process it are unaffected, because they operate on whatever
+adventure data they receive, without caring which adventure it is. Replace Hono with a
+different web framework and the domain logic survives intact: `graph.ts`, `state.ts`, `rules/`,
+none of them import Hono.
 
-If the save document adds a new field: change `model.ts` (the type) and `state.ts` (the
-creation, loading, and migration logic). The graph validator, the dice module, and the HTTP
-routes do not need to know.
+That last one is worth pausing on. The domain modules are framework-light by design: they use
+standard TypeScript and have no opinions about HTTP. `app.tsx` depends on them; they do not
+depend on `app.tsx`. The direction of knowledge flows inward, not outward.
 
-If the rendering of a passage panel changes: change `render.ts` or `player-render.ts`. The
-combat rules and the inventory logic are unaffected.
-
-If the adventure content changes: change `content/mt-graphnor.ts`. The validation, state, and
-rendering modules operate on whatever adventure data they receive; they do not care which
-adventure it is.
-
-If Hono is replaced with a different web framework: change `app.tsx` and `index.ts`. The
-domain modules do not import Hono. They would survive the replacement without modification.
-
-This last point is the dependency direction principle. The domain modules, `model.ts`,
-`graph.ts`, `state.ts`, `play.ts`, and `rules/`, are framework-light. They use standard
-TypeScript. They have no opinions about HTTP. `app.tsx` depends on them; they do not depend
-on `app.tsx`. The direction of knowledge goes inward, not outward.
-
-Robert C. Martin describes this as the **Dependency Inversion Principle**: high-level policy
-should not depend on low-level details.[^3] In the gamebook's terms, the game rules are
-high-level policy. The HTTP framework is a low-level detail. If the policy depended on the
-detail, changing the detail would require changing the policy. Keeping them independent means
-each can change without affecting the other.
+Robert C. Martin calls this the **Dependency Inversion Principle**: high-level policy should
+not depend on low-level details.[^3] The game rules are high-level policy. The web framework
+is a low-level detail. If the policy depended on the detail, swapping the framework would
+require rewriting the rules. The module boundary keeps them separate so that each can change
+independently, which is the whole point of having a module boundary at all.
 
 ---
 
@@ -179,32 +163,33 @@ each can change without affecting the other.
 
 A module's public surface is the set of names it exports. Everything else is private.
 
-`src/gamebook/model.ts` exports the types that the rest of the system uses: `Passage`,
-`Choice`, `Adventure`, `Character`, `GameState`, and so on. Those exports are a contract:
-other modules depend on them. If a type's shape changes, every importer must be updated.
-That is the cost of sharing.
+`src/gamebook/model.ts` exports the types the rest of the system uses: `Passage`, `Choice`,
+`Adventure`, `Character`, `GameState`, and so on. Those exports are a contract: other modules
+depend on them. If a type's shape changes, every importer must be updated. That is the cost of
+sharing, and it is why the surface should be kept as small as the callers actually need.
 
-`src/gamebook/graph.ts` exports `validateAdventure`, `exportMermaid`, and
-`createPassageMap`. It does not export its internal `collectTargetIds` helper or its
-traversal queue implementation. Those are details. They can change without breaking the
-callers.
+`src/gamebook/graph.ts` exports `validateAdventure`, `exportMermaid`, and `createPassageMap`.
+It does not export its internal `collectTargetIds` helper or its traversal queue implementation.
+Those are details. They can change without touching the callers, because the callers never
+asked for them.
 
-The question to ask of any export is: does another module genuinely need this, or is it
-only here because it was convenient during development? A sprawling barrel export that makes
-every internal function public is not a module; it is a filing cabinet with the doors
-removed. The API surface should be as small as the callers actually need.[^4]
+The question to ask of any export is: does another module genuinely need this, or is it only
+here because it was convenient during development? A sprawling barrel export that makes every
+internal function public is not a module; it is a filing cabinet with the doors removed. Every
+exported name is a commitment. Adding an export is easy; removing one is a breaking change for
+every caller. When in doubt, keep it private.[^4]
 
 ---
 
 ## The Author/Player Boundary As A Module Boundary
 
 Chapter 9 explained the author/player split as an access control problem. It is also a module
-boundary problem.
+boundary problem, and the two framings reinforce each other.
 
 The published gamebook ships `player-client.ts`. Development uses `client.ts`. The two files
-are not the same file with a feature flag: they are separate entry points with separate imports.
-`player-client.ts` does not import the author debug code, the forced navigation handler, or
-the development-only passage preview logic. Those modules are simply absent from the player
+are not the same file with a feature flag: they are separate entry points with separate import
+lists. `player-client.ts` does not import the author debug code, the forced navigation handler,
+or the development-only passage preview logic. Those modules are simply absent from the player
 build's dependency tree.
 
 This is what a structural boundary means in practice. It is not a conditional:
@@ -225,15 +210,11 @@ import { startNewGame, saveGame, loadGame } from "./state.ts";
 import { renderPassagePanel } from "./player-render.ts";
 ```
 
-The debug code's absence from the player bundle is guaranteed not by a conditional, but by the
-import graph. If `player-client.ts` does not import the debug module, the build tool cannot
-include it. The artifact check from Chapter 9 confirms this structurally: it verifies that the
-forbidden strings are absent from the published output, which would fail if the import graph
-had been accidentally widened.
-
-This is one of the more concrete ways that module design and access control overlap. The access
-boundary ("players should not see debug tools") is enforced partly by runtime guards and partly
-by the import structure of the build. Both layers matter.
+The debug code's absence from the player bundle is guaranteed not by a conditional but by
+the import graph. If `player-client.ts` does not import the debug module, the build tool
+cannot include it. The artifact check from Chapter 9 confirms this structurally, verifying
+that the forbidden strings are absent from the published output. A future change that
+accidentally widens the import graph would fail that check before reaching a player.
 
 ---
 
@@ -242,16 +223,17 @@ by the import structure of the build. Both layers matter.
 Coupling is the tax you pay for knowledge. The more one module knows about another's internals,
 the more tightly they are bound: a change in one requires a corresponding change in the other.
 
-The most expensive coupling is when a module imports concrete implementation details rather than
-abstractions. The gamebook demonstrates the correct approach with the injectable `RandomSource`
-from Chapter 6. The dice module does not call `Math.random()` directly through the business
-logic. It accepts a function parameter. Tests inject a deterministic source. Production uses
-`Math.random`. The business logic is decoupled from the specific random number generator; the
-parameter is the contract.
+The most expensive coupling is when a module reaches past an abstraction to import concrete
+implementation details. The gamebook demonstrates the correct alternative with the injectable
+`RandomSource` from Chapter 6. The dice module does not call `Math.random()` directly through
+the business logic. It accepts a function parameter. Tests inject a deterministic source.
+Production uses `Math.random`. The business logic is decoupled from the specific random
+number generator; the parameter is the contract, and contracts are stable in a way that
+implementations are not.
 
 The pattern is the same wherever you reach for an external dependency: depend on the contract,
-not the implementation. Name what you need; let someone else provide the thing that satisfies
-the name. If that something later changes, the caller does not need to know.[^5]
+not the implementation. Name what you need; let the caller provide the thing that satisfies
+the name. If that thing later changes, the module does not need to know.[^5]
 
 ---
 
@@ -263,28 +245,29 @@ from the outside.
 
 The safety net for refactoring is tests. The tests describe what the system does. After a
 restructuring, the tests should still pass. If they do, the external behaviour is preserved.
-If they fail, something that was previously guaranteed is now broken.
+If they fail, something that was previously guaranteed is now broken. The tests are not
+checking your work; they are defining it.
 
 The gamebook's verification suite exists precisely for this. Before any significant restructuring,
 run `bun run verify`: typecheck, unit tests, static build, static artifact check, and browser
 smoke. If everything passes, the module boundaries can be shifted, files can be moved, and
-internal logic can be reorganised, with a reasonable guarantee that the published gamebook
-still works.
+internal logic can be reorganised, with confidence that the published gamebook still behaves
+as described.
 
-The important corollary is that tests must cover the boundary you are about to move. If the
-graph validation is tested only through the HTTP routes, moving `graph.ts` to a different
-location might break the routes without the tests catching it, because the test is exercising
-the wrong boundary. Tests should be as close as possible to the unit whose behaviour they
-describe. `graph.test.ts` tests `graph.ts` directly, not through `app.tsx`. `state.test.ts`
-tests `state.ts` directly. Moving the file does not change what the test imports.[^8]
+The important corollary is that tests must cover the boundary you are about to move. If graph
+validation is tested only through the HTTP routes, moving `graph.ts` to a different location
+might break the routes without the tests catching it, because the test is exercising the wrong
+boundary. `graph.test.ts` tests `graph.ts` directly, not through `app.tsx`. Moving the file
+does not change what the test imports, which is exactly the point: the test is coupled to the
+module it describes, not to the incidental details of how that module is currently exposed.[^8]
 
 ---
 
 ## The Rendering Split As A Named Decision
 
-There is a deliberate trade-off in the current module structure worth naming explicitly: the
-rendering logic lives in `render.ts` and `player-render.ts` alongside the application shell
-in `app.tsx`, rather than in a fully separated `src/gamebook/ui/` directory. This is not an
+There is a deliberate trade-off in the current module structure worth naming explicitly. The
+rendering logic lives in `render.ts` and `player-render.ts` alongside the application shell in
+`app.tsx`, rather than in a fully separated `src/gamebook/ui/` directory. This is not an
 oversight; it is a scale decision.
 
 At the current size of the gamebook, `render.ts` and `app.tsx` are coupled enough that
@@ -293,9 +276,9 @@ their relationship is clear, and the tests cover the rendered output through `sr
 The cost of the coupling is low. The benefit of separating it into another layer would be
 modest. At this scale, the current arrangement is the right one.
 
-The signals that would suggest the time had come to draw a clearer boundary would be: finding
-yourself reading more rendering code than expected to make a routing change, or more routing
-code than expected to adjust a component's markup. When those costs arrive reliably and
+The signals that would suggest the time had come to draw a clearer boundary are specific:
+finding yourself reading more rendering code than expected to make a routing change, or more
+routing code than expected to adjust a component's markup. When those costs arrive reliably and
 repeatedly, the separation earns its keep. Right now it does not, and adding structure before
 the pain justifies it is its own kind of technical debt.[^9]
 
@@ -334,8 +317,9 @@ absence.
 
 Separate shelves do not make the information easier to produce. They make it easier to find,
 easier to update, and easier to hand to someone who has not been maintaining the ledger for
-fifteen years. That is a more modest promise than "everything in one place", and it is a more
-honest one.
+fifteen years. The Archivist was not proposing a revolution; they were proposing a filing
+system. That is a more modest promise than "everything in one place", and it is a more honest
+one.
 
 In Chapter 11, we'll look at a particular kind of content that needs its own shelf and its own
 careful handling: the rules themselves. Spells, conditions, equipment, class features: the
@@ -399,11 +383,11 @@ observation: things that belong together should be together, and things that don
 together should not know about each other. The reason the observation has been made so many
 times is that it is violated at roughly the same rate.
 
-[^3]: Robert C. Martin (aka Uncle Bob), *Clean Architecture: A Craftsman's Guide to Software 
-Structure and Design* (Prentice Hall, 2017). The Dependency Inversion Principle is one of the 
+[^3]: Robert C. Martin (aka Uncle Bob), *Clean Architecture: A Craftsman's Guide to Software
+Structure and Design* (Prentice Hall, 2017). The Dependency Inversion Principle is one of the
 five SOLID principles Martin is associated with. The formulation here, "high-level policy should
 not depend on low-level details; both should depend on abstractions", is more useful when read
-as a practical question: if the framework changes, which parts of my system should not have to 
+as a practical question: if the framework changes, which parts of my system should not have to
 change? The answer is the domain logic. The boundary that protects it is the module.
 
 [^4]: The minimal API surface principle appears in various guises across the software design
@@ -413,10 +397,10 @@ thread is that every exported name is a commitment. Adding an export is easy; re
 is a breaking change for every caller. When in doubt, keep it private.
 
 [^5]: This is the interface segregation principle in its practical form: depend on the smallest
-interface that satisfies your need. A route that needs to load a character does not need to
-import the whole SQLite repository. It needs a `getCharacter` function. If the underlying
-implementation later changes from SQLite to Postgres, or to an in-memory store for tests, the
-route does not know or care. The contract stays constant; the implementation changes behind it.
+interface that satisfies your need. A module that needs to load a character does not need to
+import the whole storage layer. It needs a `getCharacter` function. If the underlying
+implementation later changes, the module does not know or care. The contract stays constant;
+the implementation changes behind it.
 
 [^6]: The fate of compatibility shims in real codebases is interesting. The migration plan
 always includes "remove the shims once the migration is stable." In practice, shims often
