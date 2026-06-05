@@ -249,42 +249,6 @@ player experience might look similar from the outside. The architectural implica
 
 ---
 
-## The Same Pattern At Two Scales
-
-It's worth making the Campaign Ledger comparison explicit here, because the same pattern that
-structures a gamebook passage also structures a character sheet.
-
-A sheet route in Campaign Ledger returns a full page for direct navigation: addressable, bookmarkable,
-renderable without JavaScript. Individual panels within the sheet, the abilities block, the skills
-list, the resources, each have their own fragment endpoints. Editing a skill returns just the
-updated skills panel. Spending a spell slot returns just the updated resource row. Each response
-contains exactly what changed, no more.
-
-The sheet's tab panels use `hx-push-url`, so navigating between tabs updates the address bar and
-remains refreshable. After a form submission that changes server state, the route returns an
-`HX-Redirect`. The client follows it, the URL is correct, the page is clean.
-
-At the gamebook scale, this looks like:
-
-```
-GET  /gamebook                           → full page with current passage
-POST /gamebook/choices/:choiceId         → passage fragment
-```
-
-At the Campaign Ledger scale, it looks like:
-
-```
-GET  /sheet/:ref                         → full character sheet
-POST /sheet/:ref/resources/:id           → resource row fragment
-GET  /sheet/:ref/abilities               → abilities tab (full or fragment)
-```
-
-The same ideas. A different scope. The beginner version proves the concept; the production version
-proves it survives contact with real users, real data, and real complexity. This is why having two
-examples to pick from is useful.
-
----
-
 ## The Build Move
 
 By the end of this chapter, the gamebook has a working web surface:
@@ -324,6 +288,31 @@ In the next chapter, we'll step back from the passage and look at who's standing
 Before a player can make a choice, they need a character: a structured record of facts that the
 game's rules can operate on. That record is a data model, and building one is the subject of
 Chapter 4.
+
+---
+
+## At Scale: Campaign Ledger
+
+The same pattern that structures a gamebook passage also structures a character sheet in a
+multi-user application. In Campaign Ledger, a sheet route returns a full page for direct
+navigation: addressable, bookmarkable, renderable without JavaScript. Individual panels within
+the sheet each have their own fragment endpoints. Editing a skill returns just the updated skills
+panel. Spending a spell slot returns just the updated resource row.
+
+The route shapes at the two scales look like this:
+
+```
+GET  /gamebook                       → full page with current passage
+POST /gamebook/choices/:choiceId     → passage fragment
+
+GET  /sheet/:ref                     → full character sheet
+POST /sheet/:ref/resources/:id       → resource row fragment
+GET  /sheet/:ref/abilities           → abilities tab (full or fragment)
+```
+
+The concepts are identical. The scope is different. The gamebook proves the pattern with a small,
+inspectable example; Campaign Ledger proves it holds when more users, more panels, and more
+concurrent sessions apply pressure to the same ideas.
 
 ---
 

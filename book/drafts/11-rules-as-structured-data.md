@@ -190,48 +190,25 @@ same dice value object is used consistently throughout the gamebook's rules. The
 contains the minimum the code actually reads: the hit die for calculating starting hit points,
 the spellcasting ability for any future spell mechanics.[^2]
 
-Campaign Ledger separates this more formally into two database tables. `rules_entities` stores
-the named thing: its source, its entity type, its slug. `rule_mechanics` stores typed JSON
-payloads attached to the entity: spell level, spell school, equipment category, action timing,
-reset cadence. The separation means an entity can accumulate multiple mechanic payloads, and
-each payload can be updated or replaced without touching the entity record itself.
-
-For the gamebook, a flat TypeScript interface is sufficient. The design principle is the same:
-the entity is the name; the mechanic is the machine-readable detail. They have different
-reasons to change and should be changed independently where possible.
+The design principle: the entity is the name; the mechanic is the machine-readable detail. They
+have different reasons to change and should be changed independently where possible.
 
 ---
 
 ## Provenance: Making Bugs Explainable
 
 Provenance is the record of where something came from. For rules data, provenance answers:
-which source provided this entity, when it was imported, and what path it followed from the
-source into the application.
+which source provided this entity, and what path it followed from the source into the
+application.
 
 The gamebook records provenance through the `sourceId` field on every rule. That field is
 enough to satisfy the attribution requirement and to answer the policy question: can this rule
-appear in the published static build?
+appear in the published static build? Every rule in the catalogue either carries `"srd-5-1-cc"`
+or `"dads-original"`. The build pipeline checks the source before including anything in the
+published output.
 
-Campaign Ledger goes further, because it imports rules from external files and needs to be
-able to explain any rule record in the database:
-
-```typescript
-interface RuleMechanicPayload {
-  originalPath?: string;
-  ruleType?: string;
-  source?: string;
-  srdVersion?: string;
-}
-```
-
-`originalPath` is the file path the rule was imported from. `ruleType` is what the importer
-inferred the rule to be. `source` is the source's abbreviation. `srdVersion` identifies which
-edition of the SRD the rule belongs to.
-
-These fields are not for display. They are for debugging. When a rule in Campaign Ledger
-renders unexpectedly, or when a question arises about whether a particular rule is
-SRD-eligible, the provenance fields make the answer available without manually tracing the
-import history. The record of where something came from is part of the data.[^3]
+The record of where something came from is not a footnote to the real data. It is the condition
+under which the real data may be used.
 
 ---
 
@@ -244,113 +221,40 @@ A condition might appear in the base rules and in a campaign-specific house ruli
 its effect.
 
 The software needs a policy for this. When two sources describe the same entity, which one
-wins?
-
-Campaign Ledger answers with a `precedence` field on each source:
-
-```typescript
-interface RulesSource {
-  slug: string;
-  name: string;
-  contentCategory: "srd" | "third_party" | "local";
-  visibility: "public" | "campaign";
-  publicExportEligible: boolean;
-  precedence: number;
-}
-```
-
-Higher precedence wins. When the importer encounters two records for the same entity slug,
-it keeps the one from the higher-precedence source. If a campaign has a house-ruled version
-of a condition, stored in a campaign-scoped source with high precedence, it overrides the
-SRD version for that campaign's queries. The public export, however, uses only sources with
-`publicExportEligible: true`, which the campaign-local source is not.[^4]
-
-The gamebook does not yet need this level of source management. It has two sources: SRD 5.1
-and project-original material. The SRD content has priority for attribution purposes; the
-project-original content has priority for the game's specific mechanics. There is no conflict
-requiring a precedence resolution. The important lesson to carry forward is: define the
+wins? The gamebook does not yet face this conflict: it has two sources, SRD 5.1 and
+project-original material, with no overlapping entities. The important lesson is to define the
 resolution rule before the conflict exists, not after.
 
 I learned this the hard way in an earlier version of Campaign Ledger that did not track
 sources at all. The spell list was a flat file of records with no provenance field. When I
 added a homebrew spell for one campaign, it appeared in the global spell browser for every
-campaign, because there was no source-level visibility gate. Filtering it out required
-touching every query that returned spells. Adding the `sourceId` field fixed the symptom. The
-root cause was the earlier decision to treat all rules as equivalent regardless of where they
-came from. Once source is in the model, that class of bug becomes structurally impossible: a
-query for public-only rules simply does not return private-source records, because the filter
-is on a field that every record must have.
+campaign, because there was no source-level visibility gate. Adding the `sourceId` field fixed
+the symptom. Once source is in the model, that class of bug becomes structurally impossible:
+a query for public-only rules simply does not return private-source records, because the
+filter is on a field that every record must have.
 
 ---
 
-## Visibility And Public Export
+## The Attribution Panel
 
-Some rules belong to everyone. Some belong to a specific campaign. Some belong to neither, in
-the sense that they are drafts not yet ready for any audience.
+Rules provenance has a direct practical consequence for the published gamebook: the attribution
+panel. The SRD's Creative Commons licence requires attribution. Rather than writing that
+attribution by hand and hoping it stays accurate as the adventure grows, the panel is generated
+automatically from `RULE_SOURCES`, filtered to sources actually used by the current adventure.
+Adding a new SRD-derived item to the adventure catalogue adds its source to the attribution
+list without any manual step.
 
-This is the visibility problem, and it appears in every system that manages information for
-multiple audiences at once. In Campaign Ledger, it maps directly onto the access control
-concepts from Chapter 9:
+The gamebook also uses the source model to gate the static build. When publishing, only rules
+from sources marked `publicExportEligible` appear in the output. The policy lives at the source
+level, not the entity level: a choice that requires a brass key checks for the key's presence;
+a rule that belongs to a public source does not need a per-rule export flag. The source covers
+it.
 
-```typescript
-type SourceVisibility = "public" | "campaign";
-```
-
-A `public` source can be browsed by any visitor to the rules reference page. A `campaign`
-source is visible only within the campaign context it belongs to. The `publicExportEligible`
-flag on a source determines whether its rules may appear in exports, downloads, or the
-published static gamebook.
-
-The practical consequence: when the gamebook builds its static output, it uses only rules from
-`publicExportEligible` sources. It does not need to ask whether each individual rule is
-exportable; it asks whether the rule's source is. The policy lives at the source level, not
-the entity level.
-
-This is another instance of the principle from Chapter 8: gate at the right level of
-abstraction. A choice that requires a brass key checks for the key's presence. A rule that
-belongs to a public source does not need a per-rule export flag; the source's export policy
-covers it.[^5]
-
----
-
-## The Rules Page As A Product Feature
-
-Rules provenance is not just a data-integrity concern. In Campaign Ledger, the source model
-connects directly to access control: a rule's `visibility` and `publicExportEligible` fields
-determine how it participates in browsing, searching, and exporting. The data model encodes
-a policy, and the UI expresses it. Adding a new rules source is a product decision, not
-just a data operation.
-
-The gamebook's version of this is the attribution panel: a section of the published gamebook
-that lists every source, its licence, and the required attribution text. This panel is
-generated from `RULE_SOURCES`, filtered to sources actually used by the current adventure.
-It is produced automatically rather than written by hand, which means it stays accurate as
-the adventure's content evolves. Adding a new SRD-derived item to the adventure catalogue
-automatically adds its source to the attribution list.
-
----
-
-## Linking Rules To Play Objects
-
-Rules data earns its keep when it is connected to the things that use it.
-
-In Campaign Ledger, characters link to rules. A character has a list of prepared spells, each
-of which is a reference to a rule entity. A character has selected class features, each linked
-to a source. A character has equipment entries, each connected to the equipment catalogue. The
-character sheet is assembled partly from mutable play state (current hit points, conditions,
-resources) and partly from rule links (spell descriptions, class feature text, equipment names
-and categories).
-
-The link from the character to the rule is stable: it stores the rule's slug, not a copy of
-its text. When the rule's text is corrected or expanded, the character sheet reflects the
-update automatically. When a campaign-scoped rule is removed, any character links to it can
-be identified and resolved. The reference is the source of truth; the copy is the risk.
-
-The gamebook does the same thing at the item level. An `ItemDefinition` stores a `sourceId`
-that points to the rule source, and `EQUIPMENT_RULES` in `src/gamebook/rules/srd.ts` holds
-the catalogue entry. The item in the save state holds the item's id; the display layer looks
-up the name and category from the catalogue. When an item's display name changes, every
-reference to it by id reflects the update.[^6]
+The gamebook's item references work on the same indirection principle. An `ItemDefinition`
+stores a `sourceId` pointing to the rule source, and `EQUIPMENT_RULES` in
+`src/gamebook/rules/srd.ts` holds the catalogue entry. The save state holds the item's id; the
+display layer looks up the name and category from the catalogue. When an item's display name
+changes, every reference to it by id reflects the update automatically.[^5]
 
 ---
 
@@ -455,6 +359,33 @@ In Chapter 12, we'll turn from the rules the game runs on to the state the playe
 while running it. Saving a game is a contract: a promise that the progress made in one session
 can be resumed in another. What that contract requires, how it handles change over time, and
 what happens when it breaks are the subjects of the next chapter.
+
+---
+
+## At Scale: Campaign Ledger
+
+The gamebook's source model has two entries. Campaign Ledger's has many, because it imports
+rules from external files across multiple sources, editions, and licences, and needs to be able
+to explain any record in the database on demand.
+
+Each source carries a `precedence` field. When two sources describe the same entity slug,
+the higher-precedence source wins. A campaign-scoped house rule can override the SRD version
+for that campaign's queries without touching the shared rules corpus. The public export uses
+only sources flagged `publicExportEligible`, which campaign-local sources are not. Source
+policy propagates to every entity that carries the source's id: one field update, not a thousand.
+
+Campaign Ledger also separates entity storage from mechanic storage. `rules_entities` stores
+the named thing: its source, its entity type, its slug. `rule_mechanics` stores typed JSON
+payloads attached to the entity: spell level, spell school, equipment category, action timing,
+reset cadence. An entity can accumulate multiple mechanic payloads; each payload can be updated
+without touching the entity record. The gamebook's flat `ClassRule` interface is the same idea
+with the separation collapsed — sufficient at gamebook scale, instructive to see pulled apart.
+
+Character sheets link to rules by id rather than embedding rule text. A character's prepared
+spells, class features, and equipment entries are references. When a rule's text is corrected,
+every character sheet that references it reflects the update. When a campaign-scoped rule is
+removed, the affected character links can be identified and resolved. The reference is the
+source of truth; the copy is the risk.
 
 ---
 

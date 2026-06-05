@@ -326,33 +326,6 @@ automatically satisfy any interface they structurally match.
 
 ---
 
-## A Mature Comparison
-
-Campaign Ledger handles the same problem at larger scale, and the solution it landed on after
-the false start I described earlier is the same one the gamebook uses.
-
-A full character sheet in a shared campaign app has abilities, classes, skills, resources,
-equipment, defences, and proficiencies. These are not modelled as a deep class hierarchy. They
-are modelled as separate database tables, each with its own schema, assembled into a
-`CharacterSheetReadModel` when the sheet needs to be displayed.
-
-The `CharacterSheetReadModel` is not a subclass of anything. It is a composed view: a flat
-record assembled from related tables, shaped to match exactly what the UI needs. When the rules
-for armour class change, the armour class table changes. It does not cascade through a class
-hierarchy. The other tables are unaffected.
-
-When I originally put armour class inside `BaseEntity` because it was convenient, changing the
-armour class calculation meant touching every class that extended `BaseEntity`, verifying that
-none of them had overridden the relevant method in a way that would break, and then running the
-full test suite to find out which ones had. With separate tables, the same change touches one
-file. The other tables have not heard of armour class and do not care.
-
-This is composition at the persistence level, and it reflects the same instinct as the
-gamebook's template approach: model the axes of change independently, and assemble what you
-need when you need it.
-
----
-
 ## The Build Move
 
 By the end of this chapter, the gamebook has a working character creation system:
@@ -390,6 +363,26 @@ tower is theoretical. The dungeon outside it contains Eldritch Knights.
 In the next chapter, we'll add something the characters have been missing: the ability to fail.
 Dice, probability, and the particular relationship between a difficulty class and a modifier
 are the subject of Chapter 6.
+
+---
+
+## At Scale: Campaign Ledger
+
+The false start described at the opening of this chapter had a concrete resolution. Once the
+`BaseEntity` hierarchy was replaced, Campaign Ledger modelled character data as separate database
+tables: one for abilities, one for classes, one for resources, one for equipment, one for
+defences, one for skill proficiencies. Each table has its own schema and its own reasons to
+change.
+
+The `CharacterSheetReadModel` that the application assembles for display is not a subclass of
+anything. It is a composed view: a flat record built from related tables, shaped to match exactly
+what the UI needs at the moment it renders. When the armour class calculation changes, the armour
+class table changes. The other tables have not heard of armour class and do not care.
+
+This is composition at the persistence level. The instinct is identical to the gamebook's
+template approach: model the axes of change independently, and assemble what you need when you
+need it. The implementation is different because the requirements are different. The principle
+travels.
 
 ---
 [^1]: TypeScript's `class` syntax compiles down to JavaScript prototype chains, which differ from

@@ -217,14 +217,11 @@ It is not a public product, and was never intended to be. It is built with the s
 something that would be, and that care is the point.
 
 Where Mt. Graphnor is small enough to hold in your head all at once, Campaign Ledger is large
-enough to show how the same ideas grow under real-world pressure. When a chapter needs a
-beginner-sized example, it uses Mt. Graphnor. When it needs to show the same idea surviving
-contact with a real application, it uses Campaign Ledger. The two don't require you to understand
-both at once. When a Campaign Ledger section moves into SQL schemas, repository interfaces,
-or bounded contexts without stopping to introduce them, that's intentional: those sections
-are aimed at the reader who already has some of that ground. Read past them and the concept
-still lands from the gamebook side; come back when the territory feels more familiar and
-they'll read differently.
+enough to show how the same ideas look after several years of use by real people at a real table.
+Each chapter closes with a short coda, marked clearly, that shows the same concept in Campaign
+Ledger's context: more users, more edge cases, more accumulated consequence. Those codas are not
+required reading. They are the view from the next floor down. Come back to them when the gamebook
+examples have settled and you want to see where the stairs lead.
 
 ---
 
@@ -269,9 +266,11 @@ Chapter 3 it expects that HTML, HTTP verbs, and the idea of a form submission ar
 territory, and by Chapter 4 it expects TypeScript interface notation to be readable without
 introduction. What it does not assume is any prior exposure to formal software design: no
 computer science degree, no bootcamp, no previous encounter with graphs, data models,
-composition, or domain-driven design. The intended reader has some web experience, has written
-code that does something useful, and has started to suspect there are better ways to organise
-it. If that describes you, you are in the right place.
+composition, or domain-driven design. The intended reader has built things for the web, has
+written code that does something real, and has started to accumulate intuitions they can't
+quite name yet. If you've looked at a function that had grown too large and felt, rather than
+known, that it should be two functions, you're in the right place. This book is the vocabulary
+for what you've already been doing.
 
 A reasonable question at this point is why a gamebook at all. Text adventures were some of the
 earliest computer games precisely because of technical constraints, but what they demonstrated,

@@ -167,149 +167,29 @@ endpoint can submit to it without the form ever appearing on their screen. The a
 must validate the permission at the point where the action is processed, not only at the
 point where the interface is rendered.
 
-In Campaign Ledger, this is expressed through route guards that run before any rendering
-or mutation:
+In the gamebook, the route itself performs this check:
 
 ```typescript
-async function requireCampaignAccess(
-  c: Context,
-  campaignId: string,
-  level: "read" | "manage"
-): Promise<GuardResult> {
-  const session = await getSession(c);
-  if (!session) {
-    return { ok: false, reason: "unauthenticated" };
+app.post("/gamebook/passages", async c => {
+  if (!authorToolsEnabled) {
+    return c.notFound();
   }
-
-  const membership = await getCampaignMembership(session.userId, campaignId);
-  if (!membership) {
-    return { ok: false, reason: "not_found" };
-  }
-
-  if (level === "manage" && membership.role !== "game_master") {
-    return { ok: false, reason: "forbidden" };
-  }
-
-  return { ok: true };
-}
+  // ... handle forced navigation
+});
 ```
 
-The guard runs at the top of the route handler, before anything else. If it fails, the
-handler returns the appropriate response and stops. Nothing downstream runs. The rendering
-code, the database query, the mutation: none of it executes when the guard does not pass.
+The guard runs before anything else. If `authorToolsEnabled` is false, the route returns 404
+and stops. The rendering code, the navigation logic, the state mutation: none of it executes.
+A player submitting the forced navigation form against the published build gets the same
+response they would from any non-existent URL. The button's absence was a courtesy; the
+route's refusal is the actual boundary.
 
-The three failure modes map to distinct HTTP status codes.[^2] **401 Unauthorized** is the correct
-response when the actor is not authenticated at all: they haven't logged in, or their session
-has expired. **403 Forbidden** is for an authenticated actor who is not allowed to access this
-resource: they are known to the system but not permitted here. **404 Not Found** is sometimes
+The three failure modes map to distinct HTTP status codes.[^2] **401 Unauthorized** is the
+correct response when the actor is not authenticated at all. **403 Forbidden** is for an
+authenticated actor who is not allowed to access this resource. **404 Not Found** is sometimes
 appropriate when the resource exists but the actor should not know that: telling an
 unauthorised player that a private NPC dossier exists and they are forbidden from reading it
 leaks information the access control was meant to protect.[^3]
-
----
-
-## Ownership And Context
-
-The Doorkeeper's point about Mira's campaign is the ownership problem. Global roles are a
-blunt instrument. "Admin" grants certain capabilities across the system, but it does not grant
-access to every piece of data in every campaign. "Game Master" describes a role within a
-specific campaign, not within all campaigns the user has ever encountered.
-
-Campaign Ledger models this with a separation between the user's global role and their
-campaign-level membership:
-
-```typescript
-type UserRole = "admin" | "game_master" | "player";
-
-type CampaignMemberRole = "game_master" | "player";
-
-interface CampaignMembership {
-  userId: string;
-  campaignId: string;
-  role: CampaignMemberRole;
-}
-```
-
-An admin is an admin for the installation. A game master is a game master for a specific
-campaign. The two are independent: an admin is not automatically the game master of any
-campaign, and a game master of one campaign is not the game master of another.[^4]
-
-Sheet access follows the same principle. A player can read and write their own character
-sheet. A game master can read and write any sheet in their campaign. An admin cannot write
-any sheet by virtue of being an admin: they would need to be in the campaign, with the
-appropriate role, to have that permission.
-
-```typescript
-async function requireSheetAccess(
-  c: Context,
-  characterId: string,
-  level: "read" | "write"
-): Promise<GuardResult> {
-  const session = await getSession(c);
-  if (!session) return { ok: false, reason: "unauthenticated" };
-
-  const character = await getCharacter(characterId);
-  if (!character) return { ok: false, reason: "not_found" };
-
-  // Owner can always access their own sheet
-  if (character.ownerId === session.userId) return { ok: true };
-
-  // Game Masters can access sheets in their campaign
-  const membership = await getCampaignMembership(
-    session.userId,
-    character.campaignId
-  );
-  if (membership?.role === "game_master") return { ok: true };
-
-  return { ok: false, reason: "forbidden" };
-}
-```
-
-The explicit test for admin bypass is absent, and that absence is deliberate. Admins tested
-against this guard fail. If an admin needs to edit a character sheet, the correct path is to
-join the campaign as a game master, not to short-circuit the permission system.[^5]
-
----
-
-## Representation-Level Control
-
-Guarding routes is necessary but not sufficient. A well-guarded route can still leak private
-data through a component that ignores viewer context.
-
-Campaign Ledger's NPC dossiers illustrate this clearly. A dossier might contain a public
-summary, a player-visible description, and private Game Master notes. The route that serves
-the NPC page is accessible to players with campaign read access. The guard passes. But the
-repository query must filter the response based on the viewer's role:
-
-```typescript
-function listNpcSummariesForCampaign(
-  campaignId: string,
-  viewerId: string,
-  viewerRole: CampaignMemberRole
-): NpcSummary[] {
-  const npcs = getCampaignNpcs(campaignId);
-  return npcs.filter(npc => {
-    if (npc.visibility === "public") return true;
-    if (npc.visibility === "selected_player") {
-      return viewerRole === "game_master"
-        || npc.selectedPlayerIds.includes(viewerId);
-    }
-    // "game_master" visibility: only GMs see this entry at all
-    return viewerRole === "game_master";
-  });
-}
-```
-
-A player never sees an NPC whose visibility is set to game master only. Not "the player sees
-the NPC but can't read the private notes": the player does not know the NPC exists. The
-visibility filter runs at the data layer, before anything is passed to the rendering code.
-The component is never handed data it shouldn't render, so there is no risk of the rendering
-code accidentally exposing it.[^6]
-
-This is the same principle as the gamebook's hidden choices. In Chapter 8, a choice that fails
-`isChoiceAvailable` is not rendered at all: the player doesn't see a greyed-out button with
-a tooltip explaining what they're missing. The option is simply absent. Representation-level
-control means not offering, and not rendering, what the current viewer is not permitted to see.
 
 ---
 
@@ -396,63 +276,13 @@ own state, validated against authenticated identity and context.[^7]
 
 ---
 
-## Testing Access Control
-
-A permission system that is not tested is a permission system that will eventually be wrong in
-production. The tests should express the access rules as explicitly as the code does.
-
-Campaign Ledger's guard tests read as a set of declarative claims about who can do what:
-
-```typescript
-it("does not grant admin access to a sheet they do not own", async () => {
-  const admin = await createUser({ role: "admin" });
-  const player = await createUser({ role: "player" });
-  const character = await createCharacter({ ownerId: player.id });
-
-  const result = await requireSheetAccess(
-    contextFor(admin),
-    character.id,
-    "write"
-  );
-
-  expect(result).toEqual({ ok: false, reason: "forbidden" });
-});
-
-it("allows a game master to read a sheet in their campaign", async () => {
-  const gm = await createUser({ role: "game_master" });
-  const character = await createCharacterInCampaign(gm.campaignId);
-
-  const result = await requireSheetAccess(
-    contextFor(gm),
-    character.id,
-    "read"
-  );
-
-  expect(result).toEqual({ ok: true });
-});
-```
-
-Each test names an actor, a resource, an action, and the expected outcome. Read together,
-they form a permission matrix: here is every important combination we have thought about,
-and here is what the system should do in each case. The tests are documentation as much as
-verification.[^8]
-
-The gamebook's equivalent is the artifact check in `scripts/check-static.ts`. It does not
-test authentication flows or role assignments, because the gamebook has none. What it tests
-is the structural guarantee: the published files do not contain author tooling. The check is
-expressed as a concrete assertion against the actual output, not as a trust that the build
-script did the right thing.
-
----
-
 ## The Build Move
 
 By the end of this chapter, the gamebook has an explicit author/player boundary:
 
 - `createApp(options)` in `src/app.tsx` accepts `authorToolsEnabled` as a configuration
   option. The development server passes `true`; the static build passes `false`.
-- The `/gamebook/author` route returns 404 when author tools are disabled, shown in this
-  chapter's route-guard examples.
+- The `/gamebook/author` route returns 404 when author tools are disabled.
 - The forced navigation endpoint at `/gamebook/passages` rejects requests when author tools
   are disabled, regardless of what the submitted form contains.
 - `renderPassagePanel` in `src/gamebook/render.ts` accepts an `authorMode` flag and omits
@@ -461,13 +291,6 @@ By the end of this chapter, the gamebook has an explicit author/player boundary:
   `scripts/build-static.ts` uses it instead of the author-capable client.
 - `scripts/check-static.ts` asserts that the published HTML and JS bundles do not contain
   any of the forbidden author-mode strings.
-
-Campaign Ledger contributes the mature parallel: `requireCampaignAccess`,
-`requireSheetAccess`, and the NPC visibility filter in `src/campaign/npc.ts` are the
-production-scale versions of the same ideas, handling authenticated sessions, campaign
-membership, ownership, and representation-level data filtering. The full guard library and
-permission-matrix test suite are in the repository rather than reproduced here; the extract
-shown in this chapter is representative of the pattern, not the complete implementation.
 
 ---
 
@@ -478,19 +301,115 @@ judgement about whether someone is trustworthy. It is a set of rules about which
 permitted to affect which resources, in which contexts, verified at every layer where the
 boundary might be crossed.
 
-The gamebook's version of this is small: a configuration flag, two bundles, a handful of
-route guards, and an artifact check. Campaign Ledger's version is larger: sessions, roles,
-campaign membership, ownership, visibility categories, guard functions, and a test suite that
-documents the intended permission matrix explicitly.
-
-The scale is different. The principle is the same: don't offer, render, or execute what the
-current actor is not permitted to reach.
+The gamebook's version is small: a configuration flag, two bundles, a handful of route
+guards, and an artifact check. The principle is the same at any scale: don't offer, render,
+or execute what the current actor is not permitted to reach.
 
 In Chapter 10, we'll zoom out from who can access a feature and look at how the code that
 implements those features is organised. The gamebook has accumulated a set of distinct
 responsibilities: passage content, graph validation, state management, rules, rendering, and
 an application shell. How those responsibilities should be divided, named, and kept from
 entangling with each other is the subject of modules.
+
+---
+
+## At Scale: Campaign Ledger
+
+The gamebook's access boundary is structural: two entry points, two bundles, a flag checked
+at the application level. A multi-user application needs the same boundary enforced at
+runtime, against authenticated sessions, across context-specific resources.
+
+Campaign Ledger separates the user's global role from their campaign-level membership:
+
+```typescript
+type UserRole = "admin" | "game_master" | "player";
+type CampaignMemberRole = "game_master" | "player";
+
+interface CampaignMembership {
+  userId: string;
+  campaignId: string;
+  role: CampaignMemberRole;
+}
+```
+
+An admin is an admin for the installation. A game master is a game master for a specific
+campaign. The two are independent. Being an admin does not grant access to every campaign's
+content, for the same reason being a dungeon master at one table does not give you the right
+to narrate a different table's story.
+
+Sheet access follows ownership and campaign membership rather than global role. The guard
+function runs at the top of every sheet route before any rendering or mutation occurs:
+
+```typescript
+async function requireSheetAccess(
+  c: Context,
+  characterId: string,
+  level: "read" | "write"
+): Promise<GuardResult> {
+  const session = await getSession(c);
+  if (!session) return { ok: false, reason: "unauthenticated" };
+
+  const character = await getCharacter(characterId);
+  if (!character) return { ok: false, reason: "not_found" };
+
+  if (character.ownerId === session.userId) return { ok: true };
+
+  const membership = await getCampaignMembership(
+    session.userId,
+    character.campaignId
+  );
+  if (membership?.role === "game_master") return { ok: true };
+
+  return { ok: false, reason: "forbidden" };
+}
+```
+
+Admins are not exempted. If an admin needs to edit a character sheet, the correct path is
+to join the campaign with the appropriate role, not to short-circuit the permission system.
+
+Guarding routes is necessary but not sufficient. A guarded route can still leak private
+data through a component that renders more than it should. The NPC visibility filter in
+Campaign Ledger runs at the data layer, before anything reaches the template:
+
+```typescript
+function listNpcSummariesForCampaign(
+  campaignId: string,
+  viewerId: string,
+  viewerRole: CampaignMemberRole
+): NpcSummary[] {
+  const npcs = getCampaignNpcs(campaignId);
+  return npcs.filter(npc => {
+    if (npc.visibility === "public") return true;
+    if (npc.visibility === "selected_player") {
+      return viewerRole === "game_master"
+        || npc.selectedPlayerIds.includes(viewerId);
+    }
+    return viewerRole === "game_master";
+  });
+}
+```
+
+A player does not see an NPC marked game-master-only. Not "sees but can't read the notes":
+does not know it exists. The component is never handed data it should not render.
+
+Permission rules that are not tested are permission rules that will eventually be wrong. The
+guard tests read as a permission matrix: each test names an actor, a resource, an action, and
+the expected outcome.
+
+```typescript
+it("does not grant admin access to a sheet they do not own", async () => {
+  const admin = await createUser({ role: "admin" });
+  const player = await createUser({ role: "player" });
+  const character = await createCharacter({ ownerId: player.id });
+
+  const result = await requireSheetAccess(contextFor(admin), character.id, "write");
+
+  expect(result).toEqual({ ok: false, reason: "forbidden" });
+});
+```
+
+Read together, the test suite documents the intended permission model as explicitly as the
+code implements it.
 
 ---
 

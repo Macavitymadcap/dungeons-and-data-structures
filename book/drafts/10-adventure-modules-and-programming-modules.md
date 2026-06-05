@@ -243,90 +243,15 @@ Coupling is the tax you pay for knowledge. The more one module knows about anoth
 the more tightly they are bound: a change in one requires a corresponding change in the other.
 
 The most expensive coupling is when a module imports concrete implementation details rather than
-abstractions. If `play.ts` reached directly into the SQLite tables in Campaign Ledger rather than
-calling repository functions, then changing the database schema would require changing `play.ts`.
-The two are now coupled through the schema. A change to one is a change to both.
+abstractions. The gamebook demonstrates the correct approach with the injectable `RandomSource`
+from Chapter 6. The dice module does not call `Math.random()` directly through the business
+logic. It accepts a function parameter. Tests inject a deterministic source. Production uses
+`Math.random`. The business logic is decoupled from the specific random number generator; the
+parameter is the contract.
 
-The solution is to import the abstraction, not the implementation. Repository interfaces in
-Campaign Ledger define what the data layer can do: `getCharacter`, `updateResource`,
-`listNpcSummaries`. The routes import these interfaces. The SQLite implementation satisfies
-them. The routes never import the SQLite details directly. If the database engine changes, the
-repository implementations change. The routes do not.
-
-In the gamebook, the equivalent is the injectable `RandomSource` from Chapter 6. The dice
-module does not call `Math.random()` directly throughout the business logic. It accepts a
-function parameter. Tests inject a deterministic source. Production uses `Math.random`. The
-business logic is decoupled from the specific random number generator.
-
-The pattern is the same: depend on the contract, not the implementation. Name what you need;
-let someone else provide the thing that satisfies the name.[^5]
-
----
-
-## Adapters And Compatibility Shims
-
-Coupling does not always come from direct imports. Sometimes it comes from a shared library
-updating in a way that changes its public surface.
-
-Campaign Ledger uses a set of shared UI primitives from a library called Hyper-Dank, a
-collection of pre-built interface components (buttons, form fields, breadcrumbs, HTMX wiring)
-that the application depends on for its standard interface elements. A compatibility shim in
-this context is something like a translation layer between two editions of the same rulebook
-at the same table: both are playing the same game, but one set of procedures has been updated
-and the old character sheets need a conversion guide rather than a full rewrite.
-
-At some point, the library exports changed: components were renamed, props were adjusted, new
-primitives were added that overlapped with local components Campaign Ledger had already built.
-
-The migration strategy was an **adapter**, sometimes called a compatibility shim: a thin local
-module that re-exports the library primitive under the local name the rest of the application
-expects.
-
-```typescript
-// src/components/atoms/Button/index.ts
-// Before the migration, this was a locally defined component.
-// After the migration, it is a re-export of the shared primitive.
-export { Button, type ButtonProps } from "@macavitymadcap/hyper-dank-ui";
-```
-
-Every import of `Button` in Campaign Ledger continues to work. The import path is unchanged.
-The implementation now delegates to the shared library. The rest of the codebase did not need
-to be updated.
-
-The shim is not a permanent solution. It is a migration tool. Its purpose is to change the
-implementation without changing every call site at once. Once the migration is stable and
-the old paths are verified, the shims can either remain as stable re-export boundaries or
-be removed in favour of direct imports from the shared library.[^6]
-
-What makes the shim approach safe is the compatibility test that accompanies it. Campaign
-Ledger has a `test:hyper-dank` gate that imports the shared library primitives through their
-public paths and verifies that the local shims re-export them correctly. Running this test
-before and after a library update catches the moment when a shared export changes in a way
-that breaks the local assumption.
-
-```typescript
-// scripts/hyper-dank-compat.test.tsx
-it("Button shim re-exports the Hyper-Dank Button", () => {
-  const { Button: local } = require("../../src/components/atoms/Button");
-  const { Button: shared } = require("@macavitymadcap/hyper-dank-ui");
-  expect(local).toBe(shared);
-});
-
-it("no new Hyper-Dank UI exports shadow unreviewed local components", () => {
-  const sharedExports = Object.keys(require("@macavitymadcap/hyper-dank-ui"));
-  const localComponents = listLocalComponentNames();
-  const unreviewed = sharedExports.filter(
-    name => localComponents.includes(name) && !REVIEWED_OVERLAPS.includes(name)
-  );
-  expect(unreviewed).toEqual([]);
-});
-```
-
-The second test is the less obvious one. It catches the case where the shared library adds a
-new export that happens to share a name with a local component. Without the test, the local
-component and the shared one could coexist silently, each used in different places, diverging
-over time without anyone noticing. The test forces a deliberate decision: review the overlap,
-decide which one wins, and record the decision in `REVIEWED_OVERLAPS`.[^7]
+The pattern is the same wherever you reach for an external dependency: depend on the contract,
+not the implementation. Name what you need; let someone else provide the thing that satisfies
+the name. If that something later changes, the caller does not need to know.[^5]
 
 ---
 
@@ -399,10 +324,6 @@ By the end of this chapter, the gamebook's module structure is explicit and name
 - `src/index.ts` owns process startup. It depends on `src/app.tsx` and on environment
   configuration. Nothing else depends on it.
 
-The Hyper-Dank compatibility test in Campaign Ledger's `scripts/hyper-dank-compat.test.tsx`
-is introduced in this chapter as the mature example of a module boundary actively protected
-by automated checks.
-
 ---
 
 The Scribe's great ledger was not useless. Everything was there. The problem was that
@@ -420,6 +341,47 @@ In Chapter 11, we'll look at a particular kind of content that needs its own she
 careful handling: the rules themselves. Spells, conditions, equipment, class features: the
 data that makes the game's mechanics run. How structured data represents those rules, where
 it comes from, and how to be honest about that provenance is the subject of the next chapter.
+
+---
+
+## At Scale: Campaign Ledger
+
+The coupling principle from this chapter takes a concrete form in a multi-tier application.
+Where the gamebook uses an injectable `RandomSource` to decouple the dice module from
+`Math.random`, Campaign Ledger uses repository interfaces to decouple routes from the database.
+The routes define what they need: `getCharacter`, `updateResource`, `listNpcSummaries`. The
+SQLite implementation provides it. If the database engine changes, the repository implementations
+change. The routes do not.
+
+Shared dependencies introduce a different kind of coupling: a library that updates its public
+surface can break every importer at once. The adapter pattern handles this without a mass
+refactor. When Campaign Ledger's component library changed its exports, a thin re-export module
+presented the new primitive under the old local name:
+
+```typescript
+// src/components/atoms/Button/index.ts
+export { Button, type ButtonProps } from "@macavitymadcap/hyper-dank-ui";
+```
+
+Every existing import of `Button` continued to work. The implementation changed; the contract
+did not. The shim is a migration tool, not a permanent state. What keeps it honest is a
+compatibility test that verifies the re-export is still accurate after every library update,
+and catches the subtler case where the library adds a new export that silently collides with a
+local component name:
+
+```typescript
+it("no new Hyper-Dank UI exports shadow unreviewed local components", () => {
+  const sharedExports = Object.keys(require("@macavitymadcap/hyper-dank-ui"));
+  const localComponents = listLocalComponentNames();
+  const unreviewed = sharedExports.filter(
+    name => localComponents.includes(name) && !REVIEWED_OVERLAPS.includes(name)
+  );
+  expect(unreviewed).toEqual([]);
+});
+```
+
+The test fails not when behaviour is wrong, but when a change has been made without a
+conscious decision. It is testing for awareness as much as correctness.
 
 ---
 

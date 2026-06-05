@@ -292,74 +292,23 @@ place, verifying the complete migration chain.[^5]
 
 ## Three Storage Strategies
 
-The gamebook uses `localStorage`. Campaign Ledger uses both `localStorage` and SQLite.
-Understanding the difference between them, and between both of those and a downloaded JSON
-file, is useful for knowing which tool fits which problem.
+The gamebook uses three persistence mechanisms, each serving a different need.
 
 **Browser local storage** is synchronous, string-valued, per-origin, and cleared by the
-user on demand. It is appropriate for a single-player browser game with no server, where
-the player's device is the source of truth. It is fast to access and requires no setup.
-Its limitations are equally clear: it is local to one browser, invisible to the server,
-subject to eviction by the browser under storage pressure, and completely inaccessible
-on a different device.[^6]
-
-**SQLite** is a file-based relational database: structured, queryable, transactional, and
-persistent across processes. Campaign Ledger uses SQLite as the server-side source of truth
-for campaign data, character sheets, user accounts, notes, and rules. When a player updates
-their character sheet, the change goes to SQLite. When they open the app on a different
-device, they see the same state because the state lives on the server, not in their browser.
+user on demand. It is the right tool for a single-player browser game with no server: fast
+to access, zero setup, and sufficient for a save that lives on one device. Its limits are
+equally clear: local to one browser, invisible to a server, subject to eviction under storage
+pressure, and inaccessible on a different device.[^6]
 
 **Exported JSON** is a snapshot: a complete record of state at a particular moment, written
-to a file the player can download, keep, and import. It is not a live store. It does not
-auto-update. But it is portable in a way that neither local storage nor a remote database
-is: the player holds it, and no server needs to be running for them to hand it to someone
-else or import it on a new machine.
+to a file the player can download, keep, and import. It is not a live store and does not
+auto-update. What it is, is portable: the player holds it, and no server needs to be running
+for them to hand it to someone else or load it on a new machine.
 
-The gamebook uses all three. Local storage is the automatic save on every choice. Exported
-JSON is the manual download the player can share or archive. Import is the mechanism for
-loading that file back. The three serve different needs and do not substitute for each
-other.[^7]
-
----
-
-## The Local Play Document
-
-Campaign Ledger's local play feature shows how the same pattern scales to a more complex
-data model. Some players want to use Campaign Ledger without an account, to track a character
-for a one-shot or to explore the interface before committing. The local play document serves this need.
-
-It is stored in `localStorage` under a versioned key, structured exactly like the gamebook's
-save: an explicit schema, a declared version, validation before accepting imported data, and
-readable errors on failure. It stores only a summary of each character rather than a full
-sheet; the full sheet lives in SQLite and requires authentication. The player is told what
-the storage boundary means: characters stored here exist only in this browser, and here is
-how to take them elsewhere.[^8]
-
-The gamebook's save and the local play document are the same idea at different scales. The
-pattern is the same; the complexity of the data model and the number of users are different.
-
----
-
-## Backups And The Source Of Truth
-
-For Campaign Ledger's server-backed data, there is a fourth persistence layer: the hosted
-backup.
-
-The hosted backup script runs `VACUUM INTO`, SQLite's built-in mechanism for writing a clean
-compacted copy of the database to a new file. It accompanies this with an asset snapshot, a
-manifest, and a timestamp. The restore operation requires an explicit confirmation: it will
-overwrite the current database and cannot be undone without another backup.
-
-This is the production version of the same pattern the gamebook's export implements. The
-export is a point-in-time snapshot of the player's save. The backup is a point-in-time
-snapshot of the server's database. Both are durable, portable, and independent of the live
-system. Both can be used to recover from a failure. Neither is a substitute for the live
-system; they are the fall-back when the live system is unavailable or corrupted.
-
-The operational lesson is simple: any state worth storing is worth backing up, and any backup
-worth taking is worth testing. Campaign Ledger's hosted backup is tested: a restore can be
-run against a test instance to verify that the backup was made correctly before the real
-restore is needed.[^9]
+The gamebook uses both, plus a third layer that combines them: local storage is the automatic
+save on every choice; exported JSON is the manual download the player can share or archive;
+import is the mechanism for loading that file back. The three serve different needs and do not
+substitute for each other.[^7]
 
 ---
 
@@ -406,6 +355,35 @@ In Chapter 13, we'll name the approach the book has been taking: the discipline 
 software that models a real domain faithfully, using the domain's own vocabulary, drawing
 boundaries where the domain draws them. The work has been practice all along. The next chapter
 gives it a name.
+
+---
+
+## At Scale: Campaign Ledger
+
+The gamebook's persistence layer is local storage plus an exported JSON file. Campaign Ledger
+adds a third tier: SQLite as the server-side source of truth for everything that needs to
+survive across devices and sessions. When a player updates their character sheet, the change
+goes to SQLite. When they open the app on a different device, they see the same state because
+the state lives on the server, not in their browser.
+
+Campaign Ledger also applies the same versioned-document pattern to a local play mode for
+users without an account. The local play document is stored in `localStorage` under a
+versioned key, structured exactly like the gamebook's save: explicit schema, declared version,
+validation before accepting imported data, readable errors on failure. It stores only a
+character summary rather than a full sheet; the full sheet lives in SQLite and requires
+authentication. The player is told plainly what the boundary means: characters stored here
+exist only in this browser, and here is how to take them elsewhere.
+
+A fourth layer sits above all three: the hosted backup. The backup script runs SQLite's
+`VACUUM INTO` to write a clean compacted copy of the database to a new file, accompanied by
+an asset snapshot, a manifest, and a timestamp. The restore operation requires an explicit
+confirmation, because it will overwrite the current database and cannot be undone without
+another backup.
+
+The operational lesson generalises: any state worth storing is worth backing up, and any
+backup worth taking is worth testing. Campaign Ledger's backup is verified against a test
+instance before the real restore is ever needed. A backup that has never been restored is
+an untested claim that recovery is possible.
 
 ---
 

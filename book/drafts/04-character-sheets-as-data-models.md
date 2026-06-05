@@ -294,39 +294,6 @@ availability. But the principle, store the minimum and derive the rest, is commo
 
 ---
 
-## From Small Model To Large Sheet
-
-It is worth stepping back briefly to see what this model looks like when it grows up.
-
-Campaign Ledger's `CharacterSheetReadModel` assembles a full character sheet from several related
-database tables: a `characters` row for the summary, `character_abilities` for the six ability
-scores, `character_classes` for multi-class support, `character_resources` for hit dice (the dice
-a character rolls when spending a short rest to recover hit points) and spell slots (limited-use
-resources that power magic) and custom counters, `character_equipment` for the inventory,
-`character_defences` for damage resistances and immunities, `character_skills` for proficiencies,
-and a handful of others.
-
-The ability modifier calculation, the proficiency bonus, and the skill modifier formulae are the
-same functions; they just operate on data retrieved from a relational database rather than a flat
-TypeScript object.
-
-The database schema enforces its own validation layer. The `character_abilities` table has a
-constraint requiring that the `ability_name` column is one of the six valid ability names. The
-`level` column requires a value between 1 and 20. The `current_hit_points` column requires a
-non-negative integer. These are the closed vocabularies and bounds from earlier in this chapter,
-expressed in SQL rather than TypeScript, operating at a different level of the stack but serving
-the same purpose.
-
-The small gamebook model and the large Campaign Ledger model are not different ideas implemented
-twice. They are the same idea at different scales. A `Character` in Mt. Graphnor is a flat record
-suited to local storage and a single-player browser game. A `CharacterSheetReadModel` in
-Campaign Ledger is a composed view across a relational schema suited to a shared application
-with multiple users, concurrent sessions, and a need to update individual slices of the sheet
-without rewriting the whole thing. The concepts are identical; the requirements determine the
-shape.[^6]
-
----
-
 ## The Build Move
 
 By the end of this chapter, the gamebook has a playable character model:
@@ -361,6 +328,27 @@ In the next chapter, we'll look at what happens when that `CharacterClass` field
 insufficient; when the Fighter wants to cast a spell; when the Cleric needs to carry a sword; and
 when the record's clean taxonomy starts to buckle under the weight of what the game can actually do.
 That is the chapter about classes, composition, and the limits of inheritance.
+
+---
+
+## At Scale: Campaign Ledger
+
+The `Character` interface in Mt. Graphnor is a flat record: one TypeScript object, suited to local
+storage and a single-player browser game. Campaign Ledger's equivalent, `CharacterSheetReadModel`,
+assembles the same information from several related database tables: one for the summary, one for
+the six ability scores, one for multi-class support, one for spell slots and hit dice, one for
+equipment, one for defences, one for skill proficiencies.
+
+The ability modifier calculation, the proficiency bonus, and the skill modifier formulae are
+identical between the two. They just operate on data retrieved from a relational database rather
+than a flat TypeScript object. The schema enforces the same closed vocabularies that the gamebook
+enforces through union types: the `character_abilities` table requires `ability_name` to be one of
+the six valid names; the `level` column requires a value between 1 and 20. The same rules, at a
+different level of the stack.
+
+The model grew because the requirements grew. A shared application with concurrent sessions needs
+to update individual slices of a sheet without rewriting the whole thing. A single-player browser
+game does not. The concepts are identical; the requirements determined the shape.
 
 ---
 
