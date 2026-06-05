@@ -1,4 +1,4 @@
-di# Chapter 11: Rules As Structured Data
+# Chapter 11: Rules As Structured Data
 
 ---
 
@@ -158,14 +158,17 @@ where did this come from?
 
 ## Entities, Mechanics, And The Separation Between Them
 
-A rule entity is the named thing: "Shield", "Grappled", "Wizard", "Bless". An entity can be
-described with prose alone, and that description might be sufficient for a display page.
+There is a distinction worth drawing early, because collapsing it produces a category of bug
+that is annoying to diagnose. A rule entity is the named thing: "Shield", "Grappled",
+"Wizard", "Bless". A rule mechanic is the machine-readable detail that lets the software act
+on it. The entity is the noun; the mechanic is what the code actually reads.
 
-But the software often needs more than a description. It needs to know whether "Shield" is
-armour or a weapon. It needs to know that "Grappled" is a condition with mechanical effects.
-It needs to know that "Wizard" is a character class with a particular hit die, saving throw
-proficiencies, and spellcasting ability. These details are what turn a named entity into
-something the application can filter, link, and use.
+A display page can get away with prose alone. The software cannot. It needs to know whether
+"Shield" is armour or a weapon. It needs to know that "Grappled" is a condition with
+mechanical effects on movement and attack rolls. It needs to know that "Wizard" is a character
+class with a particular hit die, saving throw proficiencies, and spellcasting ability. None of
+that is in the name. All of it has to be somewhere else, in a form the code can use without
+parsing English.
 
 The gamebook keeps these at the level of detail it actually needs. The SRD catalogue in
 `src/gamebook/rules/srd.ts` holds compact records:
@@ -215,8 +218,9 @@ not coincidentally, the legally correct one.
 
 ## What The Gamebook's SRD Catalogue Actually Contains
 
-It is worth being specific, because the SRD is a large document and the gamebook uses a small
-slice of it.
+The SRD is a large document. The gamebook uses a small slice of it, and being specific about
+which slice matters, because "we use the SRD" and "we use these three fields from four class
+entries" are not the same statement legally or practically.
 
 The gamebook uses SRD 5.1-compatible vocabulary and mechanics. It does not reproduce class
 feature descriptions, spell descriptions, monster stat blocks, or extended prose of any kind.
@@ -249,30 +253,33 @@ work.
 ## Source Precedence: Defining The Policy Before The Conflict
 
 The Wizard's three spellbooks are not a contrived problem. Real rules data has overlapping
-sources: the same spell might appear in the core SRD and in a third-party supplement with
-different mechanics. The same condition might exist in the base rules and in a campaign-specific
-house ruling that modifies its effect at one table. The software needs a resolution policy for
-this before the conflict arrives, because writing the policy after the fact means touching every
-query that assumed there was not one.
+sources, and without a resolution policy written into the model before the conflict arrives,
+the policy ends up scattered: a WHERE clause here, a post-filter there, a comment explaining
+why this query is different from the one above it. The model makes the careless version
+structurally impossible, or it leaves that work to every developer who touches a query.
+
+The gamebook has two sources with no shared entities, so the conflict hasn't arrived yet. But
+the `sourceId` field is already in the model, which means when it does arrive, the resolution
+goes in one place. The same spell might appear in the core SRD and in a third-party supplement
+with different mechanics. The same condition might exist in the base rules and in a
+campaign-specific house ruling. The software needs to know which wins, and it needs to know
+before the first query is written that assumes there is only one answer.
 
 The two-audience constraint that shaped Campaign Ledger's design is this problem stated in
 advance. If the public site and the private campaign draw from the same rules database, and a
 homebrew spell and an SRD spell can both appear in a spell query, then every query that returns
 spells is implicitly making a visibility decision. Without a source field to filter on, the
-only way to implement that decision is to encode it individually into each query: a WHERE
-clause here, a post-filter there, a comment explaining why this one is different. The policy
-is present, but scattered across the codebase rather than expressed once in the model.
+only way to implement that decision is to encode it individually into each query. The policy is
+present, but scattered across the codebase rather than expressed once in the model.
 
 With a `sourceId` on every rule and a `publicExportEligible` flag on every source, the
 decision is made once. A query for publicly visible rules filters on the source's eligibility.
 A query for campaign-private rules includes sources that are not public. The homebrew spell
-appears exactly where it should and nowhere else: not because each query was written
-carefully, but because the model makes the careless version structurally impossible.[^5]
+appears exactly where it should and nowhere else: not because each query was written carefully,
+but because the model makes the alternative structurally awkward.[^5]
 
-The gamebook does not yet face overlapping sources; it has two with no shared entities. But
-the `sourceId` field is already in the model, which means the query for public-exportable
-rules already has somewhere to filter on. When a conflict eventually appears, the resolution
-policy goes in one place and propagates everywhere.
+When a conflict eventually appears in the gamebook, the resolution policy goes in one place
+and propagates everywhere.
 
 ---
 
@@ -425,11 +432,13 @@ means the dice module needs no special case for character creation. Consistency 
 system saves very little. Inconsistency in a growing one accumulates.
 
 [^3]: Provenance in data systems has a formal literature. Tim Berners-Lee's linked data
-principles include the idea that data on the web should be linked to its source, which is
-partly a usability argument and partly a trust argument. In the context of rules data,
-provenance is what makes it possible to say "this rule comes from source X, which has licence
-Y, which permits use Z." Without the chain from rule to source to licence, every rule is an
-assertion without a basis.
+design principles (published at
+[w3.org/DesignIssues/LinkedData.html](https://www.w3.org/DesignIssues/LinkedData.html))
+include the idea that data on the web should be linked to its source, which is partly a
+usability argument and partly a trust argument. In the context of rules data, provenance is
+what makes it possible to say "this rule comes from source X, which has licence Y, which
+permits use Z." Without the chain from rule to source to licence, every rule is an assertion
+without a basis.
 
 [^4]: The SRD 5.1 defines Wizard subclasses, arcane traditions, spell slot tables by level,
 and a great deal of other material the gamebook has no use for. The temptation when building

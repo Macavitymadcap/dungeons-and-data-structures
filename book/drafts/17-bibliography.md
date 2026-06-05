@@ -10,6 +10,9 @@ The annotations are written for the true nerds.
 
 ### Games and Game Series
 
+**Baker, Vincent, and Meguey Baker.** *Apocalypse World.* lumpley games, 2010 (second edition 2016).
+The game that originated the Powered by the Apocalypse design framework: character classes as self-contained playbooks, special moves as discrete capability bundles, and a system structured around conversation and narrative rather than simulation. Cited in Chapter 5 as an example of composition over inheritance in game design: a character is assembled from independent axes of definition rather than derived from a class hierarchy.
+
 **Arneson, Dave, and Gary Gygax.** *Dungeons & Dragons.* TSR, 1974.
 The original. Four booklets in a brown box. The system that introduced the polyhedral dice, the dungeon crawl, and the idea that a game could be about a single character rather than a unit of soldiers. It looked, at first glance, like a miniatures wargame supplement. It turned out to be something else entirely. The SRD 5.1, used in this book, is the current canonical open version of the rules.
 
@@ -18,6 +21,12 @@ The interactive *Black Mirror* episode that demonstrated branching narrative at 
 
 **Crowther, Will, and Don Woods.** *Colossal Cave Adventure.* 1976.
 Generally considered the first text adventure game. Crowther's original version modelled a real cave system; Woods' expansion added treasure, points, and the shape that influenced everything that followed. Cited in Chapter 2.
+
+**Crawford, Jeremy, Laura Hickman, Tracy Hickman, Christopher Perkins, et al.** *Curse of Strahd.* Wizards of the Coast, 2016.
+A reworking of the Hickmans' 1983 module *Ravenloft*, widely considered the strongest adventure module of D&D 5th edition. Cited in Chapter 10 as an example of a well-designed adventure module: a self-contained aggregate with a clear interface to the surrounding campaign. The original *Ravenloft* established the gothic horror template the 5th edition version enriches.
+
+**Hickman, Tracy, and Laura Hickman.** *Ravenloft.* TSR, 1983.
+The original standalone module that introduced Strahd von Zarovich and the gothic horror register to D&D. Cited in Chapter 10 alongside *Curse of Strahd* as the source material for the 2016 5th edition adaptation.
 
 **Dever, Joe.** *Lone Wolf* series. Berkley/Puffin, 1984–1998 (original series); further volumes published by Mongoose Publishing. Digital editions available at Project Aon: [projectaon.org](https://www.projectaon.org/).
 A gamebook series spanning twenty-eight original volumes plus a sequel series, tracking a single character across decades of in-world time. Cited in Chapter 2 as the outer limit of what a gamebook series can attempt in terms of persistent state.
@@ -63,6 +72,9 @@ The definitive scholarly bridge between gamebook form, parser fiction, and the h
 
 ### Software Engineering
 
+**Beck, Kent.** *Test-Driven Development: By Example.* Addison-Wesley, 2002.
+The book that made test-first development a named practice rather than an instinct. The cycle of write a failing test, make it pass, refactor is Beck's; the application to domain logic with injectable dependencies in Chapter 14 is downstream of it. Cited in Chapter 14.
+
 **Constantine, Larry, and Ed Yourdon.** *Structured Design: Fundamentals of a Discipline of Computer Program and Systems Design.* Prentice Hall, 1975.
 The source of the cohesion and coupling vocabulary that still dominates software architecture discussion fifty years later. Cited in Chapter 10. The terminology has proliferated, been renamed, been rediscovered, and been argued about at length, but the underlying observation has held: things which change together should be together, and things that change independently should not know too much about each other.
 
@@ -74,6 +86,9 @@ The dissertation that defined REST and, in passing, gave HATEOAS its unwieldy na
 
 **Fowler, Martin.** *Patterns of Enterprise Application Architecture.* Addison-Wesley, 2002.
 The source, among many other things, of the Post/Redirect/Get pattern cited in Chapter 3. Also a thorough taxonomy of the patterns that show up in data-heavy web applications (repositories, active records, table data gateways), most of which have been reinvented by every generation of web developers.
+
+**Freeman, Steve, and Nat Pryce.** *Growing Object-Oriented Software, Guided by Tests.* Addison-Wesley, 2009.
+The most practically useful book on TDD at the system level, applying the practice to designing interfaces and managing dependencies rather than just testing units in isolation. Cited in Chapter 14 as the recommended next step after Beck for readers who want to apply test-first thinking to a full application rather than individual functions.
 
 **Gamma, Erich, Richard Helm, Ralph Johnson, and John Vlissides.** *Design Patterns: Elements of Reusable Object-Oriented Software.* Addison-Wesley, 1994.
 The Gang of Four book. The source of "prefer composition over inheritance" and the adapter pattern. Cited in Chapters 5 and 10. Its specific patterns have dated unequally, but the underlying discipline of naming recurring solutions so they can be discussed is still the right instinct.
@@ -133,9 +148,6 @@ The following influenced the thinking behind this book without being directly ci
 **Bloch, Joshua.** *Effective Java.* Third edition. Addison-Wesley, 2018.
 Primarily a Java book, but the advice on API design (minimise the public surface; every export is a commitment) is language-agnostic and correct. Mentioned obliquely in Chapter 10 in the context of minimal module interfaces.
 
-**Beck, Kent.** *Test-Driven Development: By Example.* Addison-Wesley, 2002.
-The book that made test-first development a named practice rather than an instinct. The gamebook's approach to testable code (injectable random sources, pure functions for domain logic, tests as specifications) reflects habits formed partly from this.
-
 **Dever, Joe.** *Kai Grand Master* series (*Lone Wolf* books 13–20). Especially *The Plague Lords of Ruel* and *The Dungeons of Torgar.* Berkley, 1991–1993.
 The books in the *Lone Wolf* series where the campaign graph becomes genuinely complex, with branching routes through specific cities and dungeons that have meaningfully different consequences. A practical example of what a production-scale gamebook graph looks like.
 
@@ -170,9 +182,6 @@ The canonical relational database textbook. The normalisation arguments in Chapt
 
 **Evans, Eric.** *Domain-Driven Design: Tackling Complexity in the Heart of Software.* Addison-Wesley, 2003.
 Listed again here because Chapter 13 is an introduction, not a substitute. The pattern catalogues for repositories, domain services, factories, and sagas are worth working through properly if you find yourself building systems with genuinely complex domain logic. Martin Fowler's summary articles are a good warm-up.
-
-**Freeman, Steve, and Nat Pryce.** *Growing Object-Oriented Software, Guided by Tests.* Addison-Wesley, 2009.
-The best book on test-driven development at the system level, as opposed to the unit level. The "London school" approach of designing interfaces by writing the tests that use them complements the port-and-adapter ideas behind the injectable `RandomSource` pattern in Chapter 6.
 
 **Hunt, Andrew, and David Thomas.** *The Pragmatic Programmer: From Journeyman to Master.* Addison-Wesley, 1999 (twentieth anniversary edition 2019).
 The book that introduced DRY as a named principle, among many other things. Practical, opinionated, and still accurate. The advice to "keep knowledge in one place" and "make the machine do the work" is the practical form of everything Chapter 11 says about generated attribution panels and stable identifiers.

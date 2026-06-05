@@ -75,11 +75,11 @@ Gamebooks reached their peak of popularity in the 1980s, then faded as home comp
 and could render these adventures with graphics and mechanics that didn't require a pencil and a
 rubber. There has been something of a revival in recent years, with new titles added to the
 *Fighting Fantasy* catalogue; but even so, the cultural moment has passed. The idea behind them,
-though, hasn't. Hidetaka Miyazaki, creator of the *Dark Souls* series, has cited *Fighting
-Fantasy* as a significant influence, and his games are often compared to gamebooks precisely for
-their interconnected geography and punishing consequences. The format became a template for a
-generation of designers who may never have held a paperback with a dice-rolling section at the
-back.[^6]
+though, hasn't. Hidetaka Miyazaki, creator of the *Dark Souls* series, has spoken in interviews
+about *Fighting Fantasy* as a formative influence, and his games are often compared to gamebooks
+precisely for their interconnected geography and punishing consequences. The format became a
+template for a generation of designers who may never have held a paperback with a dice-rolling
+section at the back.[^6]
 
 The structure is not limited to games. Jorge Luis Borges wrote *The Garden of Forking Paths* in
 1941, an intricate short story built around branching choices and nested narratives. The
@@ -423,10 +423,11 @@ changed its search and recommendation behaviour; what was once a playable hypert
 now a collection of disconnected clips. Robertson has discussed the project and its
 platform-dependency problem in various interviews.
 
-[^6]: Miyazaki has discussed the *Fighting Fantasy* influence in several interviews over the years.
-The connection is most visible in the environmental storytelling of *Dark Souls*: a world that
-exists completely regardless of whether the player understands it, full of readable history for
-those who look carefully and entirely opaque to those who don't.
+[^6]: Miyazaki has spoken about the *Fighting Fantasy* influence in various interviews, though a
+specific citable source was not tracked down during the writing of this book. The connection is
+most visible in the environmental storytelling of *Dark Souls*: a world that exists completely
+regardless of whether the player understands it, full of readable history for those who look
+carefully and entirely opaque to those who don't.
 
 [^7]: *Bandersnatch* (2018), dir. David Slade, written by Charlie Brooker. Netflix's interactive
 episode was genuinely interesting as a structural achievement, whatever you think of the

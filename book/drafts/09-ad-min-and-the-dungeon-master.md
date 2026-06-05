@@ -1,4 +1,4 @@
-di# Chapter 9: Ad Min and the Dungeons Master
+# Chapter 9: The Dungeon Master And The Admin
 
 ---
 
@@ -62,6 +62,11 @@ high shelf.[^1] In practice it is everywhere, governing who can see what and why
 author/player split is a small, concrete version of the same boundary that Campaign Ledger
 enforces with sessions, roles, campaign membership, and route guards.
 
+The through-line in all of it is the Doorkeeper's distinction: having keys is not the same as
+having permission. A key says what you can open in principle. A permission says what you are
+allowed to open, for a specific resource, in a specific context. The chapter is about building
+systems that know the difference.
+
 ---
 
 ## Roles, Capabilities, And The Difference Between Them
@@ -75,7 +80,7 @@ room.
 **Authorisation** is deciding whether the identified actor may perform the requested action.
 Mira might be able to get into her room, whereas Ad Min is locked out, but that doesn't give her 
 a free pass to do whatever she likes. She's a Cleric, so while she has access to the temple's
-library, the one in he Tower of Magi is off limits to her.
+library, the one in the Tower of Magi is off limits to her.
 
 A **role** is a named set of responsibilities: player, game master, admin, author. The temptation
 is to treat a role as a permission list: if you are an admin, you can do everything. This is
@@ -221,7 +226,7 @@ await writeFile("dist/assets/player-client.js", playerBundle);
 
 The player-only client is not the author client with author features disabled at runtime. Rather, 
 it's a separate entry point that does not import the author code at all. This means the author code
-cannot be reached by inspecting the bundle, can't be enabled by a console command, and does'nt add
+cannot be reached by inspecting the bundle, can't be enabled by a console command, and doesn't add
 weight to the published assets that players download. The boundary is not conditional, but structural.
 
 The artifact check then verifies this structurally:

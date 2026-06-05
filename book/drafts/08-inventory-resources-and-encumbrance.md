@@ -57,8 +57,26 @@ fight, take damage, and be defeated. What we haven't tracked carefully is what t
 the fight: the items in their pack, the resources they can spend, and the choices that should
 only appear when the player has the right thing in hand.
 
-This chapter is about collections: how to represent, query, and update the things a character
-carries, and what the software needs to know about each kind of thing.
+The Quartermaster's two questions cover most of what an inventory needs to do. But there is a
+third kind of thing a player accumulates in a dungeon that neither question fits: not what they
+are carrying, but what has happened to them. The puzzle room has been solved. The trap has been
+disarmed. The secret passage has been found. These are facts about the session's history, not
+the player's current load. They cannot be spent like rations or dropped like a key. They are
+permanent, and they need to be modelled as such.
+
+This chapter models all three kinds of thing: items you carry, resources you spend, and flags
+you accumulate. Each is a collection, but each answers a different question, and using the wrong
+shape for the wrong question produces code that mostly works until an edge case arrives. The
+choice between them is not a technical preference; it is a claim about what the domain actually
+means.
+
+That last point has a concrete consequence worth naming before the chapter gets into the
+mechanics. Flags are permanent by design. The gamebook has a `setFlags` effect and deliberately
+no `removeFlags` counterpart, because "the puzzle room has been solved" is a historical fact, not
+a current state that can be toggled. If a future design needed both permanent records and
+reversible state, those should be two separate collections with different names, not one
+collection with an extra effect type. The model should reflect what the domain means, and in
+this domain, history does not run backwards.
 
 ---
 
@@ -89,7 +107,7 @@ interface ItemDefinition {
 The `inventory` in `GameState` is an array of id strings: `["ration", "ration", "brass-key"]`.
 The definitions live in the adventure data and are looked up by id when the game needs a display
 name or a category check. The two stay separate because the save state needs only the ids, not
-the full metadata, and because the definitions can be updated — corrected, expanded, reworded —
+the full metadata, and because the definitions can be updated, corrected, expanded, reworded,
 without touching existing save files.[^1]
 
 An array is the natural serialisation shape: standard JSON, easy to iterate, honest about the
@@ -155,7 +173,7 @@ return { ...state, inventory: [...inventory] };
 The `Set` conversion handles duplicates quietly: if a player already has the brass key and
 somehow gains it again, the set ignores the duplication rather than adding a second copy. For
 unique keys and treasures, this is exactly right. For consumables where quantity matters, it
-is the wrong behaviour — which is why the rations problem needs a different solution.
+is the wrong behaviour, which is why the rations problem needs a different solution.
 
 ---
 
@@ -239,6 +257,15 @@ already in their save. The id is a contract; the display name is editorial. Cont
 stable; editorial changes are welcome. Keep them in different fields and each can evolve at
 its own pace.[^4]
 
+This pattern, storing a reference and looking up the record it names, recurs throughout the
+gamebook because it is the honest way to model the relationship between what is mutable and what 
+is not. The save state is mutable: the player picks up the key, uses it, gains the treasure. The
+adventure content is not: the brass key is still "Brass Ward Key" whether or not anyone is
+currently carrying it. Separating the two means neither has to pretend to be the other. The
+save file is small and portable because it contains only what changed. The catalogue is stable
+and authoritative because it contains only what was authored. Each does one job, and neither has
+to apologise for what it doesn't know.
+
 ---
 
 ## Flags: State Without A Value
@@ -270,7 +297,9 @@ The more important distinction is permanence. An item can be spent; once it leav
 inventory, it is gone. A flag, once set, stays set. "The puzzle room is solved" is a permanent
 fact about what happened on this playthrough. There is no meaningful sense in which it can be
 un-solved, and the gamebook reflects this: the `setFlags` effect adds to the flags array, and
-there is deliberately no `removeFlags` effect in the basic implementation.[^5]
+there is deliberately no `removeFlags` effect anywhere in the implementation. This is the same
+commitment stated at the top of the chapter: the model should reflect what the domain means,
+and what the domain means here is that history does not run backwards.
 
 ---
 
@@ -337,9 +366,9 @@ whether any combination of them produces a passage with no exits.
 It is worth noting how differently other RPG systems approach the same problem. *Fighting
 Fantasy* handles inventory with almost no system at all: an Equipment section, a box for Gold
 pieces, and no weight or slot rules. The constraint is narrative; the author writes "you cannot
-take the chest" and trusts the player.[^6] D&D sits at the opposite extreme, with carrying
+take the chest" and trusts the player.[^5] D&D sits at the opposite extreme, with carrying
 capacity in pounds, optional encumbrance thresholds, and a rule that most tables ignore because
-the bookkeeping overhead is rarely worth the tactical interest it creates.[^7] The gamebook's
+the bookkeeping overhead is rarely worth the tactical interest it creates.[^6] The gamebook's
 model sits closer to *Fighting Fantasy*: the constraint is the requirement gate, not a weight
 calculation, and the cognitive overhead stays low enough that the mechanics stay invisible.
 
@@ -392,7 +421,7 @@ gone before the hit points change. A careless implementation that heals first an
 second leaves a window between the two operations: if the state were inspected mid-function,
 the ration would still be present while the healing had already applied. Nothing actually goes
 wrong in a synchronous function, but the ordering is still important as a design principle:
-the effect should be atomic — from the caller's perspective, the item is spent and the healing
+the effect should be atomic. From the caller's perspective, the item is spent and the healing
 applied in one transaction. The implementation enforces this by resolving all inventory changes
 before touching hit points.
 
@@ -504,14 +533,15 @@ that unlocks acknowledgement in the ending passage.
 
 ---
 
-The Quartermaster's two questions turn out to be a useful lens for any collection in software:
-is this a membership question, or is this a count? The brass key is either there or it isn't.
-The rations need a number. The flags are membership with no associated item. Each calls for a
-different shape of data, and using the wrong shape doesn't produce an error; it produces
-something that mostly works until the edge case arrives. The gamebook's model is deliberately
-minimal: string ids in an array, `Set` semantics at the point of use. That is enough for a
-five-room dungeon with a handful of items. The resource model, the slot constraint, the weight
-calculation: those are the rooms further in.
+The Quartermaster's three questions turn out to be a more complete lens than they first
+appeared: is this a membership question, a count, or a historical fact? The brass key is
+either there or it isn't. The rations need a number. The flags are permanent records of what
+happened, with no associated value and no way back. Each calls for a different shape of data,
+and using the wrong shape doesn't produce an error; it produces something that mostly works
+until the edge case arrives. The gamebook's model is deliberately minimal: string ids in an
+array, `Set` semantics at the point of use, a flags collection that only ever grows. That is
+enough for a five-room dungeon with a handful of items. The resource model, the slot
+constraint, the weight calculation: those are the rooms further in.
 
 In Chapter 9, we'll look at a different kind of constraint entirely. Not what a player is
 allowed to carry, but what different kinds of user are allowed to see. The Dungeon Master's
@@ -550,15 +580,7 @@ validation checks them, the graph validator refers to them. Changing an id is a 
 Changing a display name is editorial. They have different lifecycles and should be in
 different fields.
 
-[^5]: The decision not to implement `removeFlags` is not an oversight. A flag that says "the
-puzzle room has been solved" should not be removable by any in-game action, because the
-solution to the puzzle was a one-time event. Adding a `removeFlags` effect would mean every
-flag is now potentially impermanent, which changes the semantics of flags from "recorded
-history" to "current state". If the gamebook later needs both permanent records and toggleable
-state, those should be different collections with different names, not the same collection with
-an extra effect type.
-
-[^6]: The *Fighting Fantasy* approach to inventory is implicitly a narrative constraint rather
+[^5]: The *Fighting Fantasy* approach to inventory is implicitly a narrative constraint rather
 than a mechanical one. The books routinely include passages like "you cannot carry the heavy
 chest" or "you must leave behind all your weapons" as prose instructions, and the player is
 expected to cross things off the adventure sheet accordingly. The trust goes both ways: the
@@ -566,7 +588,7 @@ player trusts the author to set reasonable constraints, and the author trusts th
 to claim they put the dragon's treasure in their pocket. The system scales to exactly one
 player reading alone and falls apart immediately in a competitive or adversarial context.
 
-[^7]: The carrying capacity rules in SRD 5.1 are technically in force and almost universally
+[^6]: The carrying capacity rules in SRD 5.1 are technically in force and almost universally
 ignored. The optional Encumbrance variant, which adds threshold effects at five times and ten
 times the Strength score in pounds, sees occasional use at tables that want some mechanical
 weight to their packs. The Dungeon Master's Guide notes that tracking weight can slow the game

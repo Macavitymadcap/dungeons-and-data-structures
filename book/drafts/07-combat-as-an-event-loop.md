@@ -423,8 +423,8 @@ Fear and player failures. There is no queue, no sorted list of participants, no 
 determining who goes when. The order emerges from the conversation at the table.
 
 This sounds appealingly organic, and in practice it often is. The cost is that it depends
-on a quality that improv comedians and experienced gaming groups take seriously: what the
-theatre world calls chivalry. Not the knights-in-armour kind; the ensemble kind. Being
+on a quality that improv comedians and experienced gaming groups take seriously: what was 
+called in my improv days chivalry. Not the knights-in-armour kind; the ensemble kind. Being
 aware of the other players, not steamrollering their moments, making sure everyone gets
 time in the spotlight. A Daggerheart combat session where one player dominates every exchange
 is technically following the rules and completely missing the point. The system trusts the

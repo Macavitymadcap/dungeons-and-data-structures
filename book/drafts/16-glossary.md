@@ -219,6 +219,9 @@ The versioned save document in the gamebook: a single object containing everythi
 **Gate**
 A requirement checked before a choice is offered or a passage is entered: a needed item, a set flag, a minimum value. If the gate is not satisfied, the action does not appear. The gamebook checks gates when assembling the choices for a passage, so the player is never shown an action they cannot take. See also: *choice*, *flags*, *item*.
 
+**God Object**
+A class or module that has accumulated so many responsibilities that it knows everything, owns everything, and can only be changed safely by someone who has read everything. The informal name for a violation of the Single Responsibility Principle. Chapter 10's Python Five Room Dungeon is a worked example: one thousand lines, everything in a single file, no seams. The cure is modular decomposition; the diagnosis is that every change requires understanding more code than it should. See also: *module*, *single responsibility principle*, *high cohesion*.
+
 **Graph**
 A mathematical structure consisting of nodes (also called vertices) connected by edges. Gamebooks, websites, social networks, dependency trees, tube maps, and version control histories are all graphs. Once you start seeing them you find them everywhere, which is either illuminating or mildly unsettling, depending on temperament. See also: *node*, *edge*, *directed graph*, *DAG*.
 
@@ -303,6 +306,9 @@ A point in a graph. In a gamebook, a passage is a node. In a website, a page is 
 
 ## O
 
+**OWASP** (Open Web Application Security Project)
+A non-profit foundation that publishes freely available guidelines on web application security. The OWASP Top 10 is a regularly updated list of the most critical web security risks; broken access control has appeared on it for essentially every year of its publication. Relevant to Chapter 9's access control discussion. [owasp.org/Top10](https://owasp.org/Top10/). See also: *access control*, *authorisation*, *authentication*.
+
 **Ownership**
 The relationship between a user and a specific resource, granting access rights that a global role does not. A player owns their character sheet regardless of any admin's title. A Game Master owns the campaign prep for their campaign, not for other campaigns. Ownership ties a permission to a specific resource rather than granting it globally. See also: *role*, *capability*, *authorisation*.
 
@@ -310,14 +316,23 @@ The relationship between a user and a specific resource, granting access rights 
 
 ## P
 
+**Pa11y**
+An open-source command-line tool for automated accessibility testing. Runs a page against the WCAG standard using one or more test runners (axe and htmlcs being the two used in this book) and reports violations with the failing element's selector and a description of the issue. Available at [pa11y.org](https://pa11y.org/). See also: *WCAG*, *Playwright*.
+
 **Passage**
 In a gamebook, a numbered (or named) unit of prose describing a moment in the adventure, accompanied by a set of choices. The fundamental node in the gamebook's graph. In the codebase, a `Passage` interface with an `id`, a `body`, a list of `Choice` objects, and an optional `ending`. See also: *choice*, *graph*, *node*.
+
+**Playwright**
+A cross-browser end-to-end testing library for web applications. Supports Chromium, Firefox, and WebKit; drives a real browser for navigation, interaction, and assertion. Used in this book to run the static gamebook's browser smoke tests: real browser, real `localStorage`, real JavaScript execution. Alternatives that simulate rather than run the browser cannot verify storage behaviour. See also: *Pa11y*.
 
 **Polymorphism**
 The ability to write code that works with multiple different types through a shared contract, without needing to know which specific type it has. TypeScript achieves this through structural typing: if a value has the right shape, it satisfies the interface, regardless of how it was created. A function that accepts a `Character` works with any object that satisfies the `Character` interface. See also: *interface*, *structural typing*.
 
 **Post/Redirect/Get (PRG)**
 A web application pattern for handling form submissions that change server state. The POST is processed, the state changes, and the response is a redirect (303 See Other) to a GET endpoint rather than the new content directly. The client follows the redirect and renders a fresh GET response. Solving the double-submission problem that arises when a user refreshes a POST response.
+
+**Powered by the Apocalypse (PbtA)**
+A tabletop RPG design framework originating from Vincent Baker and Meguey Baker's *Apocalypse World* (2010). Rather than a single set of rules, PbtA is a design philosophy: character classes are self-contained playbooks, special abilities are discrete moves, and the system focuses on narrative conversation rather than simulation. Referenced in Chapter 5 as an example of composition over inheritance in game design: a PbtA character is assembled from independent capability bundles rather than derived from a class hierarchy. See also: *composition*, *character template*.
 
 **Proficiency Bonus**
 In D&D, a bonus added to rolls involving skills, attacks, and saving throws a character is proficient in. Scales with character level: +2 at levels 1–4, up to +6 at levels 17–20. The formula `floor((level − 1) / 4) + 2` produces the correct result for all twenty levels, which is the kind of elegant compact formula that makes you feel obscurely grateful to whoever designed it. See also: *ability modifier*, *skill modifier*, *d20 check*.
@@ -362,6 +377,9 @@ Changing the internal structure of a system without changing what it does from t
 **Repository** (Domain-Driven Design)
 An abstraction over data access that presents a collection-like interface to domain code, hiding the storage details. Domain logic calls `getCharacter(id)`; the repository decides whether to query SQLite, a cache, or an in-memory store. Callers depend on the interface, not the implementation. Also makes testing significantly easier: swap the real repository for a test double and no database is required. See also: *dependency inversion principle*, *module*.
 
+**REST** (Representational State Transfer)
+An architectural style for networked applications, defined by Roy Fielding in his 2000 doctoral dissertation. REST is not a protocol or a standard but a set of constraints: stateless communication, uniform interface, resource identification by URL, and hypermedia as the engine of application state. Chapter 3 draws on REST principles; HATEOAS is one of its constraints. See also: *HATEOAS*.
+
 **Resource**
 A counted thing a character holds, modelled as a record with a current value and an optional maximum: rations, torches, spell slots, gold. The defining question for a resource is "how many?", which distinguishes it from an item (a membership question, "do I have it?") and a flag (a historical fact, "did it happen?"). Spending a resource decrements its current value; it cannot drop below zero. See also: *item*, *flags*, *spell slot*.
 
@@ -393,6 +411,9 @@ The act of converting an in-memory data structure to a string or byte stream for
 **Set** (data structure)
 A collection that stores each value at most once and answers membership in constant time: `set.has(id)` is fast regardless of how many items the set holds. The gamebook uses a `Set` when checking inventory membership, converting the stored array to a set for the check and back to an array for storage, because arrays serialise cleanly to JSON and sets do not. The right structure for "is this present?"; the wrong one for "how many?". See also: *item*, *serialisation*.
 
+**Single Responsibility Principle**
+The principle that a module or class should have one, and only one, reason to change. A module responsible for graph validation and HTTP rendering has two reasons to change: when validation rules tighten, and when the rendering changes. Splitting it gives each part the freedom to evolve independently. One of the SOLID principles; the formal framing for what Chapter 10 calls high cohesion. Its violation is the God Object. See also: *high cohesion*, *module*, *God Object*.
+
 **Skill**
 In D&D, a specific area of competence derived from an ability score: Athletics (Strength), Stealth (Dexterity), Arcana (Intelligence), Perception (Wisdom), and others. A character proficient in a skill adds their proficiency bonus to checks using that skill. See also: *skill modifier*, *proficiency bonus*, *d20 check*.
 
@@ -423,6 +444,14 @@ The publicly available subset of D&D 5th Edition rules released by Wizards of th
 ---
 
 ## T
+
+**TDD** (see: *test-driven development*)
+
+**Test-Driven Development (TDD)**
+The practice of writing a failing test before writing the code that makes it pass. The cycle: write a test that describes the desired behaviour, watch it fail, write the minimum code to make it pass, refactor. Tests written first tend to be cleaner and less calibrated to implementation details; code written to satisfy a test tends to have clearer interfaces. Works best for domain logic with well-defined inputs and outputs; less well for frontend components where the desired behaviour is partly visual and evolves as the design does. Discussed in Chapter 14. The canonical source is Kent Beck, *Test-Driven Development: By Example* (Addison-Wesley, 2002). See also: *pure function*, *reducer*.
+
+**Text Adventure**
+A form of interactive fiction in which the player navigates a simulated world by typing commands, receiving prose descriptions of locations and events in return. *Colossal Cave Adventure* (1976) and *Zork* (1977) established the form. The underlying structure is a directed graph of locations connected by exits, described in second-person prose. The gamebook format is a print analogue: same graph structure, choices offered as a numbered list rather than a parser prompt. See also: *graph*, *passage*, *directed graph*.
 
 **Tree**
 A graph in which every node except the root has exactly one parent, and no paths converge. File systems are trees. Family trees are trees. Most gamebooks are close to trees but not quite, because paths often reconverge at a common antechamber before the finale. When paths reconverge, you have a DAG rather than a tree. See also: *DAG*, *graph*.

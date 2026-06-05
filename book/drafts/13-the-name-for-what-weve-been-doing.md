@@ -322,9 +322,10 @@ the access boundaries hold under pressure.
 
 ## At Scale: Campaign Ledger
 
-Campaign Ledger applies the same DDD vocabulary to a larger domain. The observations below are
-not new concepts; they are what the patterns from this chapter look like when the application
-has multiple bounded contexts, authenticated users, and several years of accumulated decisions.
+Campaign Ledger applies the same DDD vocabulary to a larger domain. The four patterns this
+chapter named, aggregate roots, bounded contexts, anti-corruption layers, and repository
+interfaces, are all present. What changes is not the pattern but the pressure: more contexts,
+more users, more years of accumulated decisions bearing down on each boundary.
 
 **Aggregate roots and access boundaries.** `Campaign` is an aggregate root. Characters,
 sessions, notes, NPCs, imports, and wiki pages are all owned within it. The access control
@@ -341,7 +342,7 @@ is a summary with a name, a class, and a level. Same word, different shape, appr
 context's needs.
 
 **Anti-corruption layers.** The SRD importer converts SRD 5.1 vocabulary into the application's
-own `rules_entities` and `rule_mechanics` schema — the same translation the gamebook's compact
+own `rules_entities` and `rule_mechanics` schema, the same translation the gamebook's compact
 catalogue performs, with more moving parts. The Google Docs campaign-content importer does the
 same for prep material: normalising Markdown, stripping private URLs, preserving source
 metadata before anything enters the campaign domain. Each importer speaks both languages so the

@@ -123,14 +123,36 @@ publishing pipeline, the artifact check catches access-control guarantees, and t
 smoke catches real player interactions. A failure at any gate stops the chain; there is no
 point verifying the browser build if the static build has already failed.[^1]
 
-A note on where this chapter sits in the book. Testing appears in Chapter 14, after the
-code has been built. In practice, tests often belong earlier: alongside the code, or even
-before it. Writing a test that describes the behaviour you want before writing the code that
-produces that behaviour is a discipline called test-driven development, and it has real
-advantages in keeping code focused and interfaces clean. The book defers it to here because
-understanding what to test first requires understanding what you are building, and that
-understanding has been accumulating across thirteen chapters. The order is pedagogical, not
-prescriptive.[^2]
+---
+
+## A Note On Where Tests Belong
+
+Testing appears in Chapter 14, after the code has been built. In practice, tests often
+belong earlier: alongside the code, or even before it.
+
+Writing a test that describes the behaviour you want before writing the code that produces
+that behaviour is a discipline called **test-driven development**, or TDD.[^2] The cycle is:
+write a failing test, watch it fail, write the minimum code to make it pass, refactor. Tests
+written first tend to be cleaner than tests written after, because they are written by someone
+who does not yet know the implementation and therefore cannot accidentally calibrate the test
+to it. Code written to satisfy a test tends to have clearer interfaces, for the same reason.
+
+TDD works best for domain logic with clear inputs and outputs, which is exactly where the
+gamebook uses it most. The graph validator, the dice roller, the save migrator: each has
+well-defined inputs, well-defined outputs, and no hidden dependencies. A test for any of
+them can be written before a single line of implementation exists.
+
+It works less well for frontend components, where the desired behaviour is partly visual,
+partly interactive, and partly a matter of taste that changes as the design evolves. Writing
+a test for a component before the component exists often means writing a test against an
+interface that will be redesigned three times before it settles.
+
+The book defers testing to this chapter because understanding what to test requires
+understanding what you are building, and that understanding has been accumulating across
+thirteen chapters. The order is pedagogical, not prescriptive. TDD has a devoted following,
+and some of its adherents treat it as the only legitimate way to write software, which is the
+kind of absolutism that tends to follow any good idea when it acquires a methodology and a
+name. The idea is sound; the cult is optional.
 
 ---
 
@@ -416,10 +438,21 @@ A dungeon that cannot be navigated by a player who uses a keyboard instead of a 
 screen reader instead of a monitor, is a dungeon with locked doors that were never designed
 to be opened.
 
-Accessibility testing has two layers: automated and manual. Automated tools like Pa11y check
-for structural accessibility problems that have deterministic rules: missing alt text, buttons
-without labels, colour contrast failures, focus order violations, missing landmark regions.
-These are the checks a script can run and a human would find tedious to repeat manually.
+The gamebook is built from semantic HTML: `<form>` for choices, `<button>` for actions,
+`<nav>` for navigation, heading levels that follow document order. This is not a concession
+to accessibility requirements; it is the correct way to build for the web, and the
+accessibility benefits are a consequence of correctness rather than a separate effort. Mt.
+Graphnor can be navigated entirely by keyboard and renders sensibly in a screen reader
+because the HTML is honest about what each element is for. Chapter 3's argument for semantic
+HTML over `<div>` soup pays dividends here: the accessibility tree is only as good as the
+markup it is built from.
+
+Automated tools like Pa11y check for structural accessibility problems that have
+deterministic rules: missing alt text, buttons without labels, colour contrast failures,
+focus order violations, missing landmark regions. These are the checks a script can run and
+a human would find tedious to repeat manually. Running them in the verification pipeline
+means a future change that accidentally removes a button label or breaks the focus order is
+caught before it ships, rather than discovered by a player who relies on a screen reader.
 
 Campaign Ledger runs Pa11y against its routes in the accessibility gate:
 
@@ -448,15 +481,18 @@ for (const route of routes) {
 }
 ```
 
-WCAG 2.2 Level AA is the standard. Each route is checked against two runners for broader
-coverage. Failures are reported with the selector, so the developer knows exactly which
-element failed and why.[^6]
+WCAG 2.2 Level AA is the standard.[^6] Each route is checked against two runners for broader
+coverage: axe catches a different set of issues from htmlcs, and the overlap is worth having.
+Failures are reported with the selector, so the developer knows exactly which element failed
+and why, rather than receiving a count with no location.
 
 Automated checks are necessary but not sufficient. They can verify that a button has an
 accessible label; they cannot verify that the label is the right label for the action. They
 can detect colour contrast failures above a certain ratio; they cannot verify that the overall
-colour scheme is comfortable for a player with photosensitive epilepsy. The automated gate
-is the starting line, not the finish.
+experience is comfortable for a player with photosensitive epilepsy or low vision. Manual
+review by someone who actually uses assistive technology is the only way to know whether the
+interface works for them. The automated gate is the floor, not the ceiling: it prevents the
+obvious failures from shipping, and leaves the harder questions to people rather than scripts.
 
 ---
 
@@ -547,6 +583,8 @@ Command, result, totals. A note for anything that was not needed and why. It tak
 seconds to write and it means a reviewer looking at the PR two weeks later can verify what
 was actually checked, rather than taking the author's word for it. A summary that says "tests
 pass" with no command or count is an assertion. An assertion with receipts is evidence.[^8]
+The instinct behind this, that working software must be demonstrated rather than asserted,
+comes from delivery practice with older roots than most engineering teams remember.[^9]
 
 I used to write "all tests passing ✓" in PR descriptions and feel quite good about it.
 I have since learned that this is the equivalent of the Dungeon Master saying "it's fine"
@@ -667,20 +705,10 @@ be noise. Stopping the chain on failure preserves the signal: the first failure 
 exactly where the problem is, and the subsequent gates tell you nothing useful until it is
 fixed.
 
-[^2]: Test-driven development (TDD) is the practice of writing a failing test before writing
-the code that makes it pass. The cycle is: write a test that describes the desired behaviour,
-watch it fail, write the minimum code to make it pass, refactor. The discipline has genuine
-advantages: tests that are written first tend to be cleaner, code that is written to satisfy
-a test tends to have clearer interfaces, and the suite stays honest because there is no
-temptation to write tests that are calibrated to the existing code rather than the intended
-behaviour. It works best for domain logic with clear inputs and outputs, which is exactly
-where the gamebook uses it most. It works less well for frontend components, where the
-"desired behaviour" is partly visual, partly interactive, and partly a matter of taste that
-changes as the design evolves; writing a test for a component before the component exists
-often means writing a test against an interface that will be redesigned three times before
-it settles. TDD has a devoted following, and some of its adherents treat it as the only
-legitimate way to write software, which is the kind of absolutism that tends to follow any
-good idea when it acquires a methodology and a name. The idea is sound; the cult is optional.
+[^2]: The canonical source for TDD as a named practice is Kent Beck, *Test-Driven Development:
+By Example* (Addison-Wesley, 2002). For TDD applied at the system level rather than the unit
+level, Steve Freeman and Nat Pryce's *Growing Object-Oriented Software, Guided by Tests*
+(Addison-Wesley, 2009) is the more practically applicable book for this audience.
 
 [^3]: The content readiness test is one of the more unusual uses of automated testing:
 asserting that the content is not in a specific bad state. It is not testing that the
@@ -728,3 +756,9 @@ answer is most accessible. The "assertions with receipts" shorthand applies the 
 "the tests passed" is a claim; "bun run verify: 5 gates, 82 tests, 0 failures" is the same
 claim with enough detail for a reviewer to verify it against the CI log. The extra fifteen
 words are not bureaucracy; they are the difference between a claim and evidence.
+
+[^9]: The Scrum Guide (Schwaber and Sutherland, 2020; available at
+[scrumguides.org](https://www.scrumguides.org/)) codifies the sprint review's requirement
+that working software be demonstrated rather than reported. The acceptance note practice is
+not Scrum, but the underlying instinct, that a feature is not done until its correctness can
+be shown to someone who was not there when it was built, is the same.
