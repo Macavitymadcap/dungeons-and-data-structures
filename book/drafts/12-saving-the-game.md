@@ -325,8 +325,8 @@ other.[^7]
 ## The Local Play Document
 
 Campaign Ledger's local play feature shows how the same pattern scales to a more complex
-data model. Some players want to use Campaign Ledger without an account — for a one-shot,
-or to explore the interface before committing. The local play document serves this need.
+data model. Some players want to use Campaign Ledger without an account, to track a character
+for a one-shot or to explore the interface before committing. The local play document serves this need.
 
 It is stored in `localStorage` under a versioned key, structured exactly like the gamebook's
 save: an explicit schema, a declared version, validation before accepting imported data, and
@@ -453,7 +453,7 @@ private browsing modes typically do not persist local storage across sessions. T
 documents this honestly in the UI: the save exists in this browser. Export your save if you
 want to keep it.
 
-[^7]: The three-layer approach (auto-save to local storage, manual export to JSON, manual
+[^7]: The three-layer approach (autosave to local storage, manual export to JSON, manual
 import from JSON) is a common pattern for browser-based games that want to feel modern
 without requiring an account. It solves the "different device" problem by making export and
 import explicit player actions rather than invisible infrastructure. The cost is that the

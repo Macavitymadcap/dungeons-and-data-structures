@@ -52,7 +52,7 @@ This is what lay beyond it.
 
 ## What The Dungeon Taught Us
 
-The book has moved through fourteen connected ideas. They are worth naming together, once,
+The book has moved through thirteen connected ideas. They are worth naming together, once,
 now that all of them have been introduced.
 
 **Chapter 2** put the word "graph" on the table. A gamebook is a directed graph: passages as
@@ -222,7 +222,7 @@ game save. It is any versioned, validated, migratable persistent contract.
 
 The dungeon was the teaching lens. Once the ideas are named, the lens can be set down.[^4]
 
-The next system will have its own vocabulary. The reader who has spent fourteen chapters
+The next system will have its own vocabulary. The reader who has spent thirteen chapters
 naming nodes and edges, stored facts and derived facts, authentication and authorisation,
 cohesion and coupling, validation and migration, will find those names available when the
 new domain needs them. Not as decoration. As tools.
@@ -248,7 +248,7 @@ room, you have no map at all. You make choices without knowing where they lead. 
 to consequences you did not anticipate. The map grows slowly, room by room, passage by
 passage, every wrong turn a data point.
 
-By the end of this book, the map has fourteen rooms marked on it. They are not all there are.
+By the end of this book, the map has thirteen rooms marked on it. They are not all there are.
 But they are enough to navigate by, and knowing how to make a map is more useful than any
 map that has already been drawn.
 

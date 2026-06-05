@@ -84,7 +84,7 @@ up reading.
 
 Fighting Fantasy gamebooks. D&D sourcebooks. Stories about wizards who learned the true names of
 things and could therefore change them. The wizard's power was not strength or wealth or luck.
-It was precision. An incantation worked because every word was placed correctly. A mis-spoken
+It was precision. An incantation worked because every word was placed correctly. A misspoken
 syllable redirected the energy in directions nobody wanted. There were consequences.
 
 Programming felt like that. You wrote words in a strange language, according to rules that did not
@@ -102,10 +102,10 @@ early period where most of what I understood was not much at all.
 
 ## Software Needs A World To Model
 
-Something I've come to believe, which is not original to me but took me a while to properly feel: 
-software is interesting in isolation, but the real magic happens when it intersects with another 
-domain and starts to *represent* something. A business, an archive, a game, a city's transport 
-network, an encyclopaedia, an e-commerce catalogue. The intersection is where the work gets 
+Something I've come to believe, which is not original to me but took me a while to properly feel:
+software is interesting in isolation, but the real magic happens when it intersects with another
+domain and starts to *represent* something. A business, an archive, a game, a city's transport
+network, an encyclopaedia, an e-commerce catalogue. The intersection is where the work gets
 meaningful.
 
 A spreadsheet full of arbitrary numbers is a curiosity. A spreadsheet that models a D&D campaign,
@@ -130,7 +130,7 @@ remarkably well onto each other.
 ## Games Are Systems You Can Touch
 
 There is a more practical reason to learn software development through games, beyond the personal,
-philosophical and nerdy.
+philosophical, and nerdy.
 
 Games are systems made explicit. When you play Dungeons and Dragons, you are handed a rulebook that
 describes how the world operates: what a character can do, how conflict resolves, what the
@@ -213,17 +213,18 @@ after many years, many tutorials, and a career change. It is a private, locally 
 run for my own table: character sheets, session notes, NPC dossiers, rules references, staged
 imports, player-safe publishing, role-based access, and a deployment posture with accessibility
 checks, smoke tests, screenshots, and acceptance notes. It handles real users and real sessions.
-It is not a public product, and was never intended to be. It is built with the same care as something
-that would be, and that care is the point.
+It is not a public product, and was never intended to be. It is built with the same care as
+something that would be, and that care is the point.
 
 Where Mt. Graphnor is small enough to hold in your head all at once, Campaign Ledger is large
 enough to show how the same ideas grow under real-world pressure. When a chapter needs a
 beginner-sized example, it uses Mt. Graphnor. When it needs to show the same idea surviving
 contact with a real application, it uses Campaign Ledger. The two don't require you to understand
-both at once. When a Campaign Ledger section moves into SQL schemas, repository interfaces, or bounded 
-contexts without stopping to introduce them, that's intentional: those sections are aimed at the reader 
-who already has some of that ground. Read past them and the concept still lands from the gamebook side;
-come back when the territory feels more familiar and they'll read differently.
+both at once. When a Campaign Ledger section moves into SQL schemas, repository interfaces,
+or bounded contexts without stopping to introduce them, that's intentional: those sections
+are aimed at the reader who already has some of that ground. Read past them and the concept
+still lands from the gamebook side; come back when the territory feels more familiar and
+they'll read differently.
 
 ---
 
@@ -362,5 +363,5 @@ deeper into the tradition.
 
 [^10]: The [Fighting Fantasy](https://www.fightingfantasy.com/) series was created by Steve
 Jackson and Ian Livingstone and published by Puffin/Wizard Books. The form is an inspiration.
-The content, maps, encounters, puzzle answers, named characters, trade dress, remains their
+The content, maps, encounters, puzzle answers, named characters, trade dress, remain their
 work, not mine.

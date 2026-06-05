@@ -4,16 +4,16 @@
 
 > **The Wizard and the Apprentice**
 >
-> "All practitioners the great Art," said the Wizard, "trace their power back through a 
-> lineage of teachers. My power comes from my master, Blorgana the Mysterious, who had it from 
-> her master, Afrohorse Of Wyrmshire, who received it from the great Librarian of the Gilt Tower, 
+> "All practitioners of the great Art," said the Wizard, "trace their power back through a
+> lineage of teachers. My power comes from my master, Blorgana the Mysterious, who had it from
+> her master, Afrohorse of Wyrmshire, who received it from the great Librarian of the Gilt Tower,
 > Dewey the Decimaliser. The line is unbroken; the gift passes through the chain."
 >
 > "What about her?" said the Apprentice, pointing through the window at a woman in white robes
 > who was, at that moment, closing a wound in a soldier's side with nothing but a murmured word
 > and an outstretched hand.
 >
-> The Wizard looked, eyeing the amulet around the woman's robes. "That is a Cleric of Heria."
+> The Wizard looked, eyeing the amulet at the woman's throat. "That is a Cleric of Heria."
 >
 > "She's doing magic."
 >
@@ -25,7 +25,7 @@
 >
 > "Then where does her power come from?"
 >
-> The Wizard was quiet for a moment, chewing over an answer that satisfied her professionally but 
+> The Wizard was quiet for a moment, chewing over an answer that satisfied her professionally but
 > admitted too much for comfort.
 >
 > "From her god," said the Wizard.
@@ -102,7 +102,7 @@ The `constructor` is a special function that runs when you create a new instance
 Call `brandavar.takeDamage(3)` and the hit points change.
 
 This is not inherently better or worse than the interface-and-helpers approach from Chapter 4.
-It is a different way of organising the same ideas.[^3] The data and the functions that operate on
+It is a different way of organising the same ideas.[^1] The data and the functions that operate on
 it travel together, which can be convenient. Whether that convenience is worth its costs depends
 on what the system needs to do next.
 
@@ -166,8 +166,7 @@ The problem is not visible yet. It appears when the system grows.
 Wizards and Clerics both cast spells. Where does the spellcasting logic go? It could go in
 `Character`, so that all characters have it — but then Fighters and Rogues carry spell logic
 they can never use. It could go in both `Wizard` and `Cleric` separately — but then the same
-logic exists in two places, and when the rules change, both must be updated.[^1]
-
+logic exists in two places, and when the rules change, both must be updated.[^2]
 
 The common response is a new level in the hierarchy: a `Spellcaster` class that sits between
 `Character` and the casting subclasses:
@@ -204,7 +203,7 @@ problem by month three. I ripped it out and started over with tables.
 ## The Liskov Problem
 
 There is a more precise way to name what goes wrong. In 1987, Barbara Liskov articulated a
-principle that has since become a foundational test for inheritance:[^2] a subtype should be able
+principle that has since become a foundational test for inheritance:[^3] a subtype should be able
 to stand in for its parent type without breaking the behaviour that code relying on the parent
 expects.
 
@@ -223,7 +222,7 @@ That code didn't ask for any of that. If the spellcasting subclass overrides a m
 way that depends on spell slots being present, code that doesn't know about spell slots can
 produce unexpected results.
 
-The DRY principle,[^1] Liskov, and the combinatorial explosion of the D&D multiclass problem
+The DRY principle,[^4] Liskov, and the combinatorial explosion of the D&D multiclass problem
 are all pointing at the same thing. They arrive via different routes, but the destination is
 identical: inheritance is a good fit for genuinely hierarchical relationships, and a poor fit
 for everything else. Before every `extends`, ask whether the child truly keeps all the promises
@@ -284,10 +283,10 @@ character type needs both martial and magical capabilities, a new template can d
 combination directly, without restructuring what already exists. The Eldritch Knight is not a
 design problem; it is a new constant in a file.
 
-This is also how games outside D&D handle the same problem. Powered by the Apocalypse[^4] games
+This is also how games outside D&D handle the same problem. Powered by the Apocalypse[^5] games
 use **playbooks**: a character's class is a bundle of starting stats, special moves, and
-equipment, chosen at creation, composable rather than hierarchical. Daggerheart's class/ancestry
-/community layers work on the same principle: three independent axes of character definition,
+equipment, chosen at creation, composable rather than hierarchical. Daggerheart's
+class/ancestry/community layers work on the same principle: three independent axes of character definition,
 each contributing a different slice of what the character can do, combined at creation into a
 single coherent record. Neither system builds a class hierarchy. Both systems produce a richer
 variety of characters than a fixed taxonomy would allow.
@@ -393,19 +392,7 @@ Dice, probability, and the particular relationship between a difficulty class an
 are the subject of Chapter 6.
 
 ---
-[^1]: This is the **DRY principle**: Don't Repeat Yourself. When the same logic exists in two
-places, changes must be made twice, and eventually they won't be. The cure is worse than the
-disease only when the shared ancestor accumulates so much logic that it becomes impossible to
-understand. Finding the right level of abstraction is most of the craft.
-
-[^2]: Barbara Liskov, "Data Abstraction and Hierarchy", OOPSLA 1987. The principle is usually
-stated as: if `S` is a subtype of `T`, then objects of type `T` may be replaced with objects of
-type `S` without altering any of the desirable properties of the program. In plain English: a child
-class should not surprise code that was written expecting the parent. The formal publication appeared
-in SIGPLAN Notices 23(5), 1988, as a revised version of the keynote; both sources are cited in the
-bibliography.
-
-[^3]: TypeScript's `class` syntax compiles down to JavaScript prototype chains, which differ from
+[^1]: TypeScript's `class` syntax compiles down to JavaScript prototype chains, which differ from
 classical OOP in languages like Java or C# in a few notable ways: there is no true method overloading,
 access modifiers like `private` are enforced only at compile time and not at runtime, and the prototype
 system means that methods are shared objects rather than per-instance copies. For the purposes of this
@@ -413,7 +400,24 @@ chapter, none of that matters. The inheritance model `extends` provides is close
 OOP to make the comparison useful, and the composition arguments apply equally regardless of the
 underlying mechanism.
 
-[^4] Powered by the Apocalypse (PbtA) is not so much a set of game rules as it is a design framework 
+[^2]: This is the **DRY principle**: Don't Repeat Yourself. When the same logic exists in two
+places, changes must be made twice, and eventually they won't be. The cure is worse than the
+disease only when the shared ancestor accumulates so much logic that it becomes impossible to
+understand. Finding the right level of abstraction is most of the craft.
+
+[^3]: Barbara Liskov, "Data Abstraction and Hierarchy", OOPSLA 1987. The principle is usually
+stated as: if `S` is a subtype of `T`, then objects of type `T` may be replaced with objects of
+type `S` without altering any of the desirable properties of the program. In plain English: a child
+class should not surprise code that was written expecting the parent. The formal publication appeared
+in SIGPLAN Notices 23(5), 1988, as a revised version of the keynote; both sources are cited in the
+bibliography.
+
+[^4]: "Favour object composition over class inheritance" is one of the two foundational principles
+in Gamma, Helm, Johnson, and Vlissides, *Design Patterns: Elements of Reusable Object-Oriented
+Software* (Addison-Wesley, 1994) — the book universally known as the Gang of Four. The principle
+predates the book; the book gave it a shared vocabulary.
+
+[^5]: Powered by the Apocalypse (PbtA) is not so much a set of game rules as it is a design framework
 for TTRPGs that focuses on playing a role rather than rolling to play. Its mechanics are storytelling
-and narrative-driven, and it has provided the gaming world with amazing titles, including but not 
+and narrative-driven, and it has provided the gaming world with amazing titles, including but not
 limited to *Monster of the Week* and *Thirsty Sword Lesbians*.

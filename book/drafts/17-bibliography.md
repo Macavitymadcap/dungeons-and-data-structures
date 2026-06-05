@@ -75,6 +75,9 @@ The dissertation that defined REST and, in passing, gave HATEOAS its unwieldy na
 **Fowler, Martin.** *Patterns of Enterprise Application Architecture.* Addison-Wesley, 2002.
 The source, among many other things, of the Post/Redirect/Get pattern cited in Chapter 3. Also a thorough taxonomy of the patterns that show up in data-heavy web applications (repositories, active records, table data gateways), most of which have been reinvented by every generation of web developers.
 
+**Gamma, Erich, Richard Helm, Ralph Johnson, and John Vlissides.** *Design Patterns: Elements of Reusable Object-Oriented Software.* Addison-Wesley, 1994.
+The Gang of Four book. The source of "prefer composition over inheritance" and the adapter pattern. Cited in Chapters 5 and 10. Its specific patterns have dated unequally, but the underlying discipline of naming recurring solutions so they can be discussed is still the right instinct.
+
 **Liskov, Barbara.** "Data Abstraction and Hierarchy." *SIGPLAN Notices*, vol. 23, no. 5, 1988 (keynote address, OOPSLA 1987).
 The source of the Liskov Substitution Principle: a subtype should be substitutable for its parent type without altering the desirable properties of the program. Cited in Chapter 5. A foundational paper in object-oriented design that has been summarised, misunderstood, correctly understood, and cited selectively in approximately equal measure ever since.
 
@@ -170,9 +173,6 @@ Listed again here because Chapter 13 is an introduction, not a substitute. The p
 
 **Freeman, Steve, and Nat Pryce.** *Growing Object-Oriented Software, Guided by Tests.* Addison-Wesley, 2009.
 The best book on test-driven development at the system level, as opposed to the unit level. The "London school" approach of designing interfaces by writing the tests that use them complements the port-and-adapter ideas behind the injectable `RandomSource` pattern in Chapter 6.
-
-**Gamma, Erich, Richard Helm, Ralph Johnson, and John Vlissides.** *Design Patterns: Elements of Reusable Object-Oriented Software.* Addison-Wesley, 1994.
-The Gang of Four book. The source of "prefer composition over inheritance," the adapter pattern (Chapter 10), and the observation that most design problems have been solved before. Its specific patterns have dated unequally, but the underlying discipline of naming recurring solutions so they can be discussed is still the right instinct.
 
 **Hunt, Andrew, and David Thomas.** *The Pragmatic Programmer: From Journeyman to Master.* Addison-Wesley, 1999 (twentieth anniversary edition 2019).
 The book that introduced DRY as a named principle, among many other things. Practical, opinionated, and still accurate. The advice to "keep knowledge in one place" and "make the machine do the work" is the practical form of everything Chapter 11 says about generated attribution panels and stable identifiers.

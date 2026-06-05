@@ -234,8 +234,8 @@ of the storage technology.
 
 Campaign Ledger defines repository interfaces like `CharacterRepository`, `CampaignRepository`,
 and `RulesRepository`. These interfaces say things like `getCharacter(id)`,
-`listNpcSummariesForCampaign(campaignId, viewerId, viewerRole)`, and `updateResourceCurrent(resourceId,
-delta)`. They do not say `SELECT * FROM characters WHERE id = ?`. The domain logic knows what
+`listNpcSummariesForCampaign(campaignId, viewerId, viewerRole)`, and
+`updateResourceCurrent(resourceId, delta)`. They do not say `SELECT * FROM characters WHERE id = ?`. The domain logic knows what
 it needs; the repository knows how to get it. The SQLite implementation satisfies the
 repository interface without the routes or domain modules ever knowing SQLite is involved.
 
@@ -255,9 +255,9 @@ vocabulary that is precise, stable, and widely understood.
 
 "Saving throw" does not mean "any roll to avoid something bad". It means a specific kind of
 roll against a specific ability score, triggered by a specific category of effect, with
-specific consequences for success and failure. The term is loaded with meaning. When the
-gamebook's `CheckDefinition` has a `kind: "savingThrow"` field, it is borrowing that
-precision without having to re-invent it.
+specific consequences for success and failure. The term is loaded with meaning. When
+`rollD20Check` accepts a `reason` field and the call site passes `"saving throw"`, the code
+is borrowing that precision without having to re-invent it.
 
 The aggregate structure is visible in the published rulebooks. A character sheet is a
 character aggregate: the character is the root entity, and their abilities, skills, inventory,

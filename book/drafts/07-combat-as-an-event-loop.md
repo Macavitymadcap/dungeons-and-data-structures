@@ -526,7 +526,7 @@ if a later design requires initiative-ordered turns, that counter becomes the ba
 tracking where in a full round the encounter sits.[^8]
 
 Daggerheart takes a different approach entirely. Rather than a strict initiative order,
-its combat runs on what the designers call an action spotlight: each player acts when it
+its combat runs on what the designers call an Action Spotlight: each player acts when it
 feels right to them, one after the other, with the GM making moves based on accumulated
 Fear and player failures. There is no queue, no sorted list of participants, no algorithm
 determining who goes when. The order emerges from the conversation at the table.

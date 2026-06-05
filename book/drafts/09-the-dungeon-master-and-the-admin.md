@@ -11,7 +11,7 @@
 >
 > "I have the master ring," said the Admin.
 >
-> "Good for you." said the Doorkeeper.
+> "Good for you," said the Doorkeeper.
 >
 > "I have access to everything."
 >
@@ -20,7 +20,7 @@
 >
 > Ad Min looked at the keys, then at the Doorkeeper. "I am Ad Min, keeper of the sacred dungeon."
 >
-> "You are one of the keepers" said the Doorkeeper, with the particular patience of someone who has
+> "You are one of the keepers," said the Doorkeeper, with the particular patience of someone who has
 > had this conversation before. "There are several of you. Being one does not mean being all. This
 > room belongs to Mira. Are you Mira?"
 >

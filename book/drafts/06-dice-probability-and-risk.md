@@ -17,7 +17,7 @@
 >
 > "Then it's fair."
 >
-> The adventurer screwed their eyes at the die, muttering "Doesn't feel fair.".
+> The Adventurer screwed their eyes at the die, muttering "Doesn't feel fair."
 >
 > The Oracle set down her quill. "A fair die rolls each face with equal chance. It has no memory
 > of what it rolled before, and no obligation to produce an average outcome on your behalf in the
@@ -58,14 +58,14 @@ will usually beat a weaker opponent, rather than occasionally losing to a lucky 
 games have different answers to the question of how much randomness the dice should introduce,
 and the shape of the probability distribution is the primary lever.[^3]
 
-Daggerheart, a 2024 game from Darrington Press, takes a completely different approach. Rather than 
-a single d20, players roll two twelve-sided dice of different colours: the Hope die and the Fear 
-die. The total still determines success against a difficulty class (the target number the roll 
-must meet), but which die is higher determines the *flavour* of that success. Roll higher on Hope 
-and the scene tilts in the player's favour; roll higher on Fear and the GM earns a Fear token they 
-can spend to drive the story toward trouble, regardless of whether the player succeeded. The 
-character model that sits behind this system needs to track not just ability scores and hit points 
-but a Hope and Fear economy at the table level: two parallel resource pools that belong partly to 
+Daggerheart, a 2024 game from Darrington Press, takes a completely different approach. Rather than
+a single d20, players roll two twelve-sided dice of different colours: the Hope die and the Fear
+die. The total still determines success against a difficulty class (the target number the roll
+must meet), but which die is higher determines the *flavour* of that success. Roll higher on Hope
+and the scene tilts in the player's favour; roll higher on Fear and the GM earns a Fear token they
+can spend to drive the story toward trouble, regardless of whether the player succeeded. The
+character model that sits behind this system needs to track not just ability scores and hit points
+but a Hope and Fear economy at the table level: two parallel resource pools that belong partly to
 the player and partly to the GM.[^4]
 
 This chapter is about what happens between the die leaving your hand and the dungeon master

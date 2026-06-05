@@ -68,8 +68,8 @@ into modules.[^1] His answer was not "group things that are similar" but "group 
 for the same reason, and hide the decision that might need to change."
 
 The Scribe's great ledger fails this test. Maps and laws and hero chronicles don't change for
-the same reason: maps change when the geography of the campaign changes, laws (rules) change when 
-the system is updated, hero chronicles (character records) change when a player levels up. Putting 
+the same reason: maps change when the geography of the campaign changes, laws (rules) change when
+the system is updated, hero chronicles (character records) change when a player levels up. Putting
 them all in one place means that any change to one has to navigate past all the others.
 
 The Archivist's shelves pass it. The maps shelf changes when maps change. It knows nothing about
@@ -97,10 +97,9 @@ shelf. A software module aspires to exactly the same courtesy.
 
 ## The Gamebook's Module Map
 
-In all of the 'The Build Move' sections so far, I've told you that files have been created, 
-or updated, but there has been no context for where these files exist and how they relate 
-to each other. Let's now look at the file structure of the gamebook, and why the pieces are
-where they are.
+Each Build Move section in the previous chapters has named files as they were introduced.
+What has not yet been made explicit is how those files relate to each other. Here is the
+full module map of the gamebook, and why the pieces are where they are.
 
 ```
 src/gamebook/
@@ -438,12 +437,12 @@ observation: things that belong together should be together, and things that don
 together should not know about each other. The reason the observation has been made so many
 times is that it is violated at roughly the same rate.
 
-[^3]: Robert C. Martin (aka Uncle Bob), *Clean Architecture: A Craftsman's Guide to Software Structure and
-Design* (Prentice Hall, 2017). The Dependency Inversion Principle is one of the five SOLID
-principles Martin is associated with. The formulation here, "high-level policy should not
-depend on low-level details; both should depend on abstractions", is more useful when read
-as a practical question: if the framework changes, which parts of my system should not have
-to change? The answer is the domain logic. The boundary that protects it is the module.
+[^3]: Robert C. Martin (aka Uncle Bob), *Clean Architecture: A Craftsman's Guide to Software 
+Structure and Design* (Prentice Hall, 2017). The Dependency Inversion Principle is one of the 
+five SOLID principles Martin is associated with. The formulation here, "high-level policy should
+not depend on low-level details; both should depend on abstractions", is more useful when read
+as a practical question: if the framework changes, which parts of my system should not have to 
+change? The answer is the domain logic. The boundary that protects it is the module.
 
 [^4]: The minimal API surface principle appears in various guises across the software design
 literature: Joshua Bloch's advice on API design in *Effective Java*, the YAGNI principle in

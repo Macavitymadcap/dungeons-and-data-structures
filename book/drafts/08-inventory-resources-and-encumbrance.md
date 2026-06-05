@@ -9,8 +9,8 @@
 >
 > "I need to know what I can carry," said the Adventurer.
 >
-> The Quartermaster produced a ledger and opened it to a fresh page. "Ok Chief, name of each item; 
-> whether it's carried or stowed; whether it's in hand or packed; how many, if there are multiples, 
+> The Quartermaster produced a ledger and opened it to a fresh page. "Ok Chief, name of each item;
+> whether it's carried or stowed; whether it's in hand or packed; how many, if there are multiples,
 > and the purpose, so I know whether we're counting it as kit or as cargo."
 >
 > "I have a rope," said the Adventurer.
@@ -20,29 +20,29 @@
 > "One. And a lantern, three torches, some rations. Not sure how many, I've been
 > eating them."
 >
-> The Quartermaster pull the quill behind his ear. "Eating them?"
+> The Quartermaster pulled the quill behind his ear. "Eating them?"
 >
 > "On the road."
 >
-> "Ah. See, trouble is, rations are a counted resource. We track how many remain, how many you spend, 
+> "Ah. See, trouble is, rations are a counted resource. We track how many remain, how many you spend,
 > and whether there are any left." A pause. "Are there?"
 >
 > "Two, I think. Maybe one."
 >
-> "Maybe, ok." said the Quartermaster, and did not write anything. "That rope enchanted, or
+> "Maybe, ok," said the Quartermaster, and did not write anything. "That rope enchanted, or
 > standard issue?"
 >
 > "Standard. Why?"
 >
-> "Enchanted rope's listed differently. It's not rope; it's a specific rope. The difference matters 
+> "Enchanted rope's listed differently. It's not rope; it's a specific rope. The difference matters
 > when you're asking whether someone has *a* rope versus whether they have *the* rope."
 >
 > The Adventurer considered this. "My sword's specific. I named it 'Rib Slicer'."
 >
 > "Then we will list by name. Its weight, its condition, whether it is drawn or sheathed." The
 > Quartermaster retrieved the quill. "We will also note that you cannot carry the chest you
-> found in the crypt, because you have already told me you have a sword, sorry, Rib Slicer, a shield, 
-> a pack with the lantern, torches, rope, maybe-one-maybe-two rations, and a partridge in a 
+> found in the crypt, because you have already told me you have a sword, sorry, Rib Slicer, a shield,
+> a pack with the lantern, torches, rope, maybe-one-maybe-two rations, and a partridge in a
 > pear tree. The chest stays in the crypt."
 >
 > "I didn't say anything about a partridge."
@@ -384,7 +384,7 @@ running through the whole adventure manually.
 ## Adventure Validation For Items
 
 The graph validator from Chapter 2 checks structural problems in the passage graph. The same
-validation runs extends to items and flags: if a choice requires `"brass-key"` but no passage
+validation extends to items and flags: if a choice requires `"brass-key"` but no passage
 in the adventure ever grants `"brass-key"` via an effect, that requirement will never be
 satisfiable, and the validator should say so.
 

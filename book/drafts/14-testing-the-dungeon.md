@@ -123,6 +123,15 @@ publishing pipeline, the artifact check catches access-control guarantees, and t
 smoke catches real player interactions. A failure at any gate stops the chain; there is no
 point verifying the browser build if the static build has already failed.[^1]
 
+A note on where this chapter sits in the book. Testing appears in Chapter 14, after the
+code has been built. In practice, tests often belong earlier: alongside the code, or even
+before it. Writing a test that describes the behaviour you want before writing the code that
+produces that behaviour is a discipline called test-driven development, and it has real
+advantages in keeping code focused and interfaces clean. The book defers it to here because
+understanding what to test first requires understanding what you are building, and that
+understanding has been accumulating across thirteen chapters. The order is pedagogical, not
+prescriptive.[^2]
+
 ---
 
 ## Unit Tests For Domain Rules
@@ -202,7 +211,7 @@ test("Mt. Graphnor no longer contains placeholder prose", () => {
 
 The last test is structural gatekeeping on content. It cannot check whether the prose is good.
 It can check whether it is still placeholder text. A test that fails until the author has
-written real content is a useful forcing function in the run-up to a release.[^2]
+written real content is a useful forcing function in the run-up to a release.[^3]
 
 ---
 
@@ -280,7 +289,7 @@ The access control tests deserve special attention. A route that should return 4
 mode must be tested to verify that it returns 404. The test in the third example above is not
 checking a positive case; it is checking that a negative capability is absent. These tests are
 the most likely to go missing in an incomplete suite, because they are testing for the
-non-existence of something rather than its existence.[^3]
+non-existence of something rather than its existence.[^4]
 
 ---
 
@@ -392,7 +401,7 @@ test("full player session", async ({ page }) => {
 The browser smoke covers things that no other test can cover: the interaction between the
 HTML, the browser client JavaScript, and `localStorage`. The save-on-choice, the export
 format, the import round-trip, and the reset behaviour all require a real browser with a real
-storage implementation.[^4]
+storage implementation.[^5]
 
 The smoke test does not walk every path through the adventure. It walks the golden path: the
 most important sequence the player will execute. Attempting to exercise every branch in a
@@ -441,7 +450,7 @@ for (const route of routes) {
 
 WCAG 2.2 Level AA is the standard. Each route is checked against two runners for broader
 coverage. Failures are reported with the selector, so the developer knows exactly which
-element failed and why.[^5]
+element failed and why.[^6]
 
 Automated checks are necessary but not sufficient. They can verify that a button has an
 accessible label; they cannot verify that the label is the right label for the action. They
@@ -487,7 +496,7 @@ captured deliberately as PR evidence when a UI change is being reviewed.
 
 The PR template makes this expectation explicit: user-facing UI changes require screenshot
 evidence or a note explaining why screenshots are not needed. This is not bureaucracy; it is
-the acknowledgement that code review cannot evaluate visual design from a text diff alone.[^6]
+the acknowledgement that code review cannot evaluate visual design from a text diff alone.[^7]
 
 ---
 
@@ -537,7 +546,7 @@ summary: three lines at the end of the PR description.
 Command, result, totals. A note for anything that was not needed and why. It takes thirty
 seconds to write and it means a reviewer looking at the PR two weeks later can verify what
 was actually checked, rather than taking the author's word for it. A summary that says "tests
-pass" with no command or count is an assertion. An assertion with receipts is evidence.[^7]
+pass" with no command or count is an assertion. An assertion with receipts is evidence.[^8]
 
 I used to write "all tests passing ✓" in PR descriptions and feel quite good about it.
 I have since learned that this is the equivalent of the Dungeon Master saying "it's fine"
@@ -658,21 +667,36 @@ be noise. Stopping the chain on failure preserves the signal: the first failure 
 exactly where the problem is, and the subsequent gates tell you nothing useful until it is
 fixed.
 
-[^2]: The content readiness test is one of the more unusual uses of automated testing:
+[^2]: Test-driven development (TDD) is the practice of writing a failing test before writing
+the code that makes it pass. The cycle is: write a test that describes the desired behaviour,
+watch it fail, write the minimum code to make it pass, refactor. The discipline has genuine
+advantages: tests that are written first tend to be cleaner, code that is written to satisfy
+a test tends to have clearer interfaces, and the suite stays honest because there is no
+temptation to write tests that are calibrated to the existing code rather than the intended
+behaviour. It works best for domain logic with clear inputs and outputs, which is exactly
+where the gamebook uses it most. It works less well for frontend components, where the
+"desired behaviour" is partly visual, partly interactive, and partly a matter of taste that
+changes as the design evolves; writing a test for a component before the component exists
+often means writing a test against an interface that will be redesigned three times before
+it settles. TDD has a devoted following, and some of its adherents treat it as the only
+legitimate way to write software, which is the kind of absolutism that tends to follow any
+good idea when it acquires a methodology and a name. The idea is sound; the cult is optional.
+
+[^3]: The content readiness test is one of the more unusual uses of automated testing:
 asserting that the content is not in a specific bad state. It is not testing that the
 content is good; it is testing that it has passed a minimum bar. The precedent in software
 is the linting rule that forbids `console.log` statements in committed code, or the CI check
 that forbids TODO comments in certain directories. These tests do not measure quality; they
 enforce a threshold that prevents known categories of carelessness from reaching production.
 
-[^3]: The testing of negative capabilities, things that should not be possible, is
+[^4]: The testing of negative capabilities, things that should not be possible, is
 systematically underrepresented in most test suites. Positive assertions are natural: we
 built a feature, we test that it works. Negative assertions require deliberately thinking
 about what should be absent. In the context of access control, this matters enormously: a
 test suite that verifies every positive access permission but never checks that forbidden
 access is actually forbidden is not a security test suite. It is a feature demo.
 
-[^4]: Playwright is the most capable cross-browser automation library currently available for
+[^5]: Playwright is the most capable cross-browser automation library currently available for
 web testing. It supports Chromium, Firefox, and WebKit, exposes a clean API for navigation,
 interaction, and assertion, and has first-class support for capturing screenshots, network
 requests, and browser storage. The choice of Playwright over the alternatives reflects its
@@ -680,14 +704,14 @@ ability to test the static gamebook exactly as a player experiences it: real bro
 storage, real JavaScript execution. Alternatives that simulate the browser rather than running
 it cannot verify that `localStorage` behaves as expected.
 
-[^5]: WCAG 2.2 is the current version of the Web Content Accessibility Guidelines, published
+[^6]: WCAG 2.2 is the current version of the Web Content Accessibility Guidelines, published
 by the W3C. Level AA is the standard required by most accessibility legislation and
 procurement policies in the UK and elsewhere. The three levels, A, AA, and AAA, represent
 increasing levels of accessibility provision; AA is the practical target for most web
 applications. The full specification is at [w3.org/TR/WCAG22](https://www.w3.org/TR/WCAG22/).
 Pa11y is available at [pa11y.org](https://pa11y.org/).
 
-[^6]: The PR template as a forcing function for evidence is a specific application of a
+[^7]: The PR template as a forcing function for evidence is a specific application of a
 general principle: good process is built into the workflow rather than appended to it.
 A reviewer who has to remember to ask for screenshots will sometimes forget. A PR template
 that includes a screenshots section, with a required checkbox or a note explaining why
@@ -695,7 +719,7 @@ screenshots are not needed, makes the evidence expectation part of submitting th
 The effort required to write "not applicable, logic change only" is much lower than the
 effort required to explain a visual regression after the fact.
 
-[^7]: The acceptance note pattern is borrowed from delivery practice: the assumption that a
+[^8]: The acceptance note pattern is borrowed from delivery practice: the assumption that a
 feature is not done when the code is merged, but when the evidence of its correctness is
 recorded. In regulatory environments this is a compliance requirement. In most software
 teams it is a useful discipline even without the regulatory pressure, because it forces the

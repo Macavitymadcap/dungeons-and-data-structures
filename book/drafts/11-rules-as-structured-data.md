@@ -384,9 +384,9 @@ and governed by different licence obligations.
 It is worth tracing one rule the full distance, because the individual pieces are easy to
 follow and the chain is easy to lose.
 
-The SRD states, in plain prose: a shield provides a +2 bonus to Armour Class. That sentence
-is useful at a table. It is not useful to code that needs to know whether a character is
-wearing a shield and what to add to their AC calculation.
+The SRD states, in plain prose: a shield provides a +2 bonus to Armour Class. Sufficient
+for a player at a table; not sufficient for code that needs to apply the bonus, attribute
+the source, and decide whether to include it in a published export.
 
 Turned into a catalogue record, the same rule looks like this:
 
@@ -462,8 +462,8 @@ what happens when it breaks are the subjects of the next chapter.
 permits commercial use, modification, and redistribution. For the gamebook, the practical
 obligations are: include the attribution notice in the published output, do not imply that
 Wizards of the Coast endorses the work, and do not claim that the SRD content is original
-material. The licence text is at [creativecommons.org/licenses/by/4.0/legalcode](https://creativecommons.org/licenses/by/4.0/legalcode).
-The SRD 5.1 PDF is at [media.wizards.com/2023/downloads/dnd/SRD_CC_v5.1.pdf](https://media.wizards.com/2023/downloads/dnd/SRD_CC_v5.1.pdf).
+material. The licence text is at [creativecommons.org/licenses/by/4.0/legalcode](https://creativecommons.org/licenses/by/4.0/legalcode). The SRD 5.1 PDF is at 
+[media.wizards.com/2023/downloads/dnd/SRD_CC_v5.1.pdf](https://media.wizards.com/2023/downloads/dnd/SRD_CC_v5.1.pdf).
 
 [^2]: The SRD 5.1 contains complete class descriptions, subclass options, and tables for every
 level up to 20. The gamebook uses approximately none of this. It uses the hit die, the

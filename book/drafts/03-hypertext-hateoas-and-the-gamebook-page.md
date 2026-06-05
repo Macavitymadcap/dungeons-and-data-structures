@@ -4,8 +4,8 @@
 
 > **The Adventurer and the Door**
 >
-> The door didn't look particularly significant. It was stone, old, fitted with iron bands gone rough 
-> with rust, and it had the settled air of something that had been refusing entry for longer than the 
+> The door didn't look particularly significant. It was stone, old, fitted with iron bands gone rough
+> with rust, and it had the settled air of something that had been refusing entry for longer than the
 > surrounding dungeon had been interesting.
 >
 > The Adventurer raised a torch. There was no handle, but there was a slot, and beside it a panel
@@ -22,12 +22,12 @@
 > "That's it?" said the Adventurer.
 >
 > "That's it," said the door, or rather the panel, since doors are not generally known as great
-> conversationalists. The available options are the available options. The rest of the dungeon 
+> conversationalists. The available options are the available options. The rest of the dungeon
 > is not this door's business.
 >
-> The Adventurer looked into the darkness, trying to determine what lay further in. The panel 
-> offered nothing on the subject. It did not need to. The dungeon would reveal itself at the 
-> appropriate pace, one valid action at a time, as the adventurer moved through it. Exactly how 
+> The Adventurer looked into the darkness, trying to determine what lay further in. The panel
+> offered nothing on the subject. It did not need to. The dungeon would reveal itself at the
+> appropriate pace, one valid action at a time, as the Adventurer moved through it. Exactly how
 > dungeons ought to work.
 >
 > The Adventurer considered the brass plates. Then slid a coin into the slot below *LISTEN AT
@@ -45,7 +45,7 @@ to be pressable, and when a player makes a choice something needs to happen: sta
 the next passage loads, the story continues. On the web, this surface is made of HTML. The
 mechanism is hypertext.
 
-Hypertext is older than the web.[^1] The word was coined by Ted Nelson in 1963 to describe text
+Hypertext is older than the web.[^1] The word was coined by Ted Nelson in 1965 to describe text
 that links to other text: a reading experience that branches, connects, and navigates rather than
 merely proceeding. When Tim Berners-Lee built the World Wide Web, he built it on the hypertext
 idea: documents connected by links, addressed by URLs, transmitted over HTTP. The gamebook, as
@@ -200,8 +200,7 @@ For these cases, the correct pattern is a **redirect after action**: the POST is
 state changes, and rather than returning the new content directly, the server sends a `303 See
 Other`[^6] response instructing the client to fetch that content via GET from a canonical URL. This
 is sometimes called the **Post/Redirect/Get** pattern,[^7] and it solves the double-submission problem
-that has plagued form-heavy web applications since roughly the moment form-heavy web applications were
-invented.
+that has plagued form-heavy web applications since roughly the moment they existed.
 
 In Campaign Ledger, this pattern appears throughout the sheet and campaign routes. After a player
 updates a resource, adjusts their armour class, or adds a condition, the server applies the change
@@ -230,7 +229,7 @@ itself, not from out-of-band information.
 This idea is not new. The text adventure games of the 1970s and 1980s worked exactly this way:
 the program described the current location, and the player was expected to ask what they could do
 there rather than having a persistent menu of all possible commands. `>GO NORTH` either worked or
-it didn't, and finding out was half the fun. The brass plate is just a prettier interface for the 
+it didn't, and finding out was half the fun. The brass plate is just a prettier interface for the
 same principle: the representation itself carries the valid next moves.
 
 A gamebook passage embodies this naturally. The passage presents:
@@ -308,18 +307,18 @@ that split exists in Chapter 9, when we talk about what different users are allo
 The domain modules from Chapter 2, `model.ts` and `graph.ts`, don't know anything about HTTP.
 They don't know about Hono or htmx or HTML. They know about passages, choices, validation, and
 graphs. The application shell knows about HTTP. The rendering layer bridges the two. This
-separation is not accidental; it is, in a not insignificant way, the point.
+separation is not accidental; it is, in every meaningful sense, the point.
 
 ---
 
-The web was built on a simple idea: documents with links. Every elaboration since then; forms;
-AJAX; fragments; redirects and hypermedia constraints, has been an attempt to make that idea more
+The web was built on a simple idea: documents with links. Every elaboration since then — forms,
+AJAX, fragments, redirects and hypermedia constraints — has been an attempt to make that idea more
 expressive without abandoning what made it work in the first place. The gamebook is a useful
 lens for this history because it has always been, at heart, the same thing: a document with links,
 asking you what you want to do next.
 
 The door on the dungeon panel did not lie. It offered exactly the choices available from that
-position, in that state, at that moment; precisely how a good web response ought to work.
+position, in that state, at that moment: precisely how a good web response ought to work.
 
 In the next chapter, we'll step back from the passage and look at who's standing in front of it.
 Before a player can make a choice, they need a character: a structured record of facts that the

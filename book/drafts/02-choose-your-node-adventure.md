@@ -23,8 +23,8 @@
 >
 > "It's on the map," said the Adventurer.
 >
-> "Aye," said the Cartographer. "It exists. It has walls, a floor, a ceiling, presumably some answers. 
-> But how do you get in? There's no path to it from the door we came in by. We'd have to begin inside 
+> "Aye," said the Cartographer. "It exists. It has walls, a floor, a ceiling, presumably some answers.
+> But how do you get in? There's no path to it from the door we came in by. We'd have to begin inside
 > it."
 >
 > "Then why is it on the map?"
@@ -63,16 +63,16 @@ the data structure were the same thing.
 
 In 2010, comedian John Robertson took the concept somewhere unexpected. *The Dark Room* began as
 a series of interconnected YouTube videos: each clip ended with a set of options, with links to the
-next node overlaying the video.[^5] The player navigated by clicking, using YouTube's infrastructure 
+next node overlaying the video.[^5] The player navigated by clicking, using YouTube's infrastructure
 as a hypertext engine it was never designed to be. Robertson later adapted the piece into a live show,
-with himself as the omniscient narrator and the audience member brought up on stage as the player (or 
-Darren, as they are known). In the original YouTube form the game is no longer playable as Robertson 
-intended. The platform evolved in ways that broke the edge structure, which makes it an accidental 
+with himself as the omniscient narrator and the audience member brought up on stage as the player (or
+Darren, as they are known). In the original YouTube form the game is no longer playable as Robertson
+intended. The platform evolved in ways that broke the edge structure, which makes it an accidental
 illustration of a real software concern: a graph whose edges depend on a service you don't control can
 become disconnected without warning.
 
 Gamebooks reached their peak of popularity in the 1980s, then faded as home computers caught up
-and could render these adventures with graphics and mechanics that didn't require a pencil and an
+and could render these adventures with graphics and mechanics that didn't require a pencil and a
 rubber. There has been something of a revival in recent years, with new titles added to the
 *Fighting Fantasy* catalogue; but even so, the cultural moment has passed. The idea behind them,
 though, hasn't. Hidetaka Miyazaki, creator of the *Dark Souls* series, has cited *Fighting
@@ -88,8 +88,8 @@ Brooker's 1984-set episode of *Black Mirror*, used the form for television.[^7] 
 website works, in some ways, like a gamebook. The user navigates each page like an adventurer
 working through a dungeon: instead of fighting monsters and avoiding traps, they battle cookie
 consent banners and hunt for the fabled contact form. Each page contains text and links to other
-pages, just as each scene in a gamebook is a description and a set of choices. This shared 
-structure is called a graph, and there is a branch of mathematics built entirely around understanding 
+pages, just as each scene in a gamebook is a description and a set of choices. This shared
+structure is called a graph, and there is a branch of mathematics built entirely around understanding
 them.
 
 ---
@@ -164,8 +164,8 @@ not looping back to the town market. The reader makes meaningful choices, but th
 inexorable forward motion.
 
 The structural similarity between these two diagrams is not a coincidence. Both are systems for
-navigating information through choices. The difference is mostly aesthetic: one sells you a bag of 100
-tiny plastic babies, the other asks you to fight a goblin. The underlying shape is the same.
+navigating information through choices. The difference is mostly aesthetic: one sells you a bag of a
+hundred tiny plastic babies, the other asks you to fight a goblin. The underlying shape is the same.
 
 ---
 
@@ -224,20 +224,20 @@ stakes and sets up the choices to come.
 a mechanism that rewards lateral thinking. This is the room that favours players who engage with
 the world rather than hitting everything.
 
-> *The room is circular and covered wall to wall in inscribed symbols. A scroll hovers in the centre,*
-> *its text shifting and settling into words you can read: *What has keys but cannot open locks? What*
-> *has space but no room? What can enter but never leave?* Beside it, a chest.*
+> *The room is circular and covered wall to wall in inscribed symbols. A scroll hovers in the centre,
+> its text shifting and settling into words you can read:* What has keys but cannot open locks? What
+> has space but no room? What can enter but never leave? *Beside it, a chest.*
 >
-> Do you 
-> - answer? 
-> - force the chest? 
+> Do you
+> - answer?
+> - force the chest?
 > - look more carefully at the symbols on the walls.
 
 **Room 3: Trick or Setback.** A twist that complicates progress. A trap, a false promise, a
 consequence for overconfidence. This is the room that makes players pay attention.
 
 > *The door seals behind you. The walls begin to move inward, slowly but with evident purpose. A*
-> *voice reverberates around the stone. You have perhaps two minutes.* 
+> *voice reverberates around the stone. You have perhaps two minutes.*
 > - Check your inventory.
 
 **Room 4: Climax.** The principal challenge of the adventure. This is why the dungeon exists:
@@ -444,7 +444,7 @@ stores roughly 600 connections. An adjacency matrix stores 200 x 200 = 40,000 ce
 empty. For sparse graphs, which most gamebooks are, the list wins on both memory and lookup time.
 
 [^10]: The Five Room Dungeon template has been around probably since the beginning of RPGs. The
-exact author is lost to the sands of time. Johnn Four at 
+exact author is lost to the sands of time. Johnn Four at
 [roleplayingtips.com](https://www.roleplayingtips.com/5-room-dungeons/) offers an excellent
 introduction to the idea. It's less a formula than a useful pressure: five distinct beats force you
 to think about pacing in a way that a vague "write some rooms" instruction simply doesn't.

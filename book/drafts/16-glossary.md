@@ -245,7 +245,7 @@ A fast, lightweight web framework for TypeScript, running on Bun and several oth
 A JavaScript library that extends HTML to allow any element to make HTTP requests and swap responses into the page. Used in this book to make gamebook choice forms submit as AJAX requests rather than full page reloads. Built on the observation that most of what JavaScript frameworks do could be expressed as HTML attributes, if HTML were willing. See also: *fragment*, *HATEOAS*, *progressive enhancement*.
 
 **Hypertext**
-Text that links to other text: a reading experience that branches, connects, and navigates rather than proceeding in a single sequence. The word was coined by Ted Nelson in 1963. The web is built on it. Gamebooks are printed hypertext.
+Text that links to other text: a reading experience that branches, connects, and navigates rather than proceeding in a single sequence. The word was coined by Ted Nelson in 1965. The web is built on it. Gamebooks are printed hypertext.
 
 ---
 
@@ -467,4 +467,4 @@ A set of technical standards published by the W3C for making web content accessi
 
 ---
 
-*Terms introduced by borrowed names from the D&D System Reference Document 5.1 (ability score, armour class, conditions, hit points, proficiency bonus, saving throw, skill, spell slot) are used under Creative Commons Attribution 4.0 International. See Appendix C for full attribution.*
+*Terms introduced by borrowed names from the D&D System Reference Document 5.1 (ability score, armour class, conditions, hit points, proficiency bonus, saving throw, skill, spell slot) are used under Creative Commons Attribution 4.0 International. See Appendix B for full attribution.*

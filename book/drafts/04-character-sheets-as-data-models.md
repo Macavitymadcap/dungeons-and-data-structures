@@ -21,14 +21,14 @@
 >
 > "I need to know your calling," said the Scribe, "it tells me what arms you've trained with,
 > what armour your body knows, what oaths you've made and to whom, and how far you've walked the
-> road that made you. I have columns for sword-sworn, for shadow-walkers, and for those who 
+> road that made you. I have columns for sword-sworn, for shadow-walkers, and for those who
 > carry the word of gods. I do not have a column for *multitudes*."
 >
 > A pause.
 >
 > "Sword-sworn," said the Hero.
 >
-> "Good" said the Scribe, picking the quill back up. "Now. Your endurance. How much punishment
+> "Good," said the Scribe, picking the quill back up. "Now. Your endurance. How much punishment
 > can you take before you stop?"
 >
 > "I have endured wounds that would fell lesser mortals," said the Hero. "I am, for practical
@@ -42,7 +42,7 @@
 >
 > "Ten," they said.
 >
-> "Fantastic" said the Scribe, and wrote it down.
+> "Fantastic," said the Scribe, and wrote it down.
 
 ---
 
@@ -51,9 +51,8 @@ choices submitting as forms, fragments swapping in over htmx. The dungeon has a 
 opens. But who walks through it?
 
 Before a player can make a choice that has mechanical weight, before a Stealth check can succeed
-or fail, before a sword can deal damage or a goblin can deal it back, we need a character. Not
-a story; backstory or personality: those come later. They're wonderful, the very heart of 
-*role*playing codified, but the rules can manage without them. What the rules do need is a structured 
+or fail, before a sword can deal damage or a goblin can deal it back, we need a character. Not backstory or personality: those come later. They're wonderful, the very heart of
+*role*playing codified, but the rules can manage without them. What the rules do need is a structured
 record of specific facts that can be looked up, calculated from, and updated when something happens.
 
 That record is a **data model**. Building one is the subject of this chapter.
@@ -263,14 +262,14 @@ spend to modify outcomes, decreasing each time you use it. That is the entire mo
 enough to hold in one hand, fast to generate, and sufficient to run a complete adventure. The
 character sheet for a *Fighting Fantasy* hero fits on a bookmark.
 
-*Daggerheart*, a 2024 tabletop RPG from Darrington Press, is similar to D&D but with one key 
-difference. A character sheet in Daggerheart is specific to a class, showing the relevant rules 
-and core features, and like Dungeons and Dragons offers empty lines that can be filled with 
+*Daggerheart*, a 2024 tabletop RPG from Darrington Press, is similar to D&D but with one key
+difference. A character sheet in Daggerheart is specific to a class, showing the relevant rules
+and core features, and, like Dungeons and Dragons, offers empty lines that can be filled with
 equipment, notes on personality, bonds and so on. Features and traits derived from the character's
 species, background and class are not written on the sheet in cramped handwriting to fit them into
-a neat space. Instead, each is a card that comes with the full set of the game, or available to
-print  online for the less economically endowed. This allows the player to manage a load out of
-abilities, each a separate item that can be shared between the table easily rather than having
+a neat space. Instead, each is a card that comes with the full set of the game, or is available to
+print online for the less economically endowed. This allows the player to manage a loadout of
+abilities, each a separate item that can be shared around the table easily rather than having
 to look it up in a book or decipher someone's handwriting. In data modelling terms, each card
 is a stored fact with its own identity: the sheet references the cards; it does not contain
 them. The character's capabilities are derived from what they hold, not written into who they are.
@@ -306,6 +305,7 @@ a character rolls when spending a short rest to recover hit points) and spell sl
 resources that power magic) and custom counters, `character_equipment` for the inventory,
 `character_defences` for damage resistances and immunities, `character_skills` for proficiencies,
 and a handful of others.
+
 The ability modifier calculation, the proficiency bonus, and the skill modifier formulae are the
 same functions; they just operate on data retrieved from a relational database rather than a flat
 TypeScript object.
@@ -358,8 +358,8 @@ the game mechanics. The two things can coexist: a character can be unknowable an
 story while being a `CharacterClass` and ten hit points in the code.
 
 In the next chapter, we'll look at what happens when that `CharacterClass` field starts to feel
-insufficient; when the Fighter wants to cast a spell; the Cleric needs to carry a sword and when 
-the record's clean taxonomy starts to buckle under the weight of what the game can actually do. 
+insufficient; when the Fighter wants to cast a spell; when the Cleric needs to carry a sword; and
+when the record's clean taxonomy starts to buckle under the weight of what the game can actually do.
 That is the chapter about classes, composition, and the limits of inheritance.
 
 ---
