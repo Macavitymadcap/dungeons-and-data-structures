@@ -264,13 +264,22 @@ without difficulty.
 A word on what this book assumes. It is not a book for complete beginners to programming: by
 Chapter 3 it expects that HTML, HTTP verbs, and the idea of a form submission are familiar
 territory, and by Chapter 4 it expects TypeScript interface notation to be readable without
-introduction. What it does not assume is any prior exposure to formal software design: no
-computer science degree, no bootcamp, no previous encounter with graphs, data models,
-composition, or domain-driven design. The intended reader has built things for the web, has
-written code that does something real, and has started to accumulate intuitions they can't
-quite name yet. If you've looked at a function that had grown too large and felt, rather than
-known, that it should be two functions, you're in the right place. This book is the vocabulary
-for what you've already been doing.
+introduction. The later chapters ask more. By Chapter 9, access control and route guards
+assume you have built something with endpoints and thought about who should be able to call
+them. By Chapter 10, the discussion of coupling and dependency direction assumes you have
+written a codebase large enough to feel the problem. By Chapter 13, domain-driven design
+vocabulary is introduced, but the reader who has not yet encountered aggregates, bounded
+contexts, or repositories will find the chapter lands harder than the ones before it.
+
+What the book does not assume is any prior exposure to formal software design: no computer
+science degree, no bootcamp, no previous encounter with the named concepts. The intended
+reader has built things for the web, has written code that does something real, and has
+started to accumulate intuitions they can't quite name yet. If you've looked at a function
+that had grown too large and felt, rather than known, that it should be two functions, this
+book is the vocabulary for what you've already been doing. If the later chapters introduce
+terms you haven't encountered before, that is expected; the chapters are designed to earn
+those terms rather than assume them. But it is worth knowing in advance that the book's
+difficulty increases as it progresses, because the problems it addresses do too.
 
 A reasonable question at this point is why a gamebook at all. Text adventures were some of the
 earliest computer games precisely because of technical constraints, but what they demonstrated,

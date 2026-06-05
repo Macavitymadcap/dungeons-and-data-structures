@@ -1,4 +1,4 @@
-# Chapter 9: The Dungeon Master And The Admin
+di# Chapter 9: Ad Min and the Dungeons Master
 
 ---
 
@@ -6,10 +6,10 @@
 >
 > Ad Min arrived at the gate with a ring of keys.
 >
-> They were impressive keys. Ornate, heavy, each one stamped with a different sigil. The Admin
-> held them up so the Doorkeeper could appreciate the craftsmanship.
+> They were impressive keys. Ornate, heavy, each one stamped with a different sigil. He held them up  
+> so the Doorkeeper could appreciate the craftsmanship.
 >
-> "I have the master ring," said the Admin.
+> "I have the master ring," said Ad Min.
 >
 > "Good for you," said the Doorkeeper.
 >
@@ -39,24 +39,28 @@
 
 ---
 
-In Chapter 8, we looked at constraints on what a character can carry: which items they hold,
-the choices those items unlock, and what happens when a consumable is spent. Those constraints
-operate on game state. The character meets a requirement or they don't.
+When I'm writing a passage in Mt. Graphnor, I don't want to replay the kobold encounter in node
+113 every time I need to check the wording in node 86. I want to jump directly to any passage,
+inspect the state, tweak the text, and move on. That is a completely reasonable thing to want.
+It is also, from the player's perspective, a cheat code.
 
-This chapter is about a different kind of constraint: not what the character can do inside the
-game, but what different kinds of user are allowed to see, do, and access in the system itself.
-A player navigating the published gamebook should not be able to reach the debug panel. An
-author inspecting the passage graph should not need a separate application. A campaign's Game
-Master should be able to see private NPC notes that their players cannot. These are questions of
-**access control**: who can do what, to which resource, under which conditions.
+A player who can navigate directly to node 400 and read the ending without going through the
+dungeon has not played the game; they have browsed a document. The puzzle locks, the encounter
+consequences, the inventory gates: none of those mean anything if the reader can step over them.
+The gamebook only works as a gamebook if the player's path through it is constrained in ways the
+author's is not.
 
-Access control is one of those topics that sounds like it belongs to the security chapter at
-the back of a more serious textbook, filed somewhere between cryptography and compliance.
-In practice it appears everywhere, early, and with practical consequences. A debug form that
-can be submitted by any browser request is not just an authoring convenience; it is a
-capability that needs a boundary. The gamebook's author/player split is a small, concrete
-version of the same problem that Campaign Ledger solves with sessions, roles, campaign
-membership, and route guards.
+That asymmetry is the subject of this chapter. Not what a character can do inside the fiction,
+but what different kinds of user are permitted to see, do, and reach in the system itself. The
+same problem appears at a larger scale in Campaign Ledger: when I'm running a campaign as DM, I
+need a place to keep notes the players cannot see. Plans for future sessions. The demonic
+backstory of the NPC the party have mistaken for a sweet old dear, and other such things that
+would lose their value immediately if visible to the people sitting across the table.
+
+Access control sounds like a concept that belongs in a security textbook gathering dust on a
+high shelf.[^1] In practice it is everywhere, governing who can see what and why. The gamebook's
+author/player split is a small, concrete version of the same boundary that Campaign Ledger
+enforces with sessions, roles, campaign membership, and route guards.
 
 ---
 
@@ -64,22 +68,21 @@ membership, and route guards.
 
 The first step is separating the concepts that the word "access" tends to blur together.
 
-**Authentication** is knowing who is making a request. In Campaign Ledger, a signed-in user
-has an authenticated session that identifies them by id. In the gamebook, there are no user
-accounts, but there is an application-level flag: the server knows whether it was started with
-author tooling enabled.
+**Authentication** is knowing who is making a request. The Doorkeeper can clearly see that
+Ad Min is not Mira, so despite his many impressive keys he will not be allowed into Mira's
+room.
 
 **Authorisation** is deciding whether the identified actor may perform the requested action.
-Being authenticated is not enough on its own. A signed-in user in Campaign Ledger might be
-a player in no campaigns, a Game Master in one, and an admin for the whole installation. Each
-of those facts carries different permissions, and they do not automatically imply each other.
+Mira might be able to get into her room, whereas Ad Min is locked out, but that doesn't give her 
+a free pass to do whatever she likes. She's a Cleric, so while she has access to the temple's
+library, the one in he Tower of Magi is off limits to her.
 
 A **role** is a named set of responsibilities: player, game master, admin, author. The temptation
 is to treat a role as a permission list: if you are an admin, you can do everything. This is
-the mistake the Admin made at the gate. Roles do not map to permissions globally; they map to
+the mistake that Ad Min made at the gate. Roles do not map to permissions globally; they map to
 permissions *in context*. Being an admin does not mean you can edit every campaign, any more
 than being a dungeon master at one table means you can narrate the story at a different table
-whose players didn't invite you.[^1]
+whose players didn't invite you.[^2]
 
 A **capability** is a specific thing an actor can do: read a campaign, write a character sheet,
 force passage navigation, access the debug panel, view private NPC notes. Capabilities are more
@@ -97,11 +100,10 @@ role at the system level.
 Mt. Graphnor does not have user accounts. There is nothing to log in to. But it has a
 meaningful access boundary all the same.
 
-The gamebook runs in two modes. In development, it runs with `authorToolsEnabled: true`: the
-author pages are accessible, the debug panel appears in passage renders, forced navigation
-is possible, and the browser client includes the full author-capable bundle. In the published
-static build, it runs with `authorToolsEnabled: false`: the author routes return 404, the debug
-panel is omitted from all renders, forced navigation is rejected even if the form is submitted,
+The gamebook runs in two modes. In development, it runs with `authorToolsEnabled: true`: allowing
+me to jump around from passage to passage as I need to work on whichever node I need to. In the 
+published static build, it runs with `authorToolsEnabled: false`: the author routes return 404, the
+debug panel is omitted from all renders, forced navigation is rejected even if the form is submitted,
 and the browser bundle is the player-only version that contains no author code at all.
 
 This is a capability boundary enforced at every relevant layer:
@@ -184,19 +186,19 @@ A player submitting the forced navigation form against the published build gets 
 response they would from any non-existent URL. The button's absence was a courtesy; the
 route's refusal is the actual boundary.
 
-The three failure modes map to distinct HTTP status codes.[^2] **401 Unauthorized** is the
-correct response when the actor is not authenticated at all. **403 Forbidden** is for an
-authenticated actor who is not allowed to access this resource. **404 Not Found** is sometimes
-appropriate when the resource exists but the actor should not know that: telling an
-unauthorised player that a private NPC dossier exists and they are forbidden from reading it
-leaks information the access control was meant to protect.[^3]
+The three failure modes map to distinct HTTP status codes.[^3] **401 Unauthorized** is for 
+when the actor is not authenticated at all. **403 Forbidden** is for an authenticated actor who 
+is not allowed to access this resource. **404 Not Found** is sometimes appropriate when the 
+resource exists but the actor should not know that: telling an unauthorised player that a private
+NPC dossier exists and they are forbidden from reading it leaks information the access control 
+was meant to protect.[^4]
 
 ---
 
 ## Player-Safe Publishing
 
-The gamebook takes access control one step further in a direction that logged-in web
-applications rarely need: static publishing.
+The gamebook takes access control one step further in a direction that logged-in web applications 
+rarely need: static publishing.
 
 The published gamebook is a set of static files: `dist/index.html`, `dist/gamebook/index.html`,
 and `dist/assets/player-client.js`. There is no server. There is no session. There is no route
@@ -217,11 +219,10 @@ await writeFile("dist/gamebook/index.html", await renderStaticPage(app));
 await writeFile("dist/assets/player-client.js", playerBundle);
 ```
 
-The player-only client is not the author client with author features disabled at runtime. It
-is a separate entry point that does not import the author code at all. This means the author
-code cannot be reached by inspecting the bundle, cannot be enabled by a console command, and
-does not add weight to the published assets that players download. The boundary is not
-conditional; it is structural.
+The player-only client is not the author client with author features disabled at runtime. Rather, 
+it's a separate entry point that does not import the author code at all. This means the author code
+cannot be reached by inspecting the bundle, can't be enabled by a console command, and does'nt add
+weight to the published assets that players download. The boundary is not conditional, but structural.
 
 The artifact check then verifies this structurally:
 
@@ -315,50 +316,61 @@ entangling with each other is the subject of modules.
 
 ## At Scale: Campaign Ledger
 
-The gamebook's access boundary is structural: two entry points, two bundles, a flag checked
-at the application level. A multi-user application needs the same boundary enforced at runtime,
+The gamebook's access boundary is structural: two entry points, two bundles, a flag checked at
+the application level. A multi-user application needs the same boundary enforced at runtime,
 against authenticated sessions, across context-specific resources.
 
 Campaign Ledger separates the user's global role from their campaign-level membership. An admin
 is an admin for the installation; a game master is a game master for a specific campaign. The
 two are independent. Being an admin does not grant access to every campaign's content, for the
 same reason being a dungeon master at one table does not give you the right to narrate a
-different table's story.
+different table's story.[^5]
 
-Sheet access follows ownership and campaign membership rather than global role. A guard function
-runs at the top of every sheet route before any rendering or mutation. If the session is absent,
-the route returns 401. If the character does not exist for this user's visibility, it returns
-404. If the user is neither the owner nor the campaign's game master, it returns 403. Admins
-are not exempted: the correct path for an admin who needs to edit a sheet is to join the
-campaign with the appropriate role, not to short-circuit the permission model.
+The guard function that enforces this runs at the top of every sheet route before any rendering
+or mutation. The order matters: session check first, then resource existence, then permission.
+If the session is absent, the route returns 401. If the character does not exist for this user's
+visibility, it returns 404 rather than 403, because the fact that the character exists is itself
+information the access model is meant to protect. If the user is neither the owner nor the
+campaign's game master, it returns 403. Admins are not exempted.[^6] The correct path for an
+admin who needs to look at a character sheet is to join the campaign with an appropriate role,
+not to short-circuit a permission model that exists for a reason.
 
 Guarding routes is necessary but not sufficient. A guarded route can still leak private data
-through a component that renders more than it should. The NPC visibility filter runs at the data
-layer, before anything reaches the template. A player does not see an NPC marked game-master-only;
-they do not know it exists. The component is never handed data it should not render, which means
-there is no risk of it accidentally rendering that data when the code is refactored later.
+through a component that renders more than it should. The NPC visibility filter addresses this
+at the data layer, before anything reaches the template.[^8] When a player requests the NPC
+list for a session, the query itself excludes NPCs flagged game-master-only. The component is
+never handed that data. It cannot render what it was never given, which means a future refactor
+of the rendering code cannot accidentally expose it either.
 
-Permission rules that are not tested are permission rules that will eventually be wrong. Campaign
-Ledger's guard tests read as a permission matrix: each names an actor, a resource, an action,
-and the expected outcome. Read together, they document the intended access model as explicitly
-as the code implements it.
+Campaign Ledger's permission tests are written as a matrix: each test names an actor, a
+resource, an action, and the expected outcome. The game master of campaign A can read any
+character in campaign A. A player in campaign A cannot read another player's private notes. An
+admin cannot read campaign B's content without joining campaign B. Read together, they document
+the intended access model as explicitly as the code implements it, and they will fail loudly if
+a future change breaks the boundary.[^9]
 
 ---
 
-[^1]: The analogy holds surprisingly well. A dungeon master has genuine authority at their own
-table: they can adjudicate rules, narrate consequences, and make decisions about the world.
-That authority does not extend to the table next door. The software equivalent is an admin who
-can manage user accounts and system configuration but has no more claim on the content of a
-specific campaign than a stranger who wanders in off the street. Role-based access control in
-multi-tenant applications almost always makes this distinction; it is surprising how often
-first implementations accidentally collapse it.
+[^1]: There is a security textbook worth reading, if you want to go further: the OWASP (Open
+Web Application Security Project) guidelines cover access control in detail, including the
+principle of least privilege, insecure direct object references, and broken access control,
+which has appeared in the OWASP Top 10 most critical web application security risks for
+essentially every year the list has been published. [owasp.org/Top10](https://owasp.org/Top10/)
 
-[^2]: HTTP status codes are divided into five families explained in a footnote in Chapter 3:
+[^2]: The analogy holds surprisingly well. A dungeon master has genuine authority at their own
+table: they can adjudicate rules, narrate consequences, and make decisions about the world.
+The same dungeon master, sitting as a player at a different table, no longer has that authority.
+The software equivalent is an admin who can manage user accounts and system configuration but
+has no more claim on the content of a specific campaign than anyone else. Role-based access
+control in multi-tenant applications almost always makes this distinction; it is surprising how
+often first implementations accidentally collapse it.
+
+[^3]: HTTP status codes are divided into five families explained in a footnote in Chapter 3:
 1xx informational, 2xx success, 3xx redirection, 4xx client error, 5xx server error. The
 full tour, including the celebrated 418 I'm a Teapot, is there. The three codes that matter
 most for access control are 401, 403, and 404, addressed here.
 
-[^3]: The choice between 403 and 404 for private resources is a genuine design decision with
+[^4]: The choice between 403 and 404 for private resources is a genuine design decision with
 security implications. Returning 403 when a player asks for a private NPC page tells them that
 the resource exists and they are not allowed to see it. Returning 404 tells them nothing. The
 correct choice depends on whether the existence of the resource is itself sensitive. Private
@@ -367,27 +379,18 @@ master has a secret dossier for "Mira's contact in the Thieves' Guild" might con
 meaningful information. The campaign page itself returns 403 for non-members, because the
 existence of a campaign is not a secret.
 
-[^4]: Campaign Ledger also supports a `UserCapability` model that allows specific users to hold
+[^5]: Campaign Ledger also supports a `UserCapability` model that allows specific users to hold
 individual capabilities without having a global role that implies all of them. This matters
 for situations like delegated campaign management or temporary elevated access. The principle
 is the same: capabilities are more granular than roles, and granting a capability does not
 imply granting its neighbours.
 
-[^5]: This is called the principle of least privilege: actors should have access to exactly
-what they need to do their job, and no more. It is one of the OWASP Proactive Controls and
-is mentioned in nearly every access-control reference for good reason. The question "does
-this actor need this capability to do their job?" is a useful filter for every permission
-grant. An admin who needs to review a campaign character sheet can join the campaign as a
-player and read their own sheet, or ask the game master to share the relevant information.
-Neither path requires a short-circuit through the permission system.
-
-[^6]: The pattern of filtering at the data layer rather than the rendering layer is sometimes
-called "defence in depth" in the access-control literature, and sometimes called "keep secrets
-out of the template context." The practical effect is the same: if a component is never
-handed the private data, it cannot accidentally render it, no matter what bugs are introduced
-in the rendering code later. Filtering in the repository, before the data reaches any
-component, is more reliable than filtering in a component that might be refactored by someone
-who doesn't know the data carries a sensitivity marker.
+[^6]: This is called the principle of least privilege: actors should have access to exactly
+what they need to do their job, and no more. The question "does this actor need this capability
+to do their job?" is a useful filter for every permission grant. An admin who needs to review a
+campaign character sheet can join the campaign as a player and read their own sheet, or ask the
+game master to share the relevant information. Neither path requires a short-circuit through the
+permission system.
 
 [^7]: This is why "security through obscurity" fails: hiding the form field, or the endpoint
 URL, or the API key in client-side code, relies on attackers not noticing. They notice.
@@ -395,7 +398,15 @@ The correct model is that the server verifies permission using state it controls
 the client provided. The client can say "I am an author" until it runs out of breath. The
 server checks the `authorToolsEnabled` flag and ignores the claim.
 
-[^8]: The test suite as a permission matrix is a pattern worth internalising. If you can write
+[^8]: The pattern of filtering at the data layer rather than the rendering layer is sometimes
+called "defence in depth" in the access-control literature, and sometimes "keep secrets out of
+the template context." The practical effect is the same: if a component is never handed the
+private data, it cannot accidentally render it, no matter what bugs are introduced in the
+rendering code later. Filtering in the repository, before the data reaches any component, is
+more reliable than filtering in a component that might be refactored by someone who doesn't
+know the data carries a sensitivity marker.
+
+[^9]: The test suite as a permission matrix is a pattern worth internalising. If you can write
 out the access rules in plain English (admins cannot access sheets they do not own; game
 masters can read any sheet in their campaign; players can write only their own sheets), you
 can write them as tests. If the test suite does not cover a case you care about, that case

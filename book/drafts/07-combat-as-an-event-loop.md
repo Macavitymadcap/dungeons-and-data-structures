@@ -1,4 +1,4 @@
-di# Chapter 7: Combat As An Event Loop
+# Chapter 7: Combat As An Event Loop
 
 ---
 
